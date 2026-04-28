@@ -1,0 +1,111 @@
+#
+#   Makefile for everything.
+#   This version for Mac OS/X - under development
+#
+# this file goes in cgs
+
+MAKEFILE    = makeosx
+
+include $(MAKEFILE).h
+
+# THIS WAS ADDED BY PMG 10/20/01
+.PHONY: ALL LIBRARY
+# 
+
+TARFILE     = cgs.tar
+TARCOMPRESS = cgs.tar.Z
+
+nosuchfile: ALL
+
+new: NEW
+NEW: CLEAN ALL
+
+all: ALL
+ALL: DIRECTORIES SYS LEXP COMPLOT GENPLOT RUMP HERSHEY VSORT 
+
+support: SUPPORT
+SUPPORT: DIRECTORIES HERSHEY
+
+directories: DIRECTORIES
+DIRECTORIES: 
+	- $(MKDIR) include
+	- $(MKDIR) lib
+	- $(MKDIR) bin
+
+tar: TAR
+TAR:
+	- rm $(TARFILE) $(TARCOMPRESS)
+	cd ..; tar -cvf cgs/$(TARFILE) \
+	       cgs/copyrigh \
+               cgs/read*       cgs/make*       cgs/*.inf  cgs/inf*  \
+               cgs/sys/*.c     cgs/sys/*.h     cgs/sys/make* \
+               cgs/lexp/*.c    cgs/lexp/*.h    cgs/lexp/make* \
+               cgs/complot/*.c cgs/complot/*.h cgs/complot/make* \
+               cgs/genplot/*.c cgs/genplot/*.h cgs/genplot/make* \
+               cgs/vsort/*.c   cgs/vsort/*.h   cgs/vsort/make* \
+	       cgs/hershey/*.c cgs/hershey/*.h cgs/hershey/make* \
+               cgs/hershey/*.dat cgs/hershey/*.oc cgs/hershey/fonts.inp \
+               cgs/hershey/*.doc cgs/hershey/readme \
+	       cgs/bin/devices.dat cgs/bin/genplot.ini \
+	       cgs/help/*
+	compress $(TARFILE)
+
+clean: CLEAN
+CLEAN:
+	-rm -f lib/*.a sys/*.o complot/*.o lexp/*.o genplot/*.o \
+	hershey/*.o vsort/*.o rump/*.o include/*.h
+
+spotless: SPOTLESS
+SPOTLESS: CLEAN
+	-rm -f ./bin/rump
+	-rm -f ./bin/genplot
+	-rm -f ./bin/xslave.drv
+	-rm -f ./bin/vsort.run
+	-rm -f ./hershey/hercvt
+	-rm -rf ./lib
+	-rm -rf ./include
+
+SYS:
+	cd sys     ; $(MAKE) -f $(MAKEFILE) -$(MAKEFLAGS)
+
+LEXP:
+	cd lexp    ; $(MAKE) -f $(MAKEFILE) -$(MAKEFLAGS)
+
+COMPLOT:
+	cd complot ; $(MAKE) -f $(MAKEFILE) -$(MAKEFLAGS)
+
+GENPLOT: 
+	cd genplot ; $(MAKE) -f $(MAKEFILE) -$(MAKEFLAGS)
+
+HERSHEY:
+	cd hershey ; $(MAKE) -f $(MAKEFILE) -$(MAKEFLAGS)
+
+VSORT:
+	cd vsort   ; $(MAKE) -f $(MAKEFILE) -$(MAKEFLAGS)
+
+RUMP:
+	cd rump    ; $(MAKE) -f $(MAKEFILE) -$(MAKEFLAGS)
+
+install:
+	$(INSTALLEXE) $(EXEDIR)genplot $(INSTALLEXEDIR)
+	-$(MKDIR) $(INSTALLLIBDIR)
+	-chmod 755 $(INSTALLLIBDIR)
+	$(INSTALLLIB) $(DRVDIR)devices.dat $(INSTALLLIBDIR)
+	$(INSTALLLIB) $(DRVDIR)genplot.ini $(INSTALLLIBDIR)
+	$(INSTALLLIB) $(DRVDIR)hdata.chr   $(INSTALLLIBDIR)
+	$(INSTALLLIB) $(DRVDIR)colormap.dat $(INSTALLLIBDIR)
+	$(INSTALLLIB) $(DRVDIR)termkey     $(INSTALLLIBDIR)
+	$(INSTALLEXE) $(DRVDIR)xslave.drv  $(INSTALLLIBDIR)
+	$(INSTALLEXE) $(DRVDIR)vsort.run   $(INSTALLLIBDIR)
+
+rump_install:
+	$(INSTALLEXE) $(EXEDIR)rump $(INSTALLEXEDIR)
+	$(INSTALLLIB) $(DRVDIR)rump.ini   $(INSTALLLIBDIR)
+	$(INSTALLLIB) $(DRVDIR)atom4.dat  $(INSTALLLIBDIR)
+	$(INSTALLLIB) $(DRVDIR)he4_35.stp $(INSTALLLIBDIR)
+	$(INSTALLLIB) $(DRVDIR)d_35.stp   $(INSTALLLIBDIR)
+	$(INSTALLLIB) $(DRVDIR)h_35.stp   $(INSTALLLIBDIR)
+	$(INSTALLLIB) $(DRVDIR)pscoef.dat $(INSTALLLIBDIR)
+	$(INSTALLLIB) $(DRVDIR)car.adt    $(INSTALLLIBDIR)
+	$(INSTALLLIB) $(DRVDIR)oxy.adt    $(INSTALLLIBDIR)
+	$(INSTALLLIB) $(DRVDIR)si.adt     $(INSTALLLIBDIR)

@@ -1,0 +1,11 @@
+#
+#   Makefile for HERSHEY character set data files
+#
+
+include ../makegcc.h
+
+$(DRVDIR)hdata.chr : hercvt_gnu.exe fonts.inp *.dat
+	.\hercvt_gnu -i fonts.inp -o $(DRVDIR)hdata.chr
+
+hercvt_gnu.exe : hercvt.o
+	$(CC) -o hercvt_gnu.exe hercvt.o $(SYSLIBS)

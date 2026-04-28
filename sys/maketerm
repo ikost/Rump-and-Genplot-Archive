@@ -1,0 +1,2 @@
+keyboard.exe : keyboard.c
+	icc -DTEST -DOS2 -I f:\clib\include keyboard.c \clib\lib32\posix.lib

@@ -1,0 +1,35 @@
+# ===========================================================================
+# Stopping power exception list.  The first non-comment in this file must
+# begin with the word EXCEPTION.  This causes RUMP to recognizes the file
+# as a list of stopping power exception rules instead of a normal file.
+#
+# Each line is of the form:
+#    z1  m1  z2   expr
+#
+#    z1   - incident particle Z
+#    m1   - incident particle mass (closest INTEGER)
+#    z2   - target particle Z (or pseudo Z)
+#    expr - An analytical expression valid for all energies giving the
+#           stopping power as a function of the energy (depicted as kev)
+#           or of the Ziegler determined stopping power (zgl)
+#
+# Examples:
+#  Scales Si values by 20 percent at all energies
+#    2 4 14 zgl*1.2
+#  Above 5 MeV, increase linearly by 1%/kev
+#    2 4 14 (kev.lt.5000)?zgl:zgl*(1+.01*(kev-5000))
+#  Use polynomial for mylar (z=93 in atom5.dat)
+#    1 1 93 13.37-1.969E-2*kev+1.551E-5*kev^2-6.592E-9*kev^3+1.426E-12*kev^4-1.229E-16*kev^5
+#    1 2 93 10.37-4.430E-4*kev-6.729E-6*kev^2+4.674E-9*kev^3-1.239E-12*kev^4+1.172E-16*kev^5
+#    2 4 93 12.71+5.538E-2*kev-5.557E-5*kev^2+2.440E-8*kev^3-5.175E-12*kev^4+4.274E-16*kev^5
+#
+# Lines may be up to 256 characters in length and can be logically continued
+# on the next line by ending with a \ character
+# ===========================================================================
+
+EXCEPTION TABLE
+
+# Values for Mylar (used in stopping foils)
+ 1 1 93 13.37-1.969E-2*kev+1.551E-5*kev^2-6.592E-9*kev^3+1.426E-12*kev^4-1.229E-16*kev^5
+ 1 2 93 10.37-4.430E-4*kev-6.729E-6*kev^2+4.674E-9*kev^3-1.239E-12*kev^4+1.172E-16*kev^5
+ 2 4 93 12.71+5.538E-2*kev-5.557E-5*kev^2+2.440E-8*kev^3-5.175E-12*kev^4+4.274E-16*kev^5

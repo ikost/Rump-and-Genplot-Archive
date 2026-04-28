@@ -1,0 +1,50 @@
+#
+#   Makefile for VSORT
+#
+# this file goes in clib/vsort
+
+include ../makelnx.h
+
+# Redefine LIBS so only posix linked
+LIBS    = $(LIBDIR)posix.a
+
+###########################################################################
+OBJS   = vsort.o     io_chan.o   support.o  \
+	 ljet4.o     laserjet.o  \
+	 deskjet.o   deskjetc.o	 \
+         paintjet.o  quietjet.o  \
+	 okidata.o   epson.o     pin24.o  tiff.o
+###########################################################################
+ALL:	   $(DRVDIR)vsort.run
+
+io_chan.h : ../complot/io_chan.h
+	cp ../complot/io_chan.h .
+
+io_chan.c : ../complot/io_chan.c
+	cp ../complot/io_chan.c .
+
+drvclass.h : ../complot/drvclass.h
+	cp ../complot/drvclass.h .
+
+# ----------------------------------------------------------- #
+# ------------------- Basic Library Build ------------------- #
+# ----------------------------------------------------------- #
+$(DRVDIR)vsort.run : $(OBJS) $(LIBS)
+	   $(CC) -o $(DRVDIR)vsort.run $(OBJS) $(LIBS) $(SYSLIBS)
+	   chmod 755 $(DRVDIR)vsort.run
+
+# ----------------------------------------------------------- #
+# -------------- Include File Dependencies ------------------ #
+# ----------------------------------------------------------- #
+$(OBJS) : $(INCDIR)preload.h $(INCDIR)mytypes.h $(INCDIR)extends.h \
+          io_chan.h vsort.h xtrn.h drvclass.h
+
+tiff.o : tiff.h
+
+# Some UNIX are specific about POSIX compliance.  popen/pclose are not defined
+# except via the extended compiler.  Specifically define compile route here
+vsort.o : vsort.c
+	$(ECC) $(EFLAGS) -c vsort.c
+
+io_chan.o : io_chan.c
+	$(ECC) $(EFLAGS) -c io_chan.c

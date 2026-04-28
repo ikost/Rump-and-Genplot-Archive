@@ -1,0 +1,42 @@
+#   Makefile for User routines
+
+# -------------------------------------------------------------#
+# Location of files.  User .usr loaded into DRVDIR             #
+# Note, space required at the end of lines with trailing \     #
+# -------------------------------------------------------------#
+ROOT   = f:\cgs\ 
+INCDIR = $(ROOT)incl32\ 
+LIBDIR = $(ROOT)dll32\ 
+
+# ----------------------------------------------------------------------------
+# Define macros for the target OS, machine, and compiler type.
+# ----------------------------------------------------------------------------
+SYS = -DOS2  -Di486 -DCSET2
+
+# ----------------------------------------------------------------------------
+#  $(CC)     -- ANSI/POSIX compliant compiler
+#  $(COPTS)  -- flags to go with $(CC),  standard ANSI/POSIX compiler
+#  $(LIBS)   -- local libs containing DLL resolves to be linked
+# ----------------------------------------------------------------------------
+CC      = icc
+ICC     =
+COPTS   = -I$(INCDIR) -Q+ -N30 -W3 -Sm -Gm+ -Gn+ -Kb+ -Ge- -Gd+ -G4
+LIBS    = $(LIBDIR)gensupp.lib $(LIBDIR)g_posix.lib
+
+# ----------------------------------------------------------------------------
+#  $(SYSLIBS) -- CSET system libraries/files needed in link
+#         DDE4MBSO.lIB - needed for initialization of the DLL
+#         OS2386.LIB   - necessary only if call OS/2 API functions
+# ----------------------------------------------------------------------------
+SYSLIBS = DDE4MBSO.LIB OS2386.LIB
+
+# ----------------------------------------------------------------------------
+# Inference rules
+# ----------------------------------------------------------------------------
+.SUFFIXES:
+
+# ----------------------------------------------------------- #
+# ------------------- Basic Library Build ------------------- #
+# ----------------------------------------------------------- #
+ziegler.mdl : ziegler.c $(LIBS) ziegler.def
+	$(CC) $(COPTS) $(SYS) -DGENPLOT_ENTRY -Ge- -Fe$@ $** $(SYSLIBS)

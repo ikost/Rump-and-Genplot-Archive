@@ -1,0 +1,38 @@
+Centered and Math Symbols
+# These are the special symbols with codes 0x20-0x30 being the 
+# symbols used for plotting.  Most of code page is nothing.
+# SPECIAL.CHR: added symbols
+#  3933: open cross
+#  3934: filled diamond
+#  3935: open left triangle
+#  3936: open right triangle
+#  3937: open down triangle
+#  3938: approximately symbol (simple)
+#  3939: approximately symbol (bold)
+#
+# INDEX0.DAT: added glyphs 
+#  3938: simple \approx, maps to O
+#  3939: bold \approx, maps to P
+#   854: filled down triangle, maps to Q
+#   866: open plus, maps to R
+#  3933--3938: see above, maps to S--W
+# 
+# Replaced triangles with "centered" versions.  
+#     842 -> 3940,   852 -> 3941,   853 -> 3942,   855 -> 3944
+#
+# Replaced < > (2243 and 2244) symbols with new glyphs (3950 and 3951)
+
+0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0
+0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0
+#       !    "    #    $    %    &    '    (    )    *    +    ,    -    .    /    
+ 841  840 3940  845  846  843  844  851  850 3941 3942  847 3944  856  868  2231
+#  0    1    2    3    4    5    6    7    8    9    :    ;    <    =    >    ?
+2232 2233 2234 2235 2236 2237 2238 2239 2240 2241 2242 3950 3951 2245 2246 2255
+#  @    A    B    C    D    E    F    G    H    I    J    K    L    M    N    O
+2265 2266 2268 2269 2270 2401 2402 2184 2185 2186 718  2729 3931 3932 850  3938
+#  P    Q    R    S    T    U    V    W    X    Y    Z    [    \    ]    ^    _
+3939  854  866 3933 3934 3935 3936 3937 2227 2228    0    0    0    0    0    0
+#  `    a    b    c    d    e    f    g    h    i    j    k    l    m    n    o
+   0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0
+#  p    q    r    s    t    u    v    w    x    y    z    {    |    }    ~    
+   0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0

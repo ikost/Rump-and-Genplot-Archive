@@ -1,0 +1,104 @@
+/* Generic UNIX device list
+/*                                                  
+special   special   00 00  x x x x 15  UNKNOWN              Special request
+xwindow   xdriver   01 00  x x x   15  con                  X-window driver
+xterm     tektrx    10 00  x x x x 01  FILE*/dev/tty        Xterm/tek4014
+ps        postdrv   01 01          07  PIPE*"lpr -h"        Postscript on default
+pogo      postdrv   01 01          07  PIPE*"lpr -Ppogo -h" Postscript to "pogo"
+lucy      postdrv   01 01          01  PIPE*"lpr -Plucy -h" Postscript to "lucy"
+psdisk    postdrv   06 01          01  FILE*query           Postscipt Landscape
+pstex     postdrv   07 01          01  FILE*query           Postscipt Portrait
+hp300     laserjet  01 00          01  pipe*"lpr -Popus -h" Laser to printer
+deskjet   deskjet   01 00          01  pipe*"lpr -Pwhatever -h"
+quietjet  quietjet  01 00          01  pipe*"lpr -Pquietjet -h"
+hp7475    hp-gl     05 01  x x     06  file*%tmp%           HP 7475 to file
+colorpro  hp-gl     07 01  x x     06  disk*"/dev/tty7"     HP ColorPro on TTY7
+hpdisk    hp-gl     06 01  x x     06  file*query           HP 7550 disk output
+tiff      tiff      05 256         01  file*query           72 DPI Tiff file
+tiff300   tiff      01 256         01  file*query           300 DPI Tiff file
+ncsa      tektrx    02 00  x x x x 01  FILE*/dev/tty        NCSA Telnet?
+hrz       tektrx    06 00  x x x x 01  FILE*/dev/tty        Hirez Terminal
+go235     tektrx    06 00  x x x x 01  FILE*/dev/tty        GraphOn 235
+tkc       tektrx    03 00  x x x x 15  FILE*/dev/tty        syn for 4105
+tkem      tektrx    09 00  x x x x 15  FILE*/dev/tty        syn for 4105
+tek4010   tektrx    02 00  x x x x 01  FILE*/dev/tty        Tek4010 devices
+tek4105   tektrx    03 00  x x x x 15  FILE*/dev/tty        Tek4105 terminal
+kermit    tektrx    08 00  x x x x 01  FILE*/dev/tty        Kermit terminal 
+retro     tektrx    05 00  x x x x 01  FILE*/dev/tty        Retrographics
+rem_hrz   tektrx    06 00          01  FILE*/dev/hirez      Remote hirez
+linus     hp-gl     06 01          08  XON*PIPE*"lpr -Plinus -h" HP7550
+linust    hp-gl     06 01          08  XON*PIPE*"lpr -Plinust -h" HP7550 overheads
+hpdisk    hp-gl     06 01  x x     06  XON*FILE*query       HP 7550 disk output
+hpb       hp-gl     05 01          06  XON*FILE*/dev/tty    HP7475 on terminal
+hpd       hp-gl     06 01          08  XON*PIPE*"lpr -Phps -h" HP7550
+debug     nuldrv    02 00      x x 08  FILE*/dev/tty  Debug device
+null      nuldrv    01 00      x x 08  FILE*/dev/tty  Null device
+@END           
+---------------------------------------------------------------------
+| D N     DEVICE     D  S |H|M|C|R| N  OUTPUT           Description |
+| E A     DRIVER     E  E |A|A|R|E| U  CHANNEL                      |
+| V M     NAME       V  C |S|Y|T|S| M  STRING                       |
+| I E                I  O | | | |E| B                               |
+| C                  C  N |C|H|T|R| E  see                          |
+| E                  E  D |U|A|Y|V| R  list                         |
+|                       A |R|V|P|E|    below                        |
+|                    T  R |S|E|E|D| P                               |
+|                    Y  Y |O| | | | E                               |
+|                    P    |R|C|S| | N                               |
+|                    E  P | |U|C| | S                               |
+|                       A | |R|R| |                                 |
+|                       R | |S|E| | I                               |
+|                       M | |O|E| | 2                               |
+|                         | |R|N| |                                 |
+----------------------------------------------
+
+This file contains the specifications for device names, and the internal
+driver codes associated with each name.  The format of this file is NOT
+flexible.  It is hard coded to be: 
+
+   1) 8 char device name + 2 blanks         (A8,2X)       1-8     9-10
+   2) Executable device driver              (A8,2X)      11-18   19-20
+   3) Device type (see driver listings)     (I2,1X)      21-22      23
+   4) Secondary parm (see drivers)          (I2,2X)      24-25   26-27
+   6) device characteristics - bits         4(A1,1X)     28-34   29-35
+   7) number of pens available (< 16)       I2           36-37   38-39
+   5) Output channel (see below)            (A40)        40-xx
+   8) description  (see note)               Remainder    xx-80
+
+123456789 123456789 123456789 123456789 123456789 123456789 123456789 12345678
+dddddddd  nnnnnnnn  ii ii  x x x x ii  pppppppppppp ---- descriptive text ----
+
+Note: The I/O channel can use the remainder of the line up to 40 characters.
+      A single blank character terminates the I/O string and the remainder of
+      the line is a descriptor comment only.
+
+The specific device type numbers and the secondary parameters are
+specific to each driver and the appendix concerning drivers should be
+consulted to fill in these fields.
+
+The generally recognized output devices are listed below.  Specific drivers
+may either ignore these names or implement others of it's own.
+
+SCREEN                                  - Screen 
+CON                                     - Console (debug)
+ASYNC*COM1*ENQ    ASYNC*COM2*ENQ        - COM 1/2 w/ ENQ/ACK protocol
+ASYNC*COM1*XON    ASYNC*COM2*XON        - COM 1/2 w/ XON/XOFF protocol
+ASYNC*COM2*DTA    ASYNC*COM2*DTR        - COM 1/2 w/ hardward protocol
+PRN                                     - Default printer
+LPT1        LPT2        LPT3            - LPT1: etc.
+SPOOL*COM1*info  SPOOL*COM2*info        - Spool to ASYNC*COM1, ASYNC*COM2
+DISK                                    - Generates T$xxxx.PLT disk files
+DISK*<name>                             - Generates file with <name>
+DISK*QUERY                              - Queries at execute time for filename
+DISK*LPT1                               - Same as LPT1 above
+GPIB*<name>                             - IEEE488 w/ device <name>
+
+Notes: 
+   1) The special and null devices should always be included in the code.
+   2) The '/*' as first two chars of a line indicate a comment.
+   3) @END as a line indicates logical end of file.  Remainder of the file is
+      considered to be comment text.
+   4) WARNING: The Fortran compiler assumes a TAB to occupy a single space.
+      They MUST not be used in this file!
+   5) XTERM emulator requires the xterm*tekGeometry field in .Xdefaults.
+      Suggested value is 600x600+200+200.

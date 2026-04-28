@@ -1,0 +1,55 @@
+# this file goes in cgs/sys
+
+include ../makegcc.h
+
+###########################################################################
+OBJS    = sys_1.o     sys_2.o     sys_3.o     sys_os.o    low_io.o \
+          screen.o    help.o      keyboard.o  con_unix.o  ls.o     ea.o
+GNUCOBJ = gnuc.o
+###########################################################################
+LIBRARY:  $(INCDIR)preload.h  $(INCDIR)mytypes.h  $(INCDIR)extends.h  \
+          $(INCDIR)defaults.h $(INCDIR)ea.h $(LIBDIR)posix.a
+
+$(INCDIR)preload.h : preload.h
+	cp preload.h $(INCDIR)preload.h
+	touch $(INCDIR)preload.h
+
+$(INCDIR)mytypes.h : mytypes.h
+	cp mytypes.h $(INCDIR)mytypes.h
+	touch $(INCDIR)mytypes.h
+
+$(INCDIR)defaults.h : defaults.h
+	cp defaults.h $(INCDIR)defaults.h
+	touch $(INCDIR)defaults.h
+
+$(INCDIR)extends.h : extends.h
+	cp extends.h $(INCDIR)extends.h
+	touch $(INCDIR)extends.h
+
+$(INCDIR)ea.h : ea.h
+	cp ea.h $(INCDIR)ea.h
+	touch $(INCDIR)ea.h
+
+$(LIBDIR)posix.a : $(OBJS) $(GNUCOBJ)
+	$(LIBMGR) $(LIBDIR)posix.a $(OBJS) $(GNUCOBJ)
+	@echo 'SYS LIBRARY MADE'
+
+$(OBJS)    : $(INCDIR)preload.h  $(INCDIR)mytypes.h
+sys_os.o   : $(INCDIR)extends.h  $(INCDIR)defaults.h ../makegcc.h
+help.o     : $(INCDIR)extends.h
+low_io.o   : $(INCDIR)extends.h
+ls.o       : $(INCDIR)extends.h
+screen.o   : $(INCDIR)extends.h
+keyboard.o : $(INCDIR)extends.h
+con_unix.o : $(INCDIR)extends.h
+
+# GCC is specific about ANSI compliance.  Need fileno.
+# Specifically define compile route here
+sys_2.o  : sys_2.c
+	$(ECC) $(EFLAGS) -c sys_2.c
+
+keyboard.o  : keyboard.c
+	$(ECC) $(EFLAGS) -c keyboard.c
+
+con_unix.o : con_unix.c
+	$(ECC) $(EFLAGS) -c con_unix.c

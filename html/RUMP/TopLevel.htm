@@ -1,0 +1,71 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+
+<html>
+
+<head>
+<title>Section P. RUMP</title>
+</head>
+
+<body>
+<h1 align=center>RUMP: RBS Analysis and Plotting</h1>
+
+<p><img src="redball.gif" alt="o" align=bottom width=17 height=16>
+Welcome to RUMP - the RBS plotting, analysis and simulation package. If this is
+your first visit, stop by the </font><a href="intro.htm">welcome page</font></a>
+for a quick introduction to the package, some of its history, distribution
+notes, and a few real book references.</p>
+
+<hr>
+<p align=center><br>
+</p>
+
+<div align=center>
+<center>
+<table border=3 cellpadding=5 width=95%>
+<tr><td align=center colspan=2><font size=4><b>Command References </b></font></td></tr>
+<tr><td align=center width=30%><a href="concepts.htm"><strong>General <br>
+Concepts </strong></a></td><td>General concepts and definitions (buffers, etc.)<br>
+Relationship of RUMP, SIM and PERT <br>
+Specifying elements, thicknesses </td></tr>
+<tr><td align=center><a href="cmds.htm#top"><strong>RUMP</strong></a> </td><td>Basic file and spectra reading and manipulation <br>
+Plotting, overlaying and RBS specific annotation<br>
+Simple (usually RBS only) analysis commands </td></tr>
+<tr><td align=center><a href="sim.htm"><strong>SIM</strong></a> </td><td>Sample definition and simulation setup commands.<br>
+Commands to define layers and thickness of a model sample <br>
+Reading and saving sample description files. </td></tr>
+<tr><td align=center><a href="pert.htm"><strong>PERT</strong></a> </td><td>Semi-automatic refinement of a simulation.<br>
+Defines error/normalization windows<br>
+Specify parameters to modify in search </td></tr>
+<tr><td align=center><a href="config.htm"><strong>Configuration <br>
+Commands </strong></a></td><td>Configuration and loading/modification of optional features <br>
+Examine stopping powers and load exception tables <br>
+Load and examine resonance cross-section files. </td></tr>
+</table>
+</center></div>
+<p><br>
+</p>
+<hr>
+<p><br>
+As you become more familiar with RUMP, it may eventually be necessary to delve into some of the internals to 
+configure the program for your particular analysis needs. The following appendices describe some of the specific data 
+files that can be created to interact with RUMP. </p>
+<div align=center><center>
+<table border=3 cellpadding=5 width=95%>
+<tr><td align=center colspan=2><font size=4><b>Appendices </b></font></td></tr>
+<tr><td align=center width=30%><a href="rbs_inf.htm"><strong>*.RBS</strong></a> </td><td>Specification of the binary data file format for RBS spectra. This extensible 
+key-based file format speeds storage and retrieval of spectra and their 
+associated parameters. </td></tr>
+<tr><td align=center><a href="adt_inf.htm"><strong>*.ADT</strong></a></td><td>Resonance and non-Rutherford scattering cross-sections handling. Arbitrary 
+scattering cross-sections can be handled by providing a data file containing a 
+list of energies and corresponding cross-sections. </td></tr>
+<tr><td align=center><a href="stp_inf.htm"><strong>*.STP</strong></a></td><td>Stopping powers and stopping exception files. Although RUMP will generate 
+stopping power tables on the fly, exception files provide a way to scale or 
+modify the Ziegler based stopping powers. </td></tr>
+</table>
+</center></div>
+
+</p><hr><small>
+Last modified: November 21, 1996
+<address>Michael O. Thompson <a href="mailto:mot1@cornell.edu">(mot1@cornell.edu)</a> </address></small>
+</body>
+</html>

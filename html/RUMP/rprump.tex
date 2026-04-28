@@ -1,0 +1,1879 @@
+<html>
+<head>
+<title> Section P. RUMP
+</head>
+
+<body>
+
+<h2>Important Notes</h2>
+
+<ul>
+<li> RUMP as distributed includes stopping power tables
+appropriate for incident energies to 3.0 MEV.  If you are working above this
+energy, see appendix on QSTOPP and STOPP for generating higher energy tables.
+<li> RUMP does not normally handle resonances since these are very
+geometry dependent.  To include non-Rutherford cross sections, you must
+create a {\tt .ADT} file as described in appendix on RES5.
+<li> Forward scattering simulations requires manual entry of cross
+sections.  See commands {\tt XSECT} and {\tt E2COEF}.
+<li> The native format for {\tt .RBS} files has changed. The old
+format is still recognized by RUMP.  However translator programs from
+{\tt .RBS} to other formats will need to be rewritten.  See the appendix on
+the new data format.
+</ul>
+
+<h2> Introduction and Acknowledgements </h2>
+
+<p> 
+RUMP is a series of FORTRAN subroutines designed for the analysis and
+simulation of Rutherford Backscattering Spectroscopy (RBS) data.  It was
+initially developed at Cornell University in Dr. J.W. Mayer's research group
+by then graduate students L.R. Doolittle and M.O. Thompson with assistance
+from R.C. Cochran.  The development of the efficient simulation algorithm and
+the semi-automatic search algorithms formed a major part of L.R. Doolittle's
+thesis.  Numerous other graduate students and researchers at Cornell and other
+sites have since contributed to the program.  We wish to acknowledge Dr.\
+E.J. Kramer's group at Cornell for introducing equations to SIM as well as
+being the impetus for the forward scattering support. Dr. P. Revesz is also
+acknowledged for numerous improvements in both the code and user interface
+including most recently the smoothing algorithms.  Finally, we most gratefully
+acknowledge all of the past and current graduate students at Cornell who have
+used the program for real analysis and data reduction.  We firmly believe that
+the value of RUMP stems directly from the fact that it is used by the same
+people who are responsible for its development.
+
+<p>
+The algorithms and subroutines comprising RUMP are considered to be in the
+public domain.  The source code for all RUMP specific routines are included in
+this distribution.  They may be freely modified, recompiled or distributed
+as long as the original copyright notice is retained in all source code.  CGS
+will act as a general repository for code corrections and enhancements and
+will attempt to disseminate modifications in an orderly manner.  However,
+while the code to RUMP is public domain, the library support routines are part
+of a commercial product licensed for use on one machine only and may not be
+distributed.
+
+<p> The meaning of the acronym RUMP is a question often raised in discussions.
+Let us set the record straight; the name was invented solely to avoid
+trademark infringement - the earliest name of this package was TRACOR.
+However, for those who demand full accounting and explanations, we suggest the
+following expansions:
+
+<ul>
+  <li> Rutherford Universal Manipulation Program
+  <li> RBS Universal Master Package
+  <li> RBS for the Upwardly Mobile Professional
+  <li> Rapid Unearthing of Multiple Parameters
+  <li> Random Utility for Making Pictures
+  <li> Rather Unusual Masochistic Package
+</ul>
+
+<h2> Pedigree:  Relationship between RUMP and GENPLOT </h2>
+
+<p>
+RUMP is a data manipulation package similar to GENPLOT but is
+designed specifically for the analysis and simulation of Rutherford
+Backscattering Spectroscopy (RBS) data.  Both packages were initially
+written around the same graphics and token processing libraries to
+provide a consistent (but not identical) user interface.  The two
+packages diverged in recent years however as GENPLOT became a
+commercial product for the microcomputer environment and RUMP
+development continued on a VAX mainframe.  To reduce the continuing
+effort required to support separate software packages, RUMP has once
+again been modified to conform to the current library support.  With
+this move, RUMP support and documentation (at some meager level) has
+been assumed by CGS.
+
+<p> 
+RUMP and GENPLOT are designed on equivalent software levels --- both are
+the upper shell of complex data analysis and graphics packages.  RUMP is
+neither a subset of GENPLOT nor is GENPLOT a subset of RUMP.  They are
+equivalent subroutines utilizing a common set of graphics and system support
+libraries.  Indeed, with sufficient memory GENPLOT is a command within RUMP
+and RUMP can be a command within GENPLOT.  The commands available in either
+packages can be divided into two classes; upper level commands implemented
+within the main program itself and lower level commands implemented in the
+underlying library.  {\tt PLOT} is an upper level command and hence operates
+in a different manner in each package.  However, {\tt SCRIPT} and {\tt
+ANNOTE} are support library commands and are identical in both RUMP and
+GENPLOT.  It is important to remember this distinction if you will be using
+both packages or are already familiar with one.
+
+<p>
+This section of the manual deals only with commands which are specific to
+RUMP.  Lower level commands common to RUMP and GENPLOT are fully described in
+other sections of the manual.  We have attempted to clearly identify which
+commands operate identically between the two packages as well as point out
+specific incompatibilities in the commands.  Even if you are an old user of
+RUMP, some commands have changed considerably and we ask that you {\it please
+read through section 1 of the GENPLOT manual} paying close attention to the
+``Essential Information'' (which is repeated in the ``Quick Reference''
+section).
+
+<h2> Algorithm and Data References </h2>
+
+<ol>
+  <li> <it>Algorithms for the Rapid Simulation of Rutherford Backscattering
+       Spectra</it>, L.R. Doolittle, Nucl. Inst. Meth. {\bf B9}, 344 (1985).
+  <li> <it>A Semiautomatic Algorithm for Rutherford Backscattering Analysis</it>,
+       L.R. Doolittle, Nucl. Inst. Meth. {\bf B15}, 227 (1986).
+  <li> <it>Empirical Stopping Powers for Ions in Solids</it>, J.F. Ziegler, J.P. 
+       Biersack, and U. Littmark, IBM Research Report RC9250 (1982).
+  <li> <it>Numerical Recipes</it>, Press, Flannery, Teukolsky and Vetterling,
+       (Cambridge University Press, 1986).
+  <li> <it>Backscattering Spectrometry</it>, W.K. Chu, J.W. Mayer and M.-A.
+       Nicolet, (Academic Press, NY, 1978).
+  <li> <it>Ion Beam Handbook for Material Analysis</it>, J.W. Mayer and E. 
+       Rimini, (Academic Press, NY, 1977).
+  <li> L.R. Doolittle, Ph.D Thesis, (Cornell University, Ithaca, NY 1987).
+</ol>
+
+<h2> General Concepts: Buffers and Data Files </h2>
+
+@@{Buffers and Files--RUMP}
+
+RBS experimental and simulation spectra are stored in RUMP in a set of
+internal buffers.  These buffers are reused on a rotating basis to accommodate
+new spectral data.  Twelve buffers are configured in the PC version, each
+with a maximum of 1024 channels of data (mainframe versions generally increase
+the buffer size to 2048 channels).  The buffers are numbered from -1 through
+10.  The first two buffers, -1 and 0, are always reserved for temporary
+calculations (-1) and for spectral simulations (0).  The remaining ten buffers
+hold experimental spectra, copies of simulations or temporary calculations
+(PERT).  Buffers are referred to by either number or by content (the filename
+of the corresponding data).  At any point in time, one buffer is designated as
+the MAIN or ACTIVE buffer.  This designation is important in that many
+commands, for example {\tt THICKNESS}, operate only on the ACTIVE buffer.  The
+ACTIVE buffer may be changed using commands such as {\tt GET} or {\tt POINTAT}
+and can be identified using the {\tt BUFFERS} command.  The first two special
+buffers -1 and 0 cannot, in general, be retained as the ACTIVE buffer.
+
+Buffers are actually data structures containing not only the spectral
+information (counts per channel), but also experimental parameters required
+to analyze the data.  These experimental parameters describe the incident
+particle, the beam energy, charge integration, scattering geometry, etc.  This
+information is stored on a per buffer basis and may be modified using commands
+described in this manual.
+
+RUMP data files correspond closely to the buffer structure.  The most recent
+version of the data file utilize a format which is machine independent,
+allowing direct binary exchange of data files between different mainframe and
+micro implementations of RUMP.  An appendix to this section describes the
+internal data file format in detail.  The old format, written using FORTRAN
+unformatted I/O records, is still recognized by the READ commands.  Buffers
+are filled with experimental data by reading the files using {\tt GET}, {\tt
+REAL}, {\tt PLOT} or {\tt OVERLAY}.  The ACTIVE buffer can be saved, with the
+current buffer experimental parameters, using {\tt REWRITE}, {\tt SAVE} or
+{\tt WRITE} commands.
+
+
+<h2> General Concepts: Specifying Elements </h2>
+
+Elements names are required in many of the commands to RUMP.  Internally,
+RUMP maintains a list of 92 elements with isotope masses, abundances, and
+atomic density.  Elements are specified by their common one or two letter
+symbol such as Si or O.  Full names are not permitted.  A specific isotope
+can also be specified for most commands by using the format 28Si or 31Si.  (An
+obsolete format Si+28 is also still supported.)  If the isotope is listed in
+the internal tables, the actual mass for the element is used.  Otherwise, the
+specified atomic weight will be used as the atomic mass.  42Si is valid in
+RUMP but don't expect meaningful results.
+
+Charged beams are specified in the same manner except for the addition of
+plus signs after the symbol.  4He++ is the symbol for normal double plus
+backscattering alpha particles.
+
+
+<h2> General Concepts: SIM and PERT </h2>
+
+RUMP includes a very fast and powerful, if not overly friendly, simulations
+package referred to as SIM.  SIM couples with an even less friendly package
+called PERT which automatically varies parameters describing the simulation to
+reach a ``best fit'' with a given experimental spectrum.  Both SIM and PERT
+are sub-processors under RUMP with their own set of commands and data files.
+There is no command to do a simulation; simulations are automatically
+performed when necessary using experimental parameters from the ACTIVE spectra
+and elements and layer thicknesses from a ``sample description''.  Commands
+within SIM are primarily directed to generating the sample description and
+modifying some of the simulation parameters.  PERT is solely concerned with
+the search procedure.
+
+\newpage
+
+<h2> Basic Plotting Commands </h2>
+
+\bigskip
+
+\plaintopline \autosizetable
+{\tts PLot} & Erase screen and plot spectrum from buffer or file\cr
+{\tts OVerlay} & Overlay spectrum from file or buffer on current plot\cr
+{\tts REplot} & Plot the currently active spectrum \cr
+{\tts AXis} & Draw axes only \cr
+{\tts COMPare} & Plot active and simulation buffers \cr
+{\tts BLowup} & Plot region of spectrum on an expanded vertical scale \cr
+{\tts EXpand} & Set region to a subset of current region and replot \cr
+{\tts BYe} & Quit and exit program completely\cr
+{\tts Quit} & Quit and exit program completely\cr
+\endautosizetable \medskip
+
+<h2> Plot </h2>
+
+\syntax{PLot [file | buffer \# | SIM | MAIN | ALT | LAST | NOW | THeory]}{Plot data file or specific buffer}
+
+@@{PLOT--RUMP}
+
+The {\tt PLOT} command is the basic command for drawing axes and spectrum to
+the active graphics device.  Normally, the screen is erased (or a new page
+obtained), the axes are drawn and the requested spectrum is plotted.  The data
+are drawn using the current line type and symbol type.  If the autoids option
+is selected, the identifier string from the spectrum will also be drawn on the
+plot.
+
+A filename or buffer number must be specified in RUMP version of the {\tt
+PLOT} command.  If a number between 0 and 10 is specified, it is assumed to
+refer to a buffer and that buffer plotted.  The simulation buffer will be
+updated if necessary.  If any buffer other than 0 is plotted, it becomes the
+ACTIVE buffer after this command.  If the simulation buffer 0 is plotted, the
+ACTIVE buffer remains unchanged.
+
+If a buffer number is not specified in {\tt PLOT}, the token is compared first
+to a number of special names.  The names {\tt SIM}, {\tt ALT} and {\tt THeory}
+refer to the simulation buffer 0 and hence {\tt PLOT THEORY} is equivalent to
+the command {\tt PLOT 0} described above.  The name {\tt MAIN} likewise refers
+to buffer 1 while {\tt NOW} and {\tt LAST} refer to the currently ACTIVE
+<it>.  {\it These names should not be used for normal data files.</it>
+
+If the token following {\tt PLOT} is neither a number nor a special name, it
+is assumed to be a valid filename with a default extension of {\tt .RBS}.  The
+current buffers are first searched for one already containing that filename
+(full pathname is checked).  If found, the buffer becomes ACTIVE and {\tt
+PLOT} operates as described above.  If no buffer currently contains the file,
+the buffers are scrolled down to create an empty buffer 1 and the file is read
+into buffer 1.  The original buffer 10 is lost in the process (even if the
+file read fails).  The ACTIVE pointer is set to buffer 1 and the spectrum is
+plotted.
+
+The selection of a buffer occurs before any plotting.  The scale for the YIELD
+axis (if autoranging) and the conversion from channel number to energy are
+determined from the plotted buffer.  The channel number range is converted to
+the equivalent energy range through the {\tt CONV} parameters {\tts SCALE1} and
+{\tts SCALE2}.  For a {\tt PLOT}ed spectra, both energy and channel scales are always
+correct.  
+
+The yield can be plotted either as a raw counts per channel or as a normalized
+yield, selected by the {\tt RAW} or {\tt NORMALIZED} commands.  In the
+normalized mode, the yield is normalized to conditions of 1 keV channel energy
+width, 1 $\mu$C of single plus equivalent charge, and a 1 msr detector solid
+angle.  This normalization should allow direct comparison of any spectra
+obtained at the same incident energy in the same scattering geometry.  (Note:
+Charge equivalency treats 2~$\mu$C of He$^{++}$ the same as 1~$\mu$C of
+He$^+$.)
+
+\newpage
+<h2> Overlay </h2>
+
+\syntax{OVerlay [file | buffer \# | SIM | MAIN | ALT | LAST | NOW | THeory]}{Overlay a spectrum on existing axes}
+
+@@{OVERLAY--RUMP} 
+
+{\tt OVERLAY} operates identically to {\tt PLOT} with the exception that no
+axes are drawn.  Existing energy and yield scales are used allowing
+comparison of numerous spectra.  Plotting is always done based on the energy 
+scale, {\bf not} the channel scale allowing overlay of data from different
+multichannel analyzers.  The channel axes will correct only for the first
+spectrum plotted unless all spectra have the same {\tt CONV} constants.  
+The energy scale is always correct however.  Since {\tt OVERLAY} also uses the
+current yield range, data may extend offscale if the range is inappropriate.
+
+<h2> Replot </h2>
+
+\syntax{REplot}{Replot most currently ACTIVE buffer}
+
+@@{REPLOT--RUMP}
+
+The {\tt REPLOT} command is synonymous with {\tt PLOT NOW}.  It quickly
+replots the ACTIVE buffer with a little less typing.
+
+<h2> Axis </h2>
+
+\syntax{AXis}{Erases screen and draws the axes}
+
+@@{AXIS--RUMP}
+
+The {\tt AXIS} command normally erases the screen and displays a new
+set of axes.  The conversion between energy and channel number and the yield
+scale are determined from the currently ACTIVE buffer (see {\tt PLOT} above).
+If the ACTIVE buffer contains no valid spectra data, a warning message
+indicating that the axes values are out of range may be issued.
+
+<h2> Compare </h2>
+
+\syntax{COMPare}{Compare ACTIVE buffer to simulation buffer}
+
+@@{COMPARE--RUMP}
+
+The {\tt COMPARE} command is another command designed to reduce typing.  It is
+equivalent to {\tt PLOT NOW LTYPE 1 OV THEORY LTYPE <old>}.  The ACTIVE buffer
+is plotted in the current line and symbol types and the simulation buffer is
+overlaid as a solid line.  The line type is returned to its previous value.
+
+
+<h2> Blowup </h2>
+
+\syntax{BLowup <cursor marks> <factor>}{Expand vertical scales for region of data}
+
+@@{BLOWUP--RUMP}
+
+The {\tt BLOWUP} command allows you to expand the vertical scale for a portion
+of your data to see, for example, a small impurity peak.  The cursor marks a
+region to be expanded and an expansion factor is read from the command line.
+Data from the current ACTIVE buffer is overlaid on the plot using the current
+symbol or line type over only the identified region with the specified
+expansion factor.  The channel range may be selected using either the cursor
+or the keyboard (press {\tt <ESC>} to escape from cursor to keyboard input
+mode).  The actual data in the ACTIVE buffer is {\bf not} modified and hence
+subsequent plots are not automatically expanded.
+
+<h2> EXpand </h2>
+
+\syntax{EXpand <cursor marks>}{Expand plot show only a subset region}
+
+@@{EXPAND--RUMP}
+
+{\tt EXPAND} is a useful combination of two operations: a) use of the cursor
+to define a new region and  b) a replot of the ACTIVE buffer.
+Note that {\tt EXPAND} redefines the plot region as in the {\tt REGION}
+command below and that only the ACTIVE buffer is redrawn.  Other spectra on
+the current plot will not be redrawn over the expanded range.
+
+
+<h2> Quit </h2>
+
+\syntax{QUIT or BYE}{Exits back to system from the RUMP program}
+
+@@{QUIT--RUMP}
+
+This command should be obvious (hopefully).  All buffer and status information
+is lost when you exit, as are any modifications to buffers which have not been
+saved.  If a HCOPY, temporary MACRO or SCRIPT file is active, they will be
+disposed of as appropriate (possibly with user input).
+
+\newpage
+
+<h2> Plot Scaling and Axes Layout </h2>
+
+\bigskip \plaintopline \autosizetable
+{\tts PARMS} & Display current plot parameters\cr
+{\tts REGion} &  Set the channel range\cr
+{\tts FOrcex} & Force channel scale to be exactly as specified \cr
+{\tts COunts} &  Set the range of the YIELD axis\cr
+{\tts LInear} &  Specify linear mode for YIELD axis\cr
+{\tts SQrt} &  Specify square root mode for YIELD axis\cr
+{\tts LOg} &  Specify Logarithmic mode for YIELD axis\cr
+{\tts NOrmaliz} &  Specify YIELD to be plotted in normalized units\cr
+{\tts RAw} &  Specify YIELD to be plotted as raw data \cr
+{\tts LAbels} & Set degree of labeling for axes \cr
+\endautosizetable \bigskip
+
+<h2> Parms </h2>
+
+\syntax{Parms}{Displays some internal plotting status parameters}
+
+@@{PARMS--RUMP}
+
+The {\tt PARMS} commands displays some of the plotting and scaling information
+to the screen.  See Section D for additional information on the plot size and
+device information.   The lower section indicates the range of the channel 
+data output, the scaling for the yield (Max Counts), type of yield scale
+(LINEAR, SQRT or LOG), and the current linetype, symbol and npoint
+values.
+
+\medskip\beginscreen
+ Plot device: AUTO
+ Size:      9.00 by   7.30           Shrink:  1.000
+ Offset:    0.50 by   0.00           Pen:      1 of max   7
+ Margin:    0.85 by   0.85           Speed:   18
+ Hard copy not initialized
+
+  Min-Max Channels:   100.0  600.0     Max Counts:  Autoscaled
+  Scale is linear, normalized yield.
+  Linetype:  0   Symbol:  0   Npoints:  1
+
+ Minor tick marks are disabled.
+ Current directory: C:{\bs}RUMP{\bs}EXAMPLES
+ Session SCRIPT file: r.cmd
+\endscreen
+
+<h2> Region </h2>
+
+\syntax{REgion <lower-channel> <upper-channel>}{Set the channel range}
+
+@@{REGION--RUMP}
+
+Set the region of the lower axes in channel numbers.  The region to be
+plotted is always specified in terms of channels but plotting is actually
+performed in terms of energy.  The specified channels may be rounded off to
+close values to give nicer plot scales.  See {\tt FORCEX} and {\tt SGRAPH}
+to disable the roundoff and force the scales to cover a specified region.
+
+
+<h2> Forcex </h2>
+
+\syntax{FOrcex [ON | off]}{Force channel numbers to be exact}
+
+@@{FORCEX--RUMP}
+
+Normally, the channel numbers specified by the {\tt REGION} command or by
+an {\tt EXPAND} command are ``rounded out'' to closest reasonable whole
+numbers.  This roundoff feature can be disabled by setting {\tt FORCEX ON}.
+Be sure though, when enabled, not to specify a zero length region.  The
+extension of the lower boundary of a {\tt REGION} command to zero can also
+be disabled (or controlled) by setting the ZFORCE variable using {\tt SGRAPH}.
+
+<h2> Counts </h2>
+
+\syntax{COunts <max-yield-range>}{Set the range for yield axis of the plot}
+
+@@{COUNTS--RUMP}
+
+The range for the YIELD axis is controlled by the {\tt COUNTS} commands.  The
+YIELD axis will always begin at zero and extend to the specified maximum.  If
+the {\tt COUNTS} is specified as zero, RUMP will perform autoranging of the
+axis so the entire plotted range of the ACTIVE buffer fits on screen.  If
+non-zero, the specified value is used without rounding.  While the meaning of
+the numbers on the yield axis depends on the mode of the axis (LINEAR, LOG, or
+SQRT), setting of {\tt COUNTS} should always be in terms of the maximum linear
+count.  For example, in logarithmic mode 100,000 counts for the upper limit is
+a {\tt COUNTS 10000} {\bf} {\tt COUNTS 5}.  When switching between modes, if
+YIELD is not in autoscale mode the current setting of {\tt COUNTS} is
+``translated'' to the the new mode.  However, {\tt COUNTS} is translated when
+switching between normalized and raw mode; new values must be set
+corresponding to the current setting.
+
+<h2> Linear/Log/Sqrt </h2>
+
+\syntax{LInear} {Set Y axis mode to linear scale}
+\syntax{LOg}    {Set Y axis mode to logarithmic scale}
+\syntax{SQrt}   {Set Y axis mode to square root scale (uniform statistical error)}
+
+@@{LINEAR--RUMP} @@{LOG--RUMP} @@{SQRT--RUMP}
+
+The {\tt LINEAR} mode is the default mode for displaying the yield
+information.  In this mode, peak heights and areas appear visually correct and
+it is easy to estimate compositions or concentrations.  While the {\tt LINEAR}
+is most common, the {\tt SQRT} mode is statistically more accurate.  In {\tt
+SQRT} mode, the value plotted is the square root of the number of counts in
+each channel.  In this mode, noise due to counting statistics is independent
+of the absolute yield magnitude and equal visual weight is given to features
+of equal statistical significance.  The {\tt LOG} mode is seldom used in RBS
+but is useful for spectra covering a wide dynamic range such as PIXE data.
+The common logarithm (base 10) of the data is plotted and the lower range
+limit is fixed at -2 for normalized data and 0 for raw mode data.
+
+
+<h2> Raw/Normalize </h2>
+
+\syntax{RAw}{Set Y axis to display raw channel counts}
+\syntax{NOrmaliz}{Set Y axis to display normalized channel data}
+
+@@{RAW--RUMP} @@{NORMAL--RUMP}
+
+The YIELD axis can be displayed as either the raw number of counts per channel
+or as a normalized yield where experimental differences between data are
+eliminated by scaling.  The commands {\tt RAW} and {\tt NORMAL} switch between
+these two modes.  In raw mode, the channel data is plotted exactly as recorded
+by the Multi--Channel Analyzer (MCA).  In normalized mode, the data is plotted
+based on the normalization of 
+
+$$ Yield = {{Counts * Corr} \over {Q * d\Omega * \Delta E_{chan}}} $$
+
+The units for normalization are beam dose Q in $\mu$Coulombs equivalents of
+$He^{+}$ (measured charge for $He^{++}$ is divided by two), solid angles
+$d\Omega$ in milli--steradians, and the MCA channel width $\Delta E_{chan}$ in
+keV.  A fudge factor {\tt CORR} allows for fine tuning of the beam charge to
+compensate for inaccuracies during charge integration caused by inadequate
+secondary electron suppression.
+
+In the normalized mode, yield curves should always be directly comparable
+between experiments if the beam energy and scattering geometry are the same.
+
+<h2> Labels </h2>
+
+\syntax{LABELS [ON | BRIEF | OFF]}{Set axis labeling mode}
+
+@@{Labels--RUMP}
+
+The {\tt LABELS} command sets the mode of axis labeling.  On slow plotting
+terminals, its use can make eliminate the time wasted putting up the
+coordinate labels on the screen.  Alternatively, the labels can be completely
+suppressed in a final output allowing a draftsperson (non--sexist) to label
+the plot for publication.  The default mode is on.
+
+The three modes are:
+
+\medskip \plaintopline \autowraptable{1in}{5in}*
+ON  &    Full labels: the complete title of each axis is given,
+and each major tick mark is labeled.\cr
+BRIEF &  Partial labels: an abbreviated title of each axis is
+given, and the two end major tick marks are labeled.
+This mode is recommended for routine use on slow graphics devices as it is
+faster than the ON mode. \cr
+OFF  &   No labels:  No text at all is drawn on the plot.  This can
+be used if a draftsman is to complete the artwork.\cr
+\endautowraptable
+
+In both the {\tt ON} and {\tt BRIEF} modes, labeling conforms to AIP
+standards for publication quality plots.  Minor tick marks are normally
+suppressed in publication plots and this is the default mode for RUMP.
+Minor tick marks may be re--enabled using the {\tt SUBTICKS} command.
+
+
+\newpage
+
+<h2> Controlling Plot Layout and Linetypes </h2>
+
+Most of the commands which control the plot layout and curve description 
+(line type or symbol type for curves) are essentially identical between
+GENPLOT and RUMP.  The following table refers to other sections of this manual
+where the corresponding commands are described.  Commands marked with \dag\ 
+are implemented by the graphics support libraries and consequently
+are absolutely identical to the GENPLOT equivalent.  Other commands should
+behave in the same manner as the GENPLOT documentation but are implemented by
+RUMP instead and may consequently show subtle differences.
+
+\medskip \plaintopline \autowraptable{.25\hsize}{.75\hsize}*
+\multicol{2}{l}{\bf Section A --- Device Control }\cr
+{\tts CLS\dag} & Clear the text screen\cr
+{\tts DEvice\dag} & Select plotting device \cr
+{\tts SPeed\dag} & Set the plotter pen speed \cr
+{\tts HCopy\dag} & Save plot vectors -- allows replay on hard copy device\cr
+\cr
+\multicol{2}{l}{\bf Section B --- Basic Plotting}\cr
+{\tts AUtoids} & Automatically use IDENT string as a legend\cr
+{\tts AUTOErase\dag} & Set whether screen erased with {\tt PLOT}\cr
+{\tts ERase\dag} & Erase the screen or start a new page\cr
+{\tts IDs} & Put the IDENT string of buffer in the legend\cr
+{\tts NPoints} & Point plotting interval\cr
+{\tts TIMEStamp\dag} & Put the date on the plot\cr
+\cr
+\multicol{2}{l}{\bf Section D --- Line Control}\cr
+{\tts COLor\dag} & Select the line color\cr
+{\tts LType} & Select line type for subsequent drawing\cr
+{\tts LINEWidth\dag} & Set line thickness on appropriate plotters\cr
+{\tts PEn\dag}  & Select the pen color\cr
+{\tts SYmbol} & Select symbol used for plotting \cr
+{\tts VECsize\dag} & Set the length of dashes in dashed lines\cr
+{\tts VISibili\dag} & Set line visibility\cr
+\cr
+\multicol{2}{l}{\bf Section E --- Plot Appearance}\cr
+{\tts CHARActer} & Select character set\cr
+{\tts CHRset\dag} & Select character set\cr
+{\tts SUBTIcks} & Toggle subtick mark display\cr
+\cr
+\multicol{2}{l}{\bf Section I --- Labeling}\cr
+{\tts ANNOTE\dag} & Sub--process for annotating the plot\cr
+\cr
+\multicol{2}{l}{\bf Section F --- Size and Position}\cr
+{\tts OFfset\dag} & Controls plot offset\cr
+{\tts SHrink\dag} & Scale entire plot to shrink\cr
+{\tts SIZe\dag} & Set the paper size\cr
+{\tts MARGins\dag} & Set the margins around the plot for labels\cr
+{\tts FLIPXY\dag} & Flip the X and Y axes on the page\cr
+{\tts SUB\_Plot\dag} & Adjust size/offset to create a plot within a plot\cr
+\cr
+\multicol{2}{l}{\bf Section M --- Miscellaneous}\cr
+{\tts SGRAph\dag} & Set various plot parameters\cr
+\cr
+\multicol{2}{l}{\dag \ Identical to GENPLOT command}\cr
+\endautowraptable
+
+
+\newpage
+
+<h2> RUMP Buffers </h2>
+
+\bigskip \plaintopline \autosizetable
+{\tts BUFfers} & Display current buffer status \cr
+{\tts REad} & Point at buffer with file or read RBS file into buffer 1\cr
+{\tts GET} & Point at buffer or read an RBS file into buffers\cr
+{\tts RERead} & Force rereads current buffer into buffer 1 \cr
+{\tts SWALLOW} & Load ASCII data into buffer as counts per channel\cr
+{\tts POintat} & Point at a specific buffer by number\cr
+{\tts WRITE} & Writes current buffer to another file\cr
+{\tts REWrite} & Rewrites current buffer to a file with corrections\cr
+{\tts SAVE} & Rewrites current buffer to a file with corrections\cr
+{\tts WRASCII} & Writes current buffer to an text file\cr
+{\tts EMpty} & Scrolls the data and leaves an empty buffer 1\cr
+{\tts RECALcul} & Mark sample structure as modified to force recalculation\cr
+{\tts RELEASE} & Release the ACTIVE buffer and scroll remaining up\cr
+{\tts NEWall} & Clear all buffers and zero all data \cr
+\endautosizetable \bigskip
+
+<h2> Buffers </h2>
+
+\syntax{BUffers}{Display RUMP buffer status}
+
+@@{BUFFERS} @@{Buffers} @@{Buffers--RUMP}
+
+Every {\tt PLOT}, {\tt OVERLAY}, or {\tt READ} command either points to a
+spectrum in memory or reads a new file into the temporary buffer space (see
+General Concepts at beginning of RUMP manual).
+Buffers are referred to by number and the contents of the buffers can be
+determined using the {\tt BUFFERS} command.  The {\tt BUFFERS} command
+summarizes the current contents of each buffer.  Special buffers and any
+unused buffers are not listed by this command.
+
+The {\tt BUFFERS} command lists all non-empty files by buffer number.
+Following the buffer number are two special flags described below.  The last
+20 characters of the entire pathname for the source file are shown next
+followed by the identifier text for each buffer.  The most recent buffer
+plotted or otherwise acted upon is called the ACTIVE buffer.  It is designated
+by the `*' in the {\tt BUFFERS} display before the buffer number.  You can
+explicitly make any buffer the ACTIVE buffer using the {\tt POINTAT} command.
+RUMP never points to the simulation buffer (0) unless you explicitly request
+so with the {\tt POINTAT} command. 
+
+Two other special markings used in the buffers listing indicate
+modifications to the buffer.  The `\@' marking indicates files where
+the experimental parameters in the buffer have been modified using
+commands such as {\tt MEV} or {\tt CONV}.  Buffers marked with a
+`?' indicate that the actual spectrum data (counts per channel) in the
+buffer has been changed by a command such as the background
+subtraction or the data smoothing.  All {\tt WRITE} commands will
+prompt for verification before writing out buffers with modified
+data.  No verification is necessary if only header information has
+been modified.
+
+\medskip\beginscreen
+At your service! \underbar{buf}
+* => Main    ? => Dirty    @ => Parameters changed
+  Main    1    c:{\bs}psmith{\bs}new{\bs}wb.rbs  sput w, 300 sec in ar
+  Buffer  2 ?  c:{\bs}psmith{\bs}new{\bs}wa.rbs  sput w, 300 sec in n2
+ *Buffer  3    psmith{\bs}new{\bs}sputw.rbs  sputtered w, as deposited
+  Buffer  4  \@ psmith{\bs}new{\bs}qq\_40.rbs  WSi on Si in Ar for 5 minutes
+  Buffer  5    psmith{\bs}new{\bs}ii\_40.rbs  WSi on Si in N2
+  Buffer  6    ith{\bs}new{\bs}e1-w1-n2.rbs  sample e1-w1, 300 sec in N2
+Your wish? 
+\endscreen
+
+
+<h2> Read </h2>
+
+\syntax{REad <filename>}{Read a spectra file from disk}
+
+Synonym:  {\tt GET}
+
+@@{Read--RUMP}
+
+This command obtains a spectrum, from disk if necessary, and makes it the
+ACTIVE buffer.  Either a true filename, a buffer number, or one of the special
+names listed under the {\tt PLOT} command may be specified as the filename. 
+If the filename already exists as one of the buffers, that buffer is simply
+made active.  Otherwise, {\tt READ} scrolls the buffers creating a empty
+buffer 1 and reads the file into buffer 1.  Buffer 10 is lost in the process.
+The ACTIVE buffer is set to the buffer containing the file.  Each time a file
+is read, the filename and the ID of the file are echoed to the screen.
+
+Wildcard filenames may also be specified to {\tt READ}.  In the case of
+wildcards, the process is repeated for every file which matches the wildcard
+name.  All RBS files could be read, for example, using the command {\tt READ
+*.RBS}.  Each matching file is retrieved into a unique buffers.  If more
+matches occur than there are buffers, RUMP will stop reading once all the
+buffers have been filled by the command.  A warning message indicating that 
+the maximum number have been read is displayed in this event.
+
+{\tt GET} is the normal manner in which the ACTIVE buffer is changed. 
+Specifying {\tt GET 3} or {\tt GET aa\_40.rbs} will change the ACTIVE pointer
+to the appropriate buffer.
+
+\medskip\beginscreen
+I want a cookie!! \underbar{/* Have an Oreo!}
+I want a cookie!! \underbar{read {\bs}psmith{\bs}new{\bs}*.rbs}
+File: c:{\bs}psmith{\bs}new{\bs}aa\_40.rbs
+Id:   WSi on Si, control
+File: c:{\bs}psmith{\bs}new{\bs}e-beam-i.rbs
+Id:   e-beam w, as implanted
+   .........
+File: c:{\bs}psmith{\bs}new{\bs}wb.rbs
+Id:   sput w, 300 sec in ar
+WARNING: Maximum number read - All buffers filled
+Your wish? \underbar{get aa\_40}
+Yes master?
+\endscreen
+
+
+<h2> Reread </h2>
+
+\syntax{RERead <filename>}{Read a file that was already read}
+
+@@{REREAD--RUMP}
+
+Under normal conditions, RUMP will always return to the buffer already
+containing a given file if it is requested again.  Under some circumstances,
+such as after a failed background subtract, it is necessary to bypass this and
+force RUMP to read the file off the disk.  At other times, one may just want
+to return to the original settings of the experimental parameters. 
+{\tt REREAD} performs this action by changing the extension of the filename
+associated with the ACTIVE buffer to {\tt .OLD}.  The original filename is
+then reread from disk into buffer 1.  Note that the original buffer remains
+but has a new name.  The original buffer 10 is lost in the shuffle since a new
+file is added to the buffer stack.  It is difficult to reread a file if you
+originally gave the data file an {\tt .OLD} extension.  The ACTIVE buffer
+points to the reread copy of the file after this command.
+
+\medskip\beginscreen
+Next command: \underbar{reread    /* ACTIVE was buffer 2}
+File: c:{\bs}psmith{\bs}new{\bs}wb.rbs
+Id:   sput w, 300 sec in ar
+Your wish? \underbar{buf}
+* => Main    ? => Dirty    @ => Parameters changed
+ *Main    1    c:{\bs}psmith{\bs}new{\bs}wb.rbs  sput w, 300 sec in ar
+  Buffer  3    c:{\bs}psmith{\bs}new{\bs}wa.rbs  sput w, 300 sec in n2
+  Buffer  2    c:{\bs}psmith{\bs}new{\bs}wb.old  sput w, 300 sec in ar
+  Buffer  4    psmith{\bs}new{\bs}sputw.rbs  sputtered w, as deposited
+You called? 
+\endscreen
+
+<h2> Swallow </h2>
+
+\syntax{SWALLOW <channel data>}{Load data as counts of the active buffer}
+
+@@{SWALLOW--RUMP} @@{WRASCII--RUMP} @@{ASCII data--RUMP}
+
+The {\tt SWALLOW} command is primarily intended for macro files to load in
+non-RUMP format stored ASCII channel data.  It permits the reading of ASCII
+data directly into the counts array of the ACTIVE buffer.  Channel data is
+read from the command line (or the active macro) one element at a time until a
+blank entry (or the default value) is entered.  Multiple channels of data are
+allowed on each line.  The {\tt WRASCII} command, which generates a macro file
+to reload data in a pure ASCII format, uses the {\tt SWALLOW} command.  The
+following macro file will load in a spectrum segment using the {\tt SWALLOW}
+command.  (Note the blank line used to terminate the swallow read.)  The
+command {\tt XEQ <file>} would be used to actually load the segment.
+
+\medskip\beginscreen
+/* Open a blank buffer and start swallowing the data
+empty swallow
+   0    0    0    0    0    0    0    0    0    0    0    0
+   0    0    0    0    0    2   29  223  485  786 1049 1231
+1373 1416 1504 1557 1567 1517 1539 1507 1553 1463 1516 1458
+1411 1478 1326 1417 1428 1375 1344 1306 1279 1238 1219 1289
+1246 1264 1192 1220 1212 1200 1166 1123 1142 1181 1137 1131
+1061 1065 1076 1042 1088 1110 1070 1086 1078 1017 1057 1062
+
+/* After a blank line to terminate SWALLOW, set parameters
+mev  3.02 charge 10 covers 4.95 1.6 theta 7 phi 9 omega 3.4
+corr 1.0  fwhm 25 ident 'This is test swallow data'
+\endscreen
+
+See also: {\tt WRASCII}
+
+<h2> {REWrite </h2>
+
+\syntax{REWrite}{Rewrites current buffer to a file with corrections}
+
+Synonym:  {\tt SAVE}
+
+@@{REWRITE--RUMP} @@{SAVE--RUMP}
+
+Rewrites current buffer to the current file with corrections.
+See Parameter Modifcation.
+
+<h2> {Write </h2>
+
+\syntax{WRITE <filename>}{Writes current buffer to another file}
+
+@@{WRITE--RUMP}
+
+Writes the current buffer to another file.
+
+<h2> {WRASCII </h2>
+
+\syntax{WRASCII <filename>}{Writes current buffer to a text file}
+
+@@{WRASCII--RUMP}
+
+Writes current buffer to a text file suitable for reading with {\tt SWALLOW}.
+
+See also: {\tt SWALLOW}
+
+<h2> Pointat </h2>
+
+\syntax{POintat <n>}{Set the active buffer}
+
+@@{POINT--RUMP} @@{Active Buffer--RUMP}
+
+{\tt POINTAT} allows the ACTIVE pointer to be set to any buffer, including the
+simulation and temporary buffers.  Other than the requirement that it must
+point to a configured buffer, no check is made to determine if the buffer is
+filled with valid data.  {\tt POINTAT} is the only command which will leave
+the ACTIVE buffer pointing to the simulation or temporary buffer space.
+
+<h2> Empty </h2>
+
+\syntax{EMpty}{Scroll buffers to leave an empty buffer 1}
+
+@@{EMPTY--RUMP}
+
+{\tt EMPTY } causes the current list of buffers to be scrolled with an empty
+buffer left as buffer 1.  Buffer 10 is lost in the process.  All parameters in
+buffer 1 are set to defaults, the data is set to all zero, the number of
+points is to the maximum and the buffer is marked as ACTIVE.  This command
+can be used with the {\tt SWALLOW} command below to read in ASCII data.
+
+<h2> RECALCULATE </h2>
+
+\syntax{RECALculate}{Mark sample structure as modified so recalculated}
+
+@@{RECALCULATE--RUMP}
+
+Normally RUMP tracks the status of the theory buffer.  It marks the buffer
+as being out of date if either the sample structure is modified or if the
+experimental parameters are changed (such as changing the ACTIVE buffer).
+However, it does not track modifications to the actual theory buffer data
+(such as a {\tt BACKGROUND} subtract) nor can it track modifications to sample
+parameters which are linked to the function evaluator (such as in {\tt
+EQUATION USER}).  The {\tt RECALC} command is a manual override to the
+automatic feature and simply marks the theory buffer as being out of date.
+The next reference to the theory buffer following this command will cause the
+simulation to be recalculated.
+
+
+<h2> {Release </h2>
+
+\syntax{RELease}{Release the ACTIVE buffer and unscroll}
+
+@@{RELEASE--RUMP}
+
+Buffers can be intentionally released for general use by the {\tt RELEASE}
+command.  The data in the buffer is forgotten and all parameters for the
+buffer are reset to default values.  The remaining buffers are unscrolled
+to fill in the space vacated by the released buffer.  Releasing buffer 2
+causes buffer 3 to become 2, 4 to become 3 etc.  It is not possible to
+retrieve the data in the buffer once it is released.  You must read the file
+back into memory directly.  {\tt RELEASE} is primarily used in macro files
+to maintain control over which data files remain active.
+
+<h2> NEWALL </h2>
+
+\syntax{NEWall}{Reset all parameters and clear all buffers}
+
+@@{NEWALL--RUMP}
+
+The {\tt NEWALL} command ``forgets'' completely about the current buffers and
+resets all parameters in the buffers to default values.  It returns the
+buffer stack to the same state as when RUMP was initiated.  This command is
+commonly used with macros to clear all previous reads when it is necessary to
+ensure the order of files in the buffers.
+
+
+\newpage
+
+<h2> Listing and Modifying Spectrum Parameters </h2>
+
+\bigskip \plaintopline \autosizetable
+{\tts ACtive} & List the parameters of the active buffer\cr
+{\tts BEAM} & Type of incident beam (He$^{++}$) \cr
+{\tts CHarge} & Measured beam dose in $\mu$C \cr
+{\tts CHOFF} & Channel number of first data point\cr
+{\tts CONVersi} & Channel to energy conversion constants\cr
+{\tts CORrecti} & Minor fudge factor for normalization correction\cr
+{\tts CURRent} & Average beam current (pileup calculations)\cr
+{\tts DATE} & Date of data collection\cr
+{\tts FILE} & Spectrum file name\cr
+{\tts FWHM} & Detector resolution (keV) \cr
+{\tts GEOMetry} & Scattering geometry used \cr
+{\tts IDEntifi} & Description identifier of the spectrum\cr
+{\tts MEV} & Beam energy\cr
+{\tts OMEGA} & Detector solid angle\cr
+{\tts PHI} & Supplement of the scattering angle\cr
+{\tts PSI} & Angle of surface normal to detected beam \cr
+{\tts THEta} & Sample tilt or angle of surface normal to incident beam \cr
+\endautosizetable \bigskip
+
+<h2> Active </h2>
+
+\syntax{ACtive}{List the parameters of the active buffer}
+
+@@{ACTIVE--RUMP}  @@{Active Buffer--RUMP}
+
+Each buffer includes information on the experimental parameters used in the
+data collection process.  These parameters are also stored in the data files.
+The values for the parameters of the ACTIVE buffer are listed to the screen
+using the {\tt ACTIVE} command.  This listing is organized so that related
+parameters are listed together on the same line.  The commands described
+below allow most of the parameters to be modified.
+
+\medskip\beginscreen
+Ready if you are! \underbar{buf}
+* => Main    ? => Dirty    @ => Parameters changed
+  Theory  0    temp.rbs              Simulation of Ni/Ni-Si/Si
+ *Main    1    rump{\bs}tests{\bs}examp.rbs  Ni/NiSi/Si Annealed 90 min
+Your wish? \underbar{active}
+ Filename:    c:{\bs}rump{\bs}tests{\bs}examp.rbs
+ Identifier:  Ni/NiSi/Si Annealed 90 min
+ LTCT Text:   LT= 857 CT= 860
+ Date:        18-JUN-1985 12:33:48.48
+ Beam:        3.020 MeV     4He++   10.00 uCoul   @  8.0 nA
+ Geometry:    Cornell  Theta:    7.0  Phi:    9.0  Psi:    0.0
+ MCA:         Econv:  4.950  1.600    First chan: 0.0   NPT: 1024
+ Detector:    FWHM: 35.0 keV   Omega: 3.400
+ Correction:  1.0041
+Your wish? 
+\endscreen
+
+<h2> Parameter Modification </h2>
+
+@@{FILE--RUMP} @@{IDENT--RUMP}  @@{DATE--RUMP} @@{MEV--RUMP}  @@{CHARGE--RUMP}
+@@{BEAM--RUMP}  @@{CORRECTION--RUMP} @@{GEOMETRY--RUMP} @@{PHI--RUMP}
+@@{THETA--RUMP} @@{PSI--RUMP}  @@{OMEGA--RUMP}   @@{CONVERSION--RUMP}
+@@{CHOFF--RUMP} @@{FWHM--RUMP} @@{CURRENT--RUMP}
+
+The following commands simply change the corresponding parameter in the
+ACTIVE buffer.  The use of each parameter within RUMP is listed in the notes
+below the table.  In general, only commands which one should normally modify
+during a session have abbreviations.  Commands which are, or should be, solid
+experimental parameters require spelling out in full - this is to avoid later
+command name conflicts.
+
+\medskip \autosizetable
+Command  &   Parameter  &    Notes &   Explanation\cr
+\cr
+
+{\tt FILE}     & filename       &  -    & File from whence it came\cr
+{\tt IDEntifi} & 'line of text' &  4    & Description of buffer contents\cr
+{\tt DATE}     & 'line of text' &  -    & Date of data collection\cr
+{\tt MEV}      & MeV            & 2,3,7 & Incident beam energy\cr
+{\tt CHarge}   & $\mu$Coulombs  &  1    & Integrated beam dose\cr
+{\tt BEAM}     & 4He++          & 1,2,3 & Beam type (arbitrary) \cr
+{\tt CORrecti} & Value          &  1    & Correction for beam dose\cr
+{\tt GEOMetry} & {\tts CORNELL/IBM/GENERAL} & 2,3,6 & Scattering geometry\cr
+{\tt PHI}      & degrees        & 2,3,6 & Supplement of scattering angle\cr
+{\tt THEta}    & degrees        & 2,3,6 & Sample tilt angle (incident beam)\cr
+{\tt PSI}      & degrees        & 2,3,6 & Sample exit angle (exit beam)\cr
+{\tt OMEGA}    & msr            &   1   & Detector solid angle\cr
+{\tt CONVersi} & keV/ch \quad keV(0)  &  1,5  & ADC channel to energy calibration\cr
+{\tt CHOFF}    & channel        &   5   & Channel \# of first data point\cr
+{\tt FWHM}     & keV            &   3   & Detector resolution\cr
+{\tt CURRent}  & nanoamps       &   3   & Beam current (for pileup)\cr
+\endautosizetable 
+
+\bigskip
+{\parindent=35pt\parskip=0pt
+\item{1.}  Used to normalize yield data
+\item{2.}  Parameters used by RBS analytical tools
+\item{3.}  Parameter used primarily by the simulation programs
+\item{4.}  The {\tt IDS} command displays this text on the plot
+\item{5.}  The energy scale is determined by $chan*(kev/ch) + kev(0)$.
+           {\tt CHOFF} is channel number of the first data point and is
+           normally set to 0. Changing {\tt CHOFF} shifts plot horizontally.
+\item{6.}  Scattering geometry --- see description below.
+\item{7.}  Incident beam is specified as a specific isotope and charge state
+           such as 4He++.  Stopping power data for the beam should have
+           previously been loaded.
+\par}
+ 
+These commands change only parameters in the active buffer.  The file remains
+unchanged until a {\tt REWRITE} command updates the information in the file.
+The {\tt REREAD} command may be used to restore the buffer to the state
+contained in the file.
+
+<h2> Scattering Geometry </h2>
+
+@@{SCATTERING GEOMETRY--RUMP}
+
+A full description of the scattering geometry for RBS requires three angles,
+the scattering angle of the particle, the entrance between the surface normal
+and the incident beam, and the exit angles of the beam with respect to the
+surface normal.  In the geometry {\tt GENERAL}, these three angles are
+independent and are set by the commands {\tt PHI}, {\tt THETA} and {\tt PSI}
+respectively.  Note, however, that {\tt PHI} is really the supplement of the
+scattering angle --- direct backscattering is 0 degrees.
+
+In many cases, the three angles are not completely independent.  Given a
+single tilt axis on most sample holders, only two of the angles need to be
+specified and the third can be determined from knowledge of the geometry.  Two
+``standard'' geometries are defined, {\tt CORNELL} and {\tt IBM}.  These are
+purely historical designations having little to do anymore with the actual
+geometries at the two sites.  The angle {\tt PSI}, again historically, is the
+derived quantity from {\tt THETA} and {\tt PHI}.   The {\tt IBM} geometry
+refers to the scattering configuration where the incident beam, surface
+normal, and detected beam are all coplanar.  The exit angle {\tt PSI} is set
+to {\tt PHI+THETA}.  In the {\tt CORNELL} geometry, the tilt axis lies in the
+plane defined by the incident and scattered beams, and the surface normal
+sweeps out a perpendicular plane.  The {\tt CORNELL} geometry sets 
+$cos(psi)=cos(theta)*cos(phi)$.  If there are other common geometries in the
+world, there is only space for another 32,765 possibilities in the code ---
+get your request in early.
+
+If the scattering geometry is set to {\tt GENERAL}, all three angles must
+be defined and are used.  Changing the geometry to {\tt CORNELL} or {\tt IBM}
+will cause {\tt PSI} to be ignored and its value may change.  
+
+\newpage
+
+<h2> Manipulating and Massaging Data and Buffers </h2>
+
+\bigskip \plaintopline \autosizetable
+{\tts ADD} & Add two spectra\cr
+{\tts BACKground} & Background fit and subtraction\cr
+{\tts COPY} & Copy one buffer to another\cr
+{\tts COMPRess} & Compress channels to improve statistics\cr
+{\tts MOVE} & Exchange the data in two buffers\cr
+{\tts DIVide} & Calculate a $\chi_{min}$ plot\cr
+{\tts SMOoth} & Smooth the data\cr
+{\tts SUBTRact} & Subtract two spectra\cr
+\endautosizetable
+\bigskip
+
+<h2> Move </h2>
+
+\syntax{MOve <source buffer \#> <dest buffer \#>}{Exchange the data in two buffers}
+
+@@{MOVE--RUMP}
+
+The {\tt MOVE} command is really an exchange command.  The source and
+destination buffers are exchanged, including all data and experimental
+parameters associated with the buffers.  The ACTIVE buffer remains pointing at
+the same data after this command; if either the source or destination buffer
+was ACTIVE, the actual buffer number pointed to by ACTIVE will change.
+The buffers {\it must} be specified by number for the {\tt MOVE} command. 
+In this command only, filenames are not allowed but buffer -1 is accessible.
+
+<h2> Copy </h2>
+
+\syntax{COpy <source buffer> <dest buffer>}{Copy the data in source buffer to destination}
+
+@@{COPY--RUMP}
+
+The {\tt COPY} command directly copies all experimental parameters and data
+from the source buffer to the destination buffer.  After this command, both
+buffers are absolutely identical including name and modification history.  The
+original contents of the destination buffer are lost.
+
+
+<h2> Add </h2>
+
+\syntax{ADd <source buffer> <dest buffer>}{Add two spectra}
+
+@@{ADD--RUMP}
+
+The {\tt ADD} command works with a pair of buffers, adding the contents of
+the source buffer to the destination buffer and saving the result in the
+destination buffer.  The source and destination buffers may be identified
+either by number or by the associated filename.  {\tt ADD} will attempt to
+read the file into a buffer if it is not already in the buffer set. 
+However, because of the buffers scrolling, specifying a destination file
+which does not already exist in the buffer set may cause the wrong buffers to
+be added.  It is suggested that both files be read into buffers before
+executing the {\tt ADD} command.
+
+The result of the add is placed in the destination buffer.  This buffer will
+be marked as dirty to indicate that the data has been modified (? will be
+shown by the {\tt BUFFERS} command).  The {\tt ADD} command works slightly 
+different depending on the setting of the {\tt RAW/NORMALIZE} switch.  In
+{\tt RAW} mode the add is performed literally --- counts are counts, no
+questions asked.  The charge of the destination buffer is set to the sum of
+the charges of the source and and destination buffers. 
+
+In {\tt NORMALIZED} mode, the addition is done as it appears visually on the
+graph.  The charge and correction factor of the destination buffer are not
+changed.  The data is summed for the same energy position (not same channel)
+with corrections for the width for the channels and for the beam current,
+detector and correction factors.  The resulting data is mapped onto the MCA
+structure of the original destination buffer, retaining the {\tt CONV}
+parameters.
+
+\newpage
+<h2> Subtract </h2>
+
+\syntax{SUBTRact <source buffer> <dest buffer>}{Subtract two spectra}
+
+@@{SUBTRACT--RUMP}
+
+The {\tt SUBTRACT} command subtracts the data in the source buffer from the
+destination buffer and places the results in the destination buffer.  It is
+otherwise identical to the {\tt ADD} command described above and the same
+comments apply.
+
+
+<h2> Divide </h2>
+
+\syntax{DIVide <source buffer> <dest buffer>}{Divide two spectra}
+
+@@{DIVIDE--RUMP}
+
+In the {\tt DIVIDE} command, the contents of the destination buffer are
+divided channel by channel by contents of the source buffer.  Results are
+stored in the destination buffer which is marked as having modified data.
+See notes in {\tt ADD} for warnings on specifying filenames as buffers.
+This command is commonly used to compute the ratio of a channeled spectrum to
+the reference random spectrum and determine the minimum channeling yield
+$\chi_{min}$.  
+
+{\tt DIVIDE} assumes that channel to energy conversion for the two spectra are
+identical, or identical enough to be ignored.  No check of the parameters is
+made.  The data are divided on a channel by channel basis after correcting for
+the starting channel number of each buffer.  Anything divided by zero is
+defined, as far as this command is concerned, to be zero.  Only the region of
+overlap between the two buffers is computed.  In {\tt RAW} mode, the absolute
+channel data are divided while the {\tt NORMALIZE} mode uses the scaled yield
+values.  The correction factor, solid angle and charge of the destination
+buffer are all set to unity following this command.
+
+Independent of how the mode in which the division was performed, the result
+should always be plotted in {\tt RAW} mode since the normalized plots will be
+completely meaningless.
+
+<h2> Background </h2>
+
+\syntax{BACKground <cursor entries> <order\_fit>}{Background subtract using a
+polynominal fit over region}
+
+@@{BACKGROUND--RUMP}
+
+The {\tt BACKGROUND} command attempts to extract an isolated peak from a large
+background by subtracting an estimate of the background from the data.  Peaks
+extracted in this manner are then often analyzed using the {\tt THICKNESS} or
+{\tt INTEGRAL} commands.  The {\tt BACKGROUND} is estimated by fitting a
+polynomial, of order {\tt <order\_fit>}, through the spectral data on either
+side of the isolated peak.  (You must be able to identify regions from the
+background on both sides of the peak to use this command.)  Regions are
+normally entered using the cursor, but may also be entered from the keyboard
+by pressing the {\tt <esc>} key at the first cursor.  Four channel values are
+requested and the background fit will be done in the intervals between the
+lower two and upper two values.
+
+A least squares polynomial fit is made to the data in these regions.  The
+order of the polynomial must not exceed 6.  (Generally, anything above 2 is
+lying to yourself --- if the data is not quadratic, don't try background
+subtract.)   The polynomial fit is subtracted from the channel data over the
+range of the fit, including the intervening channels.   The polynomial fit
+and the resulting spectra are then overlaid on the plot.  {\it This command
+modifies the data}, so one normally copies the buffer of interest into another
+buffer before using the {\tt BACKGROUND} command.
+
+The subtracted data is primarily suited to integrating.  After a background
+subtract, the ``gross'' integral results will give more reliable answers than
+the primitive background subtract used in the ``net'' integration.
+
+\newpage
+
+<h2> Compress </h2>
+
+\syntax{COMPRess <nchan>}{Compress multiple channels to improve statistics}
+
+@@{COMPRESS--RUMP}
+
+The statistical noise in a spectrum can be reduced by summing adjacent
+channels into a single channel using the {\tt COMPRESS} command.  The
+resulting spectra has fewer data points, but each channel is statistically
+less noisy.  The alternative is to collect data for a longer period initially.
+The parameter {\tt <nchan>} is the number of channels which are to be combined
+in each step.  Given an {\tt <nchan>} of 4, a spectrum with 1024 points will
+become a spectrum with 256 points.  The energy scales and the first channel
+number are modified to correspond to the compressed spectra.  The buffer is
+also marked as dirty to indicate modified data.
+
+<h2> Smooth </h2>
+
+\syntax{SMOoth [-SV | -CONV <ntimes> | -FFT <width>]}{Smooth the data}
+
+@@{SMOOTH--RUMP}
+
+The smooths command reduces the noise in a spectra while attempting to
+retain statistically valid features.  There are several options available
+for smoothing:
+
+{\tt \medskip \plaintopline \autosizetable
+SMOOTH               &  [-RANGE <cursor or entry>]\cr
+SMOOTH -SV           &  [-RANGE <cursor or entry>]\cr
+SMOOTH -CONV <ntimes>& \cr
+SMOOTH -FFT  <fwhm>  &  [-RANGE <cursor or entry>]\cr
+\endautosizetable}
+
+The three smoothing algorithms currently implemented are listed above, the
+Savitsy-Goulay smooth ({\tt -SV}), a convolution algorithm ({\tt -CONV}) and
+an FFT smoothing algorithm ({\tt -FFT}).  If no algorithm is selected, the
+Savitsy-Goulay algorithm will be used by default.  The buffer is marked as
+dirty to indicate modified data by this command.
+
+The Savitsky--Goulay smooth is a simple 5 point smoothing algorithm.  It works
+quickly and does a surprisingly good job.  It may be necessary to smooth
+several times to achieve the desired results.  Be sure to compare the smoothed
+spectra with the original before believing any results.  The exact formula is
+$$
+    x_n = {{-3*x_{n-2}+12*x_{n-1}+17*x_n+12*x_{n+1}-3*x_{n+2}} \over {35}}
+$$
+
+The convolution algorithm attempts to retain edges in the spectra while
+smoothing.  This is a iterative algorithm which convolutes and deconvolutes
+using the detector resolution on each iteration.  It will be executed the
+number of times specified by the {\tt <ntimes>} value.  Typical spectra
+require 5 iterations.  Note that two smooths by this algorithm are not
+equivalent to one operation with twice the number of iterations.
+
+The FFT based smoothing algorithm is based loosely on the algorithm 
+in {\it Numerical Recipes}, Press et al., (Cambridge University Press, 1986).
+The degree of smoothing is controlled by the specified {\tt <width>}.  The
+width is roughly the number of channels over which the data will be shared
+and should be approximately equal to the detector resolution divided by the
+energy width of each channel.
+
+Both the FFT and SV algorithms are implemented in a manner where the range of
+smoothing can be limited to a subset of the entire buffer; the convolution
+however, always operates over the entire spectra.  The {\tt -RANGE} option
+specifies a finite range, marked with cursors, over which the specified smooth
+will be performed.  Data outside the range will not be modified.  This feature
+allows different regions of the spectra to be smoothed to differing degrees.
+
+{\bf PERT Warning:} {\it NEVER} smooth data that PERT is to look at.
+The smooth functions give pretty--looking lines for simplified viewing but
+are less than useless for quantitative work.
+
+P.S. If you are finding smooth extremely useful, you really should consider
+collecting data for a longer period of time.  {\tt SMOOTH} should be used
+to direct further experiments, but results should not be based on smoothed
+spectra.  The {\tt COMPRESS} command above is a statistically honest method of
+improving the statistics in a spectrum.
+
+<h2> RBS ANALYSIS </h2>
+
+\bigskip \plaintopline \autosizetable
+{\tts CALibrate} & Calibrate {\tt CONV} and {\tt MEV} from spectra \cr
+{\tts CURsor}  & Displays a cursor and returns energy/yield values\cr
+{\tts ELement} & Indicates scattering energy for an element\cr
+{\tts INFo} & Prints information about an element\cr
+{\tts INTegral} & Finds integral over a region\cr
+{\tts MATrix} & Plots energy and yield expected for a pure element\cr
+{\tts THICkness} & Calculates thickness from area integral\cr
+{\tts WHATisit} & Identifies elements near a specified channel\cr
+{\tts WIDth\_th} & Calculates thickness based on energy width\cr
+{\tts INTSET} & Sets integration modes for {\tt THICKNESS} and {\tt INTEGRAL} commands \cr
+{\tts DISPLAY} & Profiles the composition of the SIM sample structure \cr
+\endautosizetable
+
+The commands in this section are designed for analysis of simple elemental
+RBS structures or for identification of features within a spectrum.  The
+command generally use surface or mean energy scattering approximations.  For
+more sophisticated analysis, the simulation capabilities described later
+should be used.
+
+Data for these commands is obtained from the {\tt ATOM3.DAT} file containing
+atomic elemental information and stopping cross--section data.  Scattering
+cross-sections are assumed to be purely Rutherford and resonances are not
+treated by these commands.  Thickness, as measured by RBS, is an areal
+density rather than a distance.  Conversion from the areal density of
+atoms/cm$^2$ to thickness is performed using the standard atomic density of
+the element.  Corrections for differing densities must be handled manually.
+
+Many of these commands request input of marker positions from the cursor.  At
+any point, the cursor input mode can be escaped by pressing the {\tt <esc>}
+key and input will be taken from the keyboard instead.  From the graph, the
+actual energy corresponding to the upper scale is obtained.  However, when
+responding to a cursor request by typing, channel numbers should be specified.
+These are translated to the equivalent energy using the {\tt CONV} parameters
+of the ACTIVE buffer.  Inside macro files, it may be necessary to use {\tt
+ENCURSOR NO} to completely disable the cursor modes and allow channel numbers
+to passed through the command line.
+
+<h2> Cursor </h2>
+
+\syntax{CURsor}{Display cursor and return energy/channel values}
+
+@@{CURSOR--RUMP}
+
+The {\tt CURSOR} command displays a crosshair or hardware cursor on graphics
+so equipped.  The coordinates of the crosshair are returned when any key or
+button is pressed and are listed to the screen as channel number, energy and
+yield (or counts if in raw mode).  If the key pressed was a {\tt 0} or {\tt
+<sp>}, the cursor mode is retained for another value.  On any other key, the
+cursor mode exist and the variables {\tts XCUR, YCUR, ECUR}, and {\tts CCUR}
+are linked to the resulting channel, yield, energy (in MeV) and character
+pressed.
+
+The energy value returned by {\tt CURSOR} corresponds to the energy scale on
+the graph.  However, the channel number shown corresponds to the channel in
+the ACTIVE buffer which has the corresponding energy.  This may differ from
+the lower channel scale on the axes if {\tt CONV} is different.
+
+Ex: {\tt Channel:  338.4   Energy:  2.840 MeV   Yield:  28.1132 /uC/keV/msr}
+
+\newpage
+<h2> Info </h2>
+
+\syntax{INFo <element>}{Print information about an element}
+
+@@{INFO--RUMP}
+
+The {\tt INFO} command prints a collection of information about the specified
+element, including the isotopic makeup and scattering/stopping parameters.
+The scattering geometry for cross section and stopping power evaluations is
+taken from the ACTIVE buffer.  The first line after the parameters gives the
+kinematic scattering factor and the channel and energy for scattering from an
+element on the surface.  The matrix scattering height is the yield expected
+from the pure element as a thick film on the surface.  The scattering cross
+section is evaluated at the incident energy and a scattering angle of {\tt
+180-phi}.  The stopping cross section {\tt [e]} includes corrections for the
+incident and exit paths.  The stopping factor {\tt [S]} is determined using
+the bulk elemental density.
+
+\medskip\beginscreen
+Your wish? \underbar{info si}
+
+ -----------------------------------------------------
+ Si  Z: 14  Mass:  28.09  Density:  0.4978E+23 at/cc ( 2.32 g/cc)
+
+ Parameters: Energy  3.000 MeV  Theta  7.00     Phi   9.00
+             keV/channel 4.950     keV(0)   1.600
+
+ Surface Scattering:         0.5654 at  1.696 MeV (Channel: 342.3)
+ Matrix scattering height:     9.05 Counts/uC/keV/msr
+ Scattering cross section:     0.110 (1E-24 cm2/ster)
+ Stopping Factors:  [e] =  76.3 (1E-15 eV-cm2)   [S] =  38.0 eV/A
+
+Isotopes:  Mass:  29.97  Abundance: 0.03090
+           Mass:  28.98  Abundance: 0.04700
+           Mass:  27.98  Abundance: 0.92210
+
+Ready if you are! 
+\endscreen
+
+<h2> Element </h2>
+
+\syntax{ELement <element>}{Plots surface scattering energy}
+
+@@{ELEMENT--RUMP}
+
+The {\tt ELEMENT} command is used to identify on the graph the position where
+an element on the surface would scatter.  The kinematic factor, energy and
+channel for scattering are printed to the terminal.  If a graphic device is
+active, a marker is drawn on the channel axis at the scattering energy and is
+labeled with the element.  If an element name only is specified, the average
+atomic weight is used.  Isotopes may be specified and will be marked
+accordingly.
+
+\medskip \screenwidth=\hsize \beginscreen
+Feed me! \underbar{element si   el 28si}
+ Si  Z=14  Mass= 28.086  K(He)=0.5654  Energy= 1.696 MeV  Channel= 342.321
+ Si  Z=14  Mass= 27.977  K(He)=0.5641  Energy= 1.692 MeV  Channel= 341.550
+At your service! 
+\endscreen
+
+<h2> Whatisit </h2>
+
+\syntax{WHATisit <cursor\_entry>}{Identify elements near channel}
+
+@@{WHATISIT--RUMP}
+
+{\tt WHATISIT} is, in one sense, the inverse of the {\tt ELEMENT} command.
+Whereas {\tt ELEMENT} is to mark a known elemental point, {\tt WHATISIT} is
+used to mark 5 elements around a given energy position.  The five closest
+elements to the marked point are displayed to the terminal and are drawn on
+the graph.  These markers thus indicate at least the range of atomic numbers
+corresponding to an unknown peak.  It is important to keep in mind that (1)
+elements may not be on the surface and (2) that mass resolution is poor at
+high Z and the actual element may not be listed at all.
+
+\medskip\beginscreen
+Ready if you are! \underbar{whatisit}
+
+ Selected energy was  1.694 MeV
+ Mg Mass  24.3   expected at  1.550 MeV (Channel  313)
+ Al Mass  27.0   expected at  1.656 MeV (Channel  334)
+ Si Mass  28.1   expected at  1.696 MeV (Channel  342)
+ P  Mass  31.0   expected at  1.790 MeV (Channel  361)
+ S  Mass  32.1   expected at  1.822 MeV (Channel  368)
+
+Ready if you are! \underbar{whatisit}
+
+ Selected energy was  2.769 MeV
+ Ir Mass 192.2   expected at  2.762 MeV (Channel  558)
+ Pt Mass 195.1   expected at  2.765 MeV (Channel  558)
+ Au Mass 197.0   expected at  2.767 MeV (Channel  559)
+ Hg Mass 200.6   expected at  2.771 MeV (Channel  560)
+ Tl Mass 204.4   expected at  2.775 MeV (Channel  560)
+
+At your service! 
+\endscreen
+
+<h2> Matrix </h2>
+
+\syntax{MATrix <element>}{Plots an element's energy and height}
+
+@@{MATRIX--RUMP}
+
+A surface thick film of any pure element has a well defined yield height
+determined by the stopping power, cross section and channel energy width. 
+This height is referred to as the matrix height and is plotted and labeled on
+the graph using the {\tt MATRIX} command.  The height and edge for the
+specified element are plotted as a cross on the graph with the element name 
+(or isotope) just above.  The height of a substrate edge, such as Si, can be
+used to verify the normalization condition.  The scattering height and
+position are also displayed on the terminal.  Matrix height is determined by
+$$
+     Yield =  { {\sigma * d\Omega * q *\Delta E_{chan}} \over {[\epsilon]}}
+$$
+
+\medskip\beginscreen
+Feed me! \underbar{mat si}
+ Si expected at  1.696 MeV ( 342.3) and height    9.052
+At your service! 
+
+\endscreen
+
+<h2> CALIBRATE </h2>
+
+\syntax{CALibrate <cursor\_pt> <cursor\_pt> <el> <el> <energy> <cursor\_pt>}{Calibrates ECONV and MEV for spectrum from specific peaks on spectrum}
+
+The settings of the channel--to--energy conversion and the absolute energy of
+the accelerator should be well known quantities but are often not controlled
+well enough for an absolute setting.  The {\tt CALIBRATE} command determines
+the values for {\tt CONV} and {\tt MEV} of the ACTIVE buffer from the
+positions of two surface element peaks and one absolute energy point.
+At Cornell, a $^{230}$Th alpha source is mounted near the detector to
+provide the absolute energy calibration in all spectra.  If the beam energy is
+accurately known, changes to the {\tt MEV} setting can be skipped by setting
+the energy of the known marker to zero.  Only values for {\tt CONV} will be
+modified in this case. 
+
+When {\tt CALIBRATE} is executed, the cursor is enabled and two surface peaks
+should be identified, either by a thin peak or the half height of a ledge. The
+elements corresponding to these points are then entered (use the specific
+isotope for better calibration especially if a low Z element is one of the
+calibration points).  The absolute energy of a known marker (in keV) is then
+requested.  The default value is the 4684 keV major peak from $^{230}$Th
+decay.  If any positive non-zero marker energy is input, the cursor is again
+displayed to obtain the position of the marker.  To improve accuracy, the
+position of the marker should have previously been determined using the {\tt
+REGION} and {\tt CURSOR} commands.  Escape out of cursor entry mode (using
+{\tt <esc>}) and enter the absolute number from the keyboard.
+
+The command changes the {\tt MEV} and {\tt CONV} values of the current buffer
+to correspond to calculated values.  The accuracy should be tested using a
+third element peak and the {\tt ELEMENT} command.  The following example
+calibrates using buffer 3 and then transfers the calibration to real spectra
+in buffers 1 and 2.
+
+\medskip\beginscreen
+Your wish?     \underbar{/* We first get the buffer and calibrate}
+Up periscope!  \underbar{/* The channel for 230Th is escaped and typed}
+Feed me!       \underbar{get 3 calibrate}
+Identify two surface elements.
+Element? (no change) \underbar{ni si}
+Marker energy, keV (4684 for 230Th) ? \underbar{4684}
+Marker position? \underbar{(pressed <esc> to abort cursor)}
+Marker position? \underbar{930}
+ Energy= 3.223 MeV    Conversion:   4.7825 keV/ch     3.24 keV(0)
+Feed me! \underbar{for \%f in (1 2) do get \%f mev 3.223 econv 4.7825 3.24}
+Beam me up Scottie! 
+\endscreen
+
+<h2> Integral/Thickness </h2>
+
+\syntax{INTegral <cursor\_low> <cursor\_high>}{Integral of counts over a region}
+\syntax{THICkness <cursor\_low> <cursor\_high> <element>}{Thickness calculation based on total counts in region}
+\syntax{THICkness <cursor\_low> <cursor\_high> <element> <alpha\_val>}{}
+
+@@{THICKNESS--RUMP} @@{INTEGRAL--RUMP}
+
+The {\tt INTEGRAL} command determines the total integrated number of counts
+between two markers in the ACTIVE buffer, either on a {\tt RAW} or {\tt
+NORMALIZED} basis.  In the raw mode, the absolute counts in each channel are
+summed.  In normalized mode, this sum is then scaled by the charge, detector
+solid angle and correction factor ({\tt Q, OMEGA} and {\tt CORR}) to standard
+conditions.  Two integrals, the ``gross'' and the ``net'', are reported. 
+The gross integral is the complete sum while the net integral includes only
+counts which lie above a straight line drawn between the region edges.   The
+net integral thus performs the simplest of background subtractions.  However,
+the {\tt BACKGROUND} command should be used to extract the peak first if it
+lies on any substantial background signal.  
+
+There are two ways in which the {\tt INTEGRAL} command can handle the channels
+at either end of the integration region.  The {\tt INTSET} command is used
+to set the mode.  In the default mode, the boundaries of the integration are
+rounded to integers before summing the data (the rounding occurs toward the
+center of the region).  {\tt INTSET} can switch the integration mode so that
+the partial channels at the boundaries are also included in the integration.
+See the {\tt INTSET} command for more details.
+
+The {\tt THICKNESS} command first does an {\tt INTEGRAL} and then translates
+the measured total yield into an equivalent thickness (atoms/cm$^2$) of an
+element.   To first order, the total number of scattering centers (atoms) is
+related directly to the integrated yield through the beam dose and detector
+solid angle, $Y \approx {{d\sigma} \over {d\Omega}} * d\Omega * Q * N_t /
+\cos \theta_{in}$.  Hence, the thickness determined by integration of a peak
+is an absolute measurement assuming that $d\Omega$ and $Q$ are known
+accurately.  Since these quantities
+are usually known only to within about 5\%, the fudge factor {\tt CORR} also
+enters into the equation.   Within these constraints, {\tt THICKNESS} provides
+an absolute measurement of the number of atoms/cm$^2$ present.  This areal
+density is presented as a thickness using the bulk elemental density. 
+Thickness values are reported for both the gross and net integrals.
+
+The {\tt INTSET} command also controls the manner in which the thickness is
+calculated from the integral.  The default is to use the simple surface
+scattering approximation.  Increasing accuracy is achieved by allowing {\tt
+THICKNESS} to estimate the correction required because the scattering cross
+section increases as the particle slows down in the layer.  The greatest
+accuracy is obtained if the user provides the ``alpha'' energy loss ratio
+factor (after setting the mode with {\tt INTSET Q}).  Even in the
+compensated modes, the thicknesses are valid primarily for pure elemental
+layers and {\tt SIM} should be used for more complex structures.  See the
+{\tt INTSET} command for additional details on compensated thickness.
+
+The variables {\tt GROSS\$}, {\tt NET\$}, and {\tt THICK\$} are linked by this
+command. {\tt GROSS\$} and {\tt NET\$} are real numbers contain the
+corresponding integrals.  {\tt THICK\$} is a four element array containing the
+gross and net thicknesses in Angstroms (entries 1 and 2) and areal thickness
+in atoms/cm$^2$ in entries 3 and 4.
+
+\medskip\beginscreen \beginverb
+
+Your wish? \underbar{thick ni}
+Identify region with cursor.  Press any key.
+     Discrete integration on Buffer  1,   Ni/NiSi/Si Annealed 90 min
+ Region:  385.0 to  482.0 Gross:     5196.78 Net:     5164.94  (#/uC/msr)
+ Ni surface approximation with micro-density of  8.90 g/cc yields
+ (Gross)  0.1847E+19 Atoms/cm**2 ( 2023.4 Angstroms)
+ ( Net )  0.1835E+19 Atoms/cm**2 ( 2011.0 Angstroms)
+
+Yes dear? \underbar{intset interp thick ni intset round}
+Identify region with cursor.  Press any key.
+ Interpolated integration on Buffer  1,   Ni/NiSi/Si Annealed 90 min
+ Region:  385.4 to  482.3 Gross:     5196.18 Net:     5158.00  (#/uC/msr)
+ Ni surface approximation with micro-density of  8.90 g/cc yields
+ (Gross)  0.1846E+19 Atoms/cm**2 ( 2023.2 Angstroms)
+ ( Net )  0.1833E+19 Atoms/cm**2 ( 2008.3 Angstroms)
+
+At your service! \underbar{intset estimate thick ni}
+Identify region with cursor.  Press any key.
+     Discrete integration on Buffer  1,   Ni/NiSi/Si Annealed 90 min
+ Region:  385.0 to  482.0 Gross:     5196.78 Net:     5164.94  (#/uC/msr)
+ Ni surface approximation with micro-density of  8.90 g/cc yields
+ (Gross)  0.1847E+19 Atoms/cm**2 ( 2023.4 Angstroms)
+ ( Net )  0.1835E+19 Atoms/cm**2 ( 2011.0 Angstroms)
+
+Compensated calculation (refer to Chu et.al. page 65)
+For fixed alpha =    1.13703      (surface approx. for Ni)
+ (Gross)  0.1766E+19 Atoms/cm**2 ( 1934.8 Angstroms)
+ ( Net )  0.1755E+19 Atoms/cm**2 ( 1923.3 Angstroms)
+
+Your wish? 
+\endverb \endscreen
+
+<h2> Width\_thick </h2>
+
+\syntax{WIDth\_th <cursor\_low> <cursor\_high> <element>}{Thickness
+calculation based on peak width}
+
+@@{WIDTH\_THICK--RUMP}
+
+As an alternate to {\tt THICKNESS}, the width of a layer in energy can be
+related to its thickness through the stopping factor [S].  The {\tt
+WIDTH\_THICK} command determines the thickness based on a mean energy
+approximation for the stopping factor.  (See Chu et al. for a discussion of
+the mean energy approximation.)  {\tt WIDTH\_THICK} is appropriate for almost
+pure elemental layers whose widths are substantially greater than the detector
+resolution and form well defined flat top ledges.  The cursor is used to mark
+the half--height points on either side of the layer.  The compensated stopping
+factors and the calculated thickness are reported.  The accuracy of this 
+calculation is constrained by the accuracy of the stopping power tables,
+usually about 5-10\%.  The final thickness (\AA) and area thickness are linked
+as the array {\tt THICK\$}.
+
+\medskip\beginscreen
+Feed me! \underbar{width\_th}
+Place cursor at half-height points.
+Element? (no change) \underbar{Ni}
+ Stopping Factors:   [e] = 112.9 (1E-15 eV-cm2)  [S] = 103.0 eV/A
+ Width:  254.5 keV    0.2254E+19 Atoms/cm**2     2470.3 Angstroms
+Feed me! \underbar{eval thick\$(2)}
+Value:   2.254E+18
+Yes Master? 
+\endscreen
+
+<h2> INTSET </h2>
+
+\syntax{INTSET [Round|Interp|Surf|Est|Query|?]}{Set mode for thickness calculations}
+
+@@{INTSET--RUMP}
+
+The {\tt INTSET} command sets the internal mode used for calculating the {\tt
+INTEGRAL} or the {\tt THICKNESS} commands.  Integrals are evaluated in either
+of two modes.  In the {\tt roundoff} mode, channels are rounded toward the
+center of the integration region.  In the {\tt interpolate} mode, each channel
+is treated as having a triangular basis extending one channel to either side
+of center.   The edges of the region need not be integer channels and the
+integral will include an appropriate fraction of the nearby edge channels. 
+The default mode is {\tt rounding}.
+
+Three modes may be set for determining the thickness of an element over the 
+region, {\tt surface}, {\tt estimate} and {\tt query}.  The default is the
+{\tt surface} approximation and no correction for the increase of the cross
+section with depth is attempted.  The other modes {\tt estimate} and {\tt
+query} are forms of the mean energy approximation.  The energy of the particle
+at the time of scattering is estimated from the detected energy.  Energy loss
+on the ingoing path is assumed to be a constant fraction of the total energy
+loss and hence the scattering energy can be obtained from the overall energy
+loss.  In terms of stopping powers, 
+$$
+E_{scat} = E_0-{\left ( {{dE}\over{dx}} \right )_{E_0} \over {cos \Theta_{in}}} *
+          {{\Delta E} \over 
+{\left [ K {\left ( {{dE}\over{dx}} \right )_{E_0} \over {\cos\theta_{in}}} +
+           {\left ( {{dE}\over{dx}} \right )_{KE_0} \over {\cos\theta_{out}}} \right ]}}
+$$
+The parameter alpha is defined by the quantity
+$$
+ alpha = {{\cos\theta_{in}} \over {\cos\theta_{out}}} * 
+           {{\left ( {{dE}\over{dx}} \right)_{KE_0}} \over 
+           {\left ( {{dE}\over{dx}} \right)_{E_0}}}
+$$
+and is sufficient to perform the above calculations.  In the {\tt estimate}
+mode, the thickness integrals are performed correcting for cross section
+changes using this formulation of alpha.   For repeated measurements on a
+given sample type, alpha can be calibrated accurately and the {\tt query}
+mode allows for direct entry of a user value of alpha.  Given accurate user
+values, {\tt THICKNESS} will correctly evaluate the areal density of elements
+even in compounds.  See Chu et al. equations 3.21ff for additional details.
+
+The ? command provides a listing and short description of these modes as well
+as identifying which modes are currently active. 
+
+\medskip\beginscreen
+Feed me! \underbar{intset}
+[Round|Interp|Surf|Est|Query|?] \underbar{?}
+
+* current mode - Single letter command - Explanation of mode
+* R - Integrals are rounded to nearest channel
+  I - Integrals are interpolated between channels
+* S - Thickness calculation based on surface approximation only
+  E - Compensated thickness calculation with an estimated alpha
+  Q - Compensated thickness calculation with query for alpha
+
+At your service! \underbar{intset I intset E intset ?}
+
+* current mode - Single letter command - Explanation of mode
+  R - Integrals are rounded to nearest channel
+* I - Integrals are interpolated between channels
+  S - Thickness calculation based on surface approximation only
+* E - Compensated thickness calculation with an estimated alpha
+  Q - Compensated thickness calculation with query for alpha
+
+At your service! 
+\endscreen
+
+<h2> Profile </h2>
+
+\syntax{PROfile <element> <cursor\_region> <filename>}{Profile an element as concentration versus depth}
+
+@@{PROFILE--RUMP}
+
+The {\tt PROFILE} command (within RUMP --- not SIM) estimaes the concentration
+versus depth for a single element corresponding over a given region in the
+ACTIVE spectrum --- usually an isolate peak.  The stopping factors which
+determine the non--linear conversion from energy to depth are calculated using
+the current sample structure defined in the {\tt SIM} module.  A reasonable
+sample structure {\it must be} defined prior to requesting {\tt PROFILE}.  For
+example, to profile As as a dopant in Si, the sample structure need be defined
+only as pure Si since the As will not strongly affect the stopping powers.
+
+Concentrations are reported in atomic fraction and the depth is measured in
+the only units appropriate to RBS, 10$^{15}$~at/cm$^2$.  {\tt PROFILE} makes
+no attempt to deconvolute detector resolution, straggling, isotope effects, or
+overlapping elements.  Hence, it is most useful for heavy, isolated impurity
+peaks or monoisotopic elements.
+
+The concentration versus depth is plotted if a graphics device is available.
+After plotting, a filename is requested and the data may be written as ASCII
+data pairs to the file.  Stored data can be subsequently massaged using
+GENPLOT or other analysis programs.  If no filename (or a /) is given, the
+data will not be stored.  The last command in the example below
+might be used in a macro file for automatically profiling Ni over a given
+range without saving the data.  The {\tt ENCURSOR} command allows the range
+(in channel numbers) to be specified from the command line instead of by the
+cursor (equivalent to escaping out of the cursor using {\tt <esc>}).
+
+\medskip\beginscreen
+Yes Master? \underbar{read {\bs}rump{\bs}examp}
+File: c:{\bs}rump{\bs}examp.rbs
+Id:   Ni/NiSi/Si Annealed 90 min 295C
+Up periscope! \underbar{sim get {\bs}rump{\bs}examp return}
+Beam me up Scottie! \underbar{profile}
+Element to be profiled? (abort) \underbar{ni}
+Use cursor to define region to be profiled.
+File name (if any) of saved data: \underbar{niprof.dat}
+Your wish? \underbar{encursor no profile ni 300 500 / encursor yes}
+Hey, man, what next? 
+\endscreen
+
+Profile will fail if no simulation sample has been defined.  Also, the profile
+will fail with the message {\tt Simulation goes to zero in region of interest}
+if you request a profile over a region completely invalid for the element.
+Invalid experimental parameters will also generate an error.  Warnings
+are given if the profile is subject to some isotope effect or if absurd
+answers would be expected because of the isotopic distribution (profiling B
+for example). 
+
+\hl1{Other Commands}
+
+The following system utility commands are identical between GENPLOT and RUMP 
+and are described in other sections of the manual as specified in the table
+below.
+
+\medskip\autowraptable{.25\hsize}{.75\hsize}*
+\multicol{2}{l}{\bf Section J -- Function Evaluation}\cr
+{\tts ALLOCate} & Allocate a variable \cr
+{\tts DEALLocate} & Deallocate a variable \cr
+{\tts DEClare} & Allocate and set a STRING variable \cr
+{\tts DEFine} & Define a user function \cr
+{\tts EValuate} & Evaluate a general math expression \cr
+{\tts LET} & Set a variable to a constant or expression \cr
+{\tts LISTVar} & List all the defined variables \cr
+{\tts SAVEVars} & Save variables to disk file \cr
+{\tts SETVar} & Allocate and set a real variable \cr
+\cr
+\multicol{2}{l}{\bf Section K -- Command Macros}\cr
+{\tts BASE\_MACRO} & Specify a default macro directory \cr
+{\tts ECHO} & Toggle the command display while a macro is running \cr
+{\tts FOR} & Repeat command loop \cr
+{\tts MACRO} & Collect commands in a macro file \cr
+{\tts GOTO} & Continue execution at the given label \cr
+{\tts IF} & Conditional execution of commands \cr
+{\tts QUERY} & Prompt the user for input from the macro \cr
+{\tts SAVE\_MACRO} & Save the commands from MACRO in a file \cr
+{\tts SLEEP} & Delay for a given length of time \cr
+{\tts WAIT} & Wait for user action before continuing \cr
+{\tts XEQ} & Execute a macro file \cr
+{\tts CMDLIN} & Execute the next token as a series of commands \cr
+{\tts \&GETARG} & Get the next argument from the macro command line \cr
+{\tts \&QUERY} & Get the next token from the user \cr
+{\tts \&YESNO} & Get a yes/no answer from the user \cr
+{\tts \&ENCODE} & Real number to string encoding \cr
+\endautowraptable
+
+\medskip\autowraptable{.25\hsize}{.75\hsize}*
+\multicol{2}{l}{\bf Section L --- Operating System} \cr
+{\tts CD} & Change directory \cr
+{\tts DIr} & Display directory \cr
+{\tts <disk>:} & Change default disk \cr
+{\tts DOS} & Send a command to the system to be executed \cr
+{\tts MEMory} & Display unused RAM space \cr
+{\tts PAUSE} & Temporarily pause GENPLOT and bring in the system \cr
+{\tts TYpe} & Type a file on the screen \cr
+{\tts WHEre} & Gives the pathname of the current directory \cr
+\cr
+\multicol{2}{l}{\bf Section N --- Editing}\cr
+{\tts EMacs} & Built in editor\cr
+\endautowraptable
+
+\closesyntax
+\bye
+
+\input rpsim
+\input rppert
+
+%------------------------------------------------------------
+
+\hl1{Starting RUMP and Initialization}
+
+<h2> Starting RUMP </h2>
+
+\syntax{RUMP [ini\_file]}{Start RUMP with optional initialization file}
+\syntax{PERT [ini\_file]}{Start RUMP and PERT with optional initialization file}
+
+RUMP and PERT may be started directly from the {\tt .EXE} files distributed in
+the {\tt RUMP} directory.  RUMP and PERT differ only in that RUMP has all
+routines associated with the PERT commands nulled out to save space.  Hence, 
+RUMP is a complete subset of PERT.  Both RUMP and PERT require a full 640 kB
+configuration and will not run if a substantial number of terminate and stay
+resident routines have been loaded (TSR's).  
+
+Because of the large memory requirements of RUMP and PERT, they are normally
+executed from the batch files {\tt RUMP.BAT} or {\tt PERT.BAT}.  These batch
+files define an environment variable {\tt HDATA.CHR} which causes only 4
+character sets to be loaded into the graphic plotting routines.  The batch
+files point RUMP initialization to {\tt RUMP.INI} and PERT initialization to
+{\tt PERT.INI} or as specified on the calling command line.
+
+
+<h2> Initialization </h2>
+
+The default directory for RUMP internal data files and the initialization file
+is {\tt c:{\bs}rump}.  RUMP will search for atomic stopping power data files,
+resonance cross section tables and the initialization files in this
+directory if not found elsewhere.  The search order is (1) check for an
+environment variable with the same name as the requested file and use the
+value of the environment variable as the actual filename, (2) check for file
+in the current directory and (3) check for file in the default directory.
+
+RUMP automatically loads the {\tt ATOM3.DAT} file during initialization.  This
+file must contain the atomic stoppping power data.  Next, RUMP searches for 
+the default initialization file {\tt RUMP.INI} or the initialization file
+specified on the command line.  If an initialization file is found, it will be
+executed as a macro file after other initialization.  The file is always
+executed with {\tt ECHO OFF}.  Initialization files should configure RUMP with
+the appropriate facility dependent parameters.
+
+<h2> RUMP Data Files </h2>
+
+RUMP requires only a single data file, the atomic stopping power and isotope
+information file.  The stopping power tables are initially loaded from
+{\tt atom3.dat} in the default directory.  These tables, as distributed, are
+configured for alpha particle energies between 0.35 and 3.5 MeV.  See the
+{\tt LOAD} command and the {\tt QSTOPP} and {\tt STOPP} programs for
+generating alternate stopping power tables.  Resonance cross section files are
+also, by default, located in the {\tt c:{\bs}rump} directory and loaded as
+requested by the {\tt LOAD} command.
+
+Many other data files are part of the underlying subsystem and are loaded from
+the {\tt c:{\bs}genplot} directory.  RUMP only files which are located in 
+{\tt c:{\bs}genplot} are include {\tt RUMP\_RDR.OVL} and {\tt RUMP\_DYN.OVL}.
+These files contain additional executable code for {\tt RUMP.EXE} and {\tt
+PERT.EXE}. 
+
+<h2> VAX Specifics </h2>
+%
+%@@{VAX--RUMP}
+%
+%A filename on the VAX is the title of a clump of information.  In particular,
+%your spectrum with parameters is stored as a file. The name of a file must be
+%{\tt TITLE.EXT}, where {\tt TITLE} is 1--9 characters, letters or numbers.
+%{\tt EXT} is 0--3 characters, letters or numbers. No distinction is made here
+%between upper and lower case letters.  Example: {\tt ALCU1G.RBS} would be a
+%glancing angle RBS spectrum.  RUMP will supply the {\tt .RBS}, but VMS
+%commands do not.
+%
+%The version number of a file is shown by a {\tt ;N} at the end of the file
+%name.  You can usually ignore this -- all commands refer to the latest
+%version.  For {\tt DELETE}, however, you must specify which version (use {\tt
+%;*} for all of them).
+%
+%The wildcard characters for use with {\tt GET} are `*' and `?'.  `*' will
+%match any string of characters, and `?' will match any single character.
+%
+%\hl3{Spawn}
+%
+%Spawn a subprocess to execute VMS commands.
+%
+%{\tt SPAWN} can be particularly useful in editing macro files.  Simply say
+%{\tt spawn~edit~filename}, and when you exit the editor you can {\tt
+%xeq~filename} to try it out.  This is convenient when you are working on a
+%macro to do some complex plotting.
+%
+%\hl3{Initialization File}
+%
+%RUMP will search for the file {\tt SYS\$LOGIN:RUMP.INI} when it is started up.
+%If found, this file will be run as a macro in {\tt QUIET} mode.
+%%\bye
+%you are working on a
+%macro to do some complex plotting.
+%
+%\hl3{Initialization File}
+%
+%RUMP searches for the file {\tt SYS\$LOGIN:RUMP.INI} when it is started up.
+%If found, this file will be run as a macro in {\tt QUIET} mode.
+
+\input rpfile
+\closesyntax
+</html>

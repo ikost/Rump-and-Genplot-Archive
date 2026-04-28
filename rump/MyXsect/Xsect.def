@@ -1,0 +1,3 @@
+LIBRARY xsect
+EXPORTS
+   CrossSection

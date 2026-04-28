@@ -1,0 +1,80 @@
+#
+#   Makefile for GENPLOT
+#
+# this file goes in clib/genplot
+
+include ../makegcc.h
+
+EXEFILE = $(EXEDIR)genplot.exe
+LIBFILE = $(LIBDIR)genplot.a
+EXELIBS = $(LIBFILE) $(LIBDIR)tplot.a $(LIBDIR)lexp.a $(LIBDIR)posix.a
+
+###########################################################################
+#  -- gptuser.o replaced with user_aix.o to get specific functions loaded
+MAIN    = main.o
+SERIAL  = serial.c
+OBJS    = genplot.o  gptplot.o  gptaxis.o  gptread.o  user_aix.o  \
+          gptcull.o  gptfit.o   gptsubs.o  gpttrans.o gpt_3d.o \
+          gptmatrx.o nlsfit.o   curfit.o   locmin.o   \
+	  fsetup.o   helper.o   \
+          fft2c.o    fft_me.o   userrdwr.o 
+###########################################################################
+GENPLOT:  $(LIBFILE) $(EXEFILE)
+
+$(EXEFILE) : $(MAIN) $(EXELIBS)
+	$(CC) -o $(EXEFILE) $(MAIN) $(EXELIBS) $(SYSLIBS)
+#	chmod 755 $(EXEFILE)
+
+$(LIBFILE) : $(SERIAL) $(OBJS) revision.h
+	$(CC) $(CFLAGS) -c -o serial.o $(SERIAL)
+	$(LIBMGR) $(LIBFILE) $(OBJS) serial.o
+	rm serial.o
+	@echo 'Genplot LIBRARY made'
+
+# ----------------------------------------------------------- #
+# -------------- Include File Dependencies ------------------ #
+# ----------------------------------------------------------- #
+$(MAIN)     : $(INCDIR)preload.h $(INCDIR)mytypes.h $(INCDIR)extends.h  \
+              $(INCDIR)lexp.h $(INCDIR)tplot.h   genplot.h
+
+$(OBJS)     : $(INCDIR)preload.h $(INCDIR)mytypes.h $(INCDIR)extends.h \
+              $(INCDIR)lexp.h
+
+main.o      : $(INCDIR)tplot.h genplot.h
+genplot.o   : $(INCDIR)tplot.h genplot.h gptxtrn.h gptdef.h 
+gptaxis.o   : $(INCDIR)tplot.h           gptxtrn.h gptdef.h 
+gptcull.o   : $(INCDIR)tplot.h           gptxtrn.h
+gptfit.o    : $(INCDIR)tplot.h           gptxtrn.h gptdef.h nlsfit.h
+gptplot.o   : $(INCDIR)tplot.h           gptxtrn.h gptdef.h
+gptread.o   : $(INCDIR)tplot.h           gptxtrn.h gptdef.h 
+gptsubs.o   : $(INCDIR)tplot.h           gptxtrn.h gptdef.h 
+gpttrans.o  : $(INCDIR)tplot.h           gptxtrn.h
+gptmatrx.o  : $(INCDIR)tplot.h           gptxtrn.h
+gptuser.o   :                            gptxtrn.h gptdef.h 
+gpt_3d.o    : $(INCDIR)tplot.h           gptxtrn.h gptdef.h
+fsetup.o    : $(INCDIR)tplot.h           gptxtrn.h gptdef.h
+fft_me.o    :                            gptxtrn.h
+nlsfit.o    : $(INCDIR)tplot.h genplot.h gptxtrn.h          nlsfit.h
+userrdwr.o  :                            gptxtrn.h
+user_aix.o  :	                         gptxtrn.h gptdef.h 
+
+# Other dependencies, based on primary routines
+helper.o    : helper.h
+curfit.o    : helper.h curfit.h 
+locmin.o    : helper.h curfit.h 
+fft2c.o     :                   fft2c.h
+gptfit.o    : helper.h          
+gptmatrx.o  : helper.h          
+gptsubs.o   : helper.h          
+gpttrans.o  : helper.h          fft2c.h
+gpt_3d.o    : helper.h
+fft_me.o    :                   fft2c.h
+nlsfit.o    : helper.h curfit.h
+
+# Some UNIX are specific about POSIX compliance.  popen/pclose are not defined
+# except via the extended compiler.  Specifically define compile route here
+fft_me.o    : fft_me.c
+	$(ECC) $(EFLAGS) -c fft_me.c
+
+gptread.o   : gptread.c
+	$(ECC) $(EFLAGS) -c gptread.c

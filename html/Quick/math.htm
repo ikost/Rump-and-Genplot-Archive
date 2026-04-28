@@ -1,0 +1,243 @@
+<html>
+
+<head>
+<title>Math Function Reference</title>
+</head>
+
+<body>
+<h1 align=center>Math Function Reference</h1>
+<hr>
+
+
+<h3><FONT COLOR="339999">Operator Precedence</FONT></h3>
+
+<pre>
+     !   ** or ^                   - Factorials and exponentiation
+     -                             - Unary minus
+     * /                           - Multiplication and Division
+     + -                           - Addition and subtraction
+     .gt. .lt. .ge. .le. .eq. .ne. - Relational operators
+      >    <    >=   <=   ==   !=  - (synonymous)
+                            <> ^=  - (.ne. synonyms)
+     .not.                         - Logical operators
+     .and.  &amp;
+     .or.   |
+     .eqv.     .neqv.
+     (cond) ? (true) : (false)     - Conditional evaluation
+</pre>
+
+<p> For evaluation purposes, FALSE is 0.0, while TRUE is any non-zero value.
+Logical expressions return +1.0 for TRUE and 0.0 for FALSE.
+
+
+<h3><FONT COLOR="339999">Intrinsic functions (by class)</FONT></h3>
+<pre>
+ abs(z)      sqrt(z)     pow(z,m)    ln(z)       log(z)      exp(z)
+ int(z)      nint(z)     frac(z)     sign(z)     fabs(z)     magn(z)
+ 
+ min(z,...)  max(z,...)  mod(x,y)        fmod(x,y)   m1n(n)      fact(z)
+ ceil(z)     floor(z)    limit(z,lo,hi)  ldexp(x,i)  round(x,i)
+
+ sin(z)      cos(z)      tan(z)      cot(z)
+ sind(z)     cosd(z)     tand(z)     cotd(z)
+ asin(z)     acos(z)     atan(z)     acot(z)     atan2(x,y)
+ asind(z)    acosd(z)    atand(z)    acotd(z)    atan2d(x,y)
+
+ sinh(z)     cosh(z)     tanh(z)   
+ asinh(z)    acosh(z)    atanh(z)
+
+ real(z)     imag(z)     conj(z)     arg(z)      magn(z)
+
+ j0(x)       j1(x)       jn(n,x)     y0(x)       y1(x)       yn(n,x)
+
+ rnd()       rand()      srand(x)   gamma(z)   *lngamma(z)
+ erf(z)      erfc(z)     ndtr(z)    ndtri(x)
+
+ gauss(z,x0,sigma)       gaussian(z,x0,sigma)   hv$(x)      
+ poisson(z,x0)           binomial(x,n,p)        lorentz(z,x0,width)
+ pearson_IV()            pearson_VI()          
+ edgeworth(x,x0,sigma,skew,kurt)
+
+ @ave(ar)    @avg(ar)    @mean(ar)   @median(ar) @max(ar)    @min(ar)   
+ @sum(ar)    @absmin(ar) @absmax(ar) @abssum(ar) @rms(ar)    @std(ar)   
+ @span(ar)   @range(ar)  @skew(ar)   @kurt(ar)  
+
+ @integral(cv)           @correlate(cv)
+
+ spline(z)   dspln(z)    ddspln(z)   
+ spline2(z,spl)          dspln2(z,spl)           ddspln2(z,spl)
+
+ poly(z,ar)  tn(n,z)     cheby(z,ar)
+
+ time()      sizeof(var) typeof(var) exists(var)
+
+ isfile(fname)           isdir(fname)            
+ filedate(fname)         filetime(fname)         filesize(fname)
+
+</pre>
+
+<p> In real calculation mode, lngamma(x) returns ln(|gamma(x)|) while in 
+complex mode, the absolute value is not taken.  As they so, so sorry Charlie ...
+
+<h3><FONT COLOR="339999">Intrinsic functions (alphabetical)</FONT></h3>
+
+<pre>
+ @absmax(ar)     @absmin(ar)     @abssum(ar)     @ave(ar)        @avg(ar)        
+ @correlate(cv)  @integral(cv)   @kurt(ar)       @max(ar)        @mean(ar)       
+ @median(ar)     @min(ar)        @range(ar)      @rms(ar)        @skew(ar)       
+ @span(ar)       @std(ar)        @sum(ar)        abs(z)          acos(z)         
+ acosd(z)        acosh(z)        acot(z)         acotd(z)        arg(z)          
+ asin(z)         asind(z)        asinh(z)        atan(z)         atan2(x,y)
+ atan2d(x,y)     atand(z)        atanh(z)        binomial(x,n,p) ceil(z)         
+ cheby(z,ar)     conj(z)         cos(z)          cosd(z)         cosh(z)         
+ cot(z)          cotd(z)         ddspln(z)       ddspln2(z,spl)  dspln(z)        
+ dspln2(z,spl)   edgeworth(z,u,s,sk,ku)          erf(z)          erfc(z)         
+ exists(obj)     exp(z)          fabs(z)         fact(z)         filedate(fname)
+ filesize(fname) filetime(fname) floor(z)        fmod(x,y)       frac(z)   
+ gamma(z)        gauss(z,u,s)    gaussian(z,u,s) hv$(z)          imag(z)         
+ int(z)          isdir(fname)    isfile(fname)   j0(x)           j1(x)           
+ jn(n,x)         ldexp(x,i)      limit(z,lo,hi)  ln(z)           lngamma(z)      
+ log(z)          lorentz(z,x0,width)             m1n(n)          magn(z)         
+ max(z,...)      min(z,...)      mod(x,y)        ndtr(z)         ndtri(x)        
+ nint(z)         pearson_IV()    pearson_VI()    poisson(z,x0)   poly(z,ar)      
+ pow(z,m)        rand()          real(z)         rnd()           round(x,i)      
+ sign(z)         sin(z)          sind(z)         sinh(z)         sizeof(obj)     
+ spline(z)       spline2(z,spl)  sqrt(z)         srand(z)        tan(z)          
+ tand(z)         tanh(z)         time()          tn(n,z)         typeof(obj)     
+ y0(x)           y1(x)           yn(n,x)
+</pre>
+
+<h3><FONT COLOR="339999">Intrinsic functions (summary detail)</FONT></h3>
+<pre>
+ abs(z)      absolute value of z
+ sqrt(z)     square root
+ pow(z,m)    raise to power x^m
+ ln(z)       natural logarithm (base e)
+ log(z)      common logarithm (base 10)
+ exp(z)      exponentiation (base e)
+ int(z)      integer truncation z (real part)
+ nint(z)     nearest integer to z (real part)
+ frac(z)     fractional part of z (real part)
+ sign(z)     sign - returns +1, 0 or -1
+ fabs(z)     absolute value of z (alternate name)
+ magn(z)     absolute value of z (alternate name)
+
+ min(z,...)  minimum of a list (magnitude for complex)
+ max(z,...)  maximum of a list (magnitude for complex)
+ mod(x,y)    modulo - result is in range (-y,y) with same sign as x
+ fmod(x,y)   alias for modulo
+ m1n(n)      minus 1 to the nth (-1^n)
+ fact(z)     factorial of z (z! alternate form)
+ ceil(z)     smallest integer >= z
+ floor(z)    largest integer <= z
+ ldexp(x,i)  load binary exponent - x*2^i
+ round(x,i)  Round x to i decimal points - round(2.372,1) = 2.4
+
+Complex operations:
+ real(z)    return real component of complex number
+ imag(z)    return imaginary component of complex number (as a real)
+ conj(z)    complex conjugate
+ arg(z)     angle (radians) of x+iy -> r*exp(j*theta)
+ magn(z)    magnitude of x+iy -> r*exp(j*theta)
+
+Trig functions:
+ sin(z)    cos(z)    tan(z)    cot(z)       radian based arguments
+ sind(z)   cosd(z)   tand(z)   cotd(z)      degree based arguments
+ asin(z)   acos(z)   atan(z)   acot(z)      returns radian value
+ asind(z)  acosd(z)  atand(z)  acotd(z)     returns degree value
+ atan2(x,y)          atan2d(x,y)            inverse tangent of x/y
+
+Hyperbolic Trig functions:
+ sinh(z)         (e^z-e^-z)/2
+ cosh(z)         (e^z+e^-z)/2
+ tanh(z)         sinh(z)/cosh(z)
+ asinh(z)        inverse sinh(z)
+ acosh(z)        inverse cosh(z)
+ atanh(z)        inverse tanh(z)
+
+Bessel functions:
+ j0(x)                   Bessel function of zero order
+ j1(x)                   Bessel function of first order
+ jn(n,x)                 Bessel function of arbitrary order
+ y0(x) y1(x) yn(n,x)     Alternate Bessel functions
+
+Probability and distributions:
+ rnd()                 Random number in (0,1)
+ rand()                Random number in (0,1)
+ srand(x)              Set seed for random number generator to x
+ gamma(z)              Gamma function (please don't try negative integers)
+ lngamma(z)            Natural log of the Gamma function
+
+ gnoise()              Gaussian distributed noise = ndtri(rnd())
+ pnoise()              Poisson distributed noise (not implemented)
+
+ erf(z)                error function (integral of Gaussian)
+ erfc(z)               complementary error function (1-erf)
+ ndtr(z)               Normal distribution
+ ndtri(x)              Inverse of normal distribution
+
+ hv$(x)                Heaviside operator 0 x<0, 0.5 x=0, 1 x>0
+ gauss(z,x0,sigma)     Gaussian distribution = exp(-(z-x0)^2/sigma^2)
+ gaussian(z,x0,sigma)  Gaussian distribution
+ poisson(z,x0)         Poisson distribution  = (x0^x/x!)*exp(-x0)
+ binomial(x,n,p)       Binomial distribution = C(n|x)*p^x*(1-p)^(n-x)
+ lorentz(z,x0,width)   Lorentz distribution  = [w/2]/pi/{(x-x0)^2+(w/2)^2}
+
+ edgeworth(x,x0,sigma,skew,kurt)    Edgeworth distribution (ion implantation)
+ pearson_IV()                       Not implemented yet, but reserved
+ pearson_VI()                       Not implemented yet, but reserved
+
+Array operations:
+ @ave(ar)         Average of array
+ @avg(ar)         Average of array
+ @mean(ar)        Average of array
+ @median(ar)      Median of the array
+ @max(ar)         Maximum of array - also sets $I to index of max
+ @min(ar)         Minimum of array - also sets $I to index of min
+ @sum(ar)         Sum of array elements
+ @absmin(ar)      Minimum of absolute value - also sets $I
+ @absmax(ar)      Maximum of absolute value - also sets $I
+ @abssum(ar)      Sum of absolute values
+ @rms(ar)         Root mean squared deviation
+ @std(ar)         Standard Deviation of array
+ @span(ar)        Span of array (max-min)
+ @range(ar)       Span of array (max-min)
+ @skew(ar)        Skew of array
+ @kurt(ar)        Kurtosis of array (a normal distribution will yield 0)
+
+Curve operations:
+ @integral(cv)    Simple integral under the curve
+ @correlate(cv)   Simple correlation coefficient between x and y
+
+Spline operations:
+ spline(z)        spline evaluated at x, based on SPL$DATA array
+ dspln(z)         spline derivative, based on SPL$DATA array
+ ddspln(z)        spline second derivative, based on SPL$DATA array
+ spline2(z,spl)   spline evaluated at x, based on data in array structure spl
+ dspln2(z,spl)    spline derivative, based on data in array structure spl
+ ddspln2(z,spl)   spline second derivative, based on data in array structure spl
+
+Polynomial functions:
+ poly(z,ar)       ar(0)+ar(1)*z+ ... +ar(n-1)*z^(n-1) 
+ tn(n,z)          Chebyshev polynomial of order n
+ cheby(z,ar)      sum(ar(i)*tn(i,z))  (implemented with Clenshaw's recurrence)
+
+System operations:
+ time()           Seconds since epoch (normally 00:00:00 Jan. 1, 1970 UTC)
+ sizeof(any)      Number of items in a variable/array
+ typeof(any)      Type of variable/array (not useful except to authors!)
+
+File operations:
+ isfile(fname)    Returns true if fname exists as a readable file
+ isdir(fname)     Returns true if fname exists as a directory
+ filedate(fname)  Last modified date (seconds since epoch)
+ filetime(fname)  Last modified date (seconds since epoch)
+ filesize(fname)  Size of file (bytes)
+<pre>
+
+
+</p><hr><small>
+Last modified: October 21, 1997
+<address>Michael O. Thompson <a href="mailto:tommy@genplot.com">(tommy@genplot.com)</a> </address></small>
+</body>
+</html>

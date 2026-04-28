@@ -1,0 +1,85 @@
+#
+#   Makefile for RUMP
+#
+# this file goes in cgs/rump
+
+include ../makegcc.h
+
+EXEFILE = $(EXEDIR)rump.exe
+LIBFILE = $(LIBDIR)rump.a
+EXELIBS = $(LIBFILE) $(LIBDIR)genplot.a $(LIBDIR)tplot.a $(LIBDIR)lexp.a $(LIBDIR)posix.a
+
+RUMPPATHS = -DRUMPCONFIGPATH=\"$(RUMPCONFIGPATH)\"
+
+###########################################################################
+MAIN   = main.o
+SERIAL = serial.c
+OBJS   = rump.o    config.o \
+         aplot.o   bmanip.o   null.o    rdwr.o      tplot.o     atomdo.o \
+         anlytc.o  rbs_rdwr.o atomio.o  rdwr_old.o  sim2.o      pert.o   \
+         creatr.o  anlyz.o    stopp.o   ziegler.o   reswork.o   stopfoil.o \
+         stopping.o sigma.o
+###########################################################################
+RUMP:  $(LIBFILE) $(EXEFILE)
+
+$(EXEFILE) : $(MAIN) $(EXELIBS)
+	$(CC) -o $(EXEFILE) $(MAIN) $(EXELIBS) $(SYSLIBS)
+
+$(LIBFILE) : $(SERIAL) $(OBJS)
+	$(CC) $(RUMPPATHS) $(CFLAGS) -c -o serial.o $(SERIAL)
+	$(LIBMGR) $(LIBFILE) $(OBJS) serial.o
+	rm serial.o
+	@echo 'RUMP LIBRARY made'
+
+$(MAIN)     : $(INCDIR)mytypes.h $(INCDIR)extends.h \
+              $(INCDIR)lexp.h    $(INCDIR)tplot.h   \
+              rump.h \
+              rumpdata.h rumpproto.h rkeys.h
+
+# ----------------------------------------------------------- #
+# -------------- Include File Dependencies ------------------ #
+# ----------------------------------------------------------- #
+RUMP_H = rump.h spectrum.h rumpdata.h rumpproto.h rkeys.h
+TPLOT  = $(INCDIR)tplot.h
+
+$(OBJS) : $(INCDIR)preload.h $(INCDIR)mytypes.h $(INCDIR)extends.h \
+          $(INCDIR)lexp.h
+
+anlytc.o   : $(RUMP_H) $(TPLOT) stopping.h
+anlyz.o    : $(RUMP_H)                     sample.h
+aplot.o    : $(RUMP_H) $(TPLOT)
+atomdo.o   : $(RUMP_H)
+atomio.o   : $(RUMP_H)
+bmanip.o   : $(RUMP_H)
+config.o   : $(RUMP_H)
+creatr.o   : $(RUMP_H)          stopping.h sample.h creatr.h xsect.h          sigma.h
+sigma.o    : $(RUMP_H)                                                        sigma.h
+main.o     : $(RUMP_H) $(TPLOT)
+null.o     : $(RUMP_H)                                       xsect.h
+pert.o     : $(RUMP_H)                     sample.h                    pert.h
+rdwr.o     : $(RUMP_H)
+reswork.o  : $(RUMP_H)                                       xsect.h
+rump.o     : $(RUMP_H) $(TPLOT)
+sim2.o     : $(RUMP_H)                     sample.h
+stopfoil.o : $(RUMP_H)                     sample.h
+stopp.o    : $(RUMP_H)          stopping.h 
+stopping.o : $(RUMP_H)          stopping.h
+tplot.o    : $(RUMP_H) $(TPLOT)
+ziegler.o  : $(RUMP_H)
+
+rbs_rdwr.o : spectrum.h
+rdwr_old.o : spectrum.h
+ndtr.o     : ../lexp/gvdefs.h
+pert.o     : ../genplot/curfit.h
+rump.o     : ../genplot/genplot.h
+stopp.o    : ../genplot/genplot.h
+anlytc.o   : ../genplot/gptxtrn.h
+stopping.o : ../genplot/genplot.h
+
+# Some UNIX are specific about POSIX compliance.  popen/pclose are not defined
+# except via the extended compiler.  Specifically define compile route here
+rdwr.o    : rdwr.c
+	$(ECC) $(EFLAGS) -c rdwr.c
+
+rbs_rdwr.o    : rbs_rdwr.c
+	$(ECC) $(EFLAGS) -c rbs_rdwr.c

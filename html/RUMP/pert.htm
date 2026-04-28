@@ -1,0 +1,623 @@
+<HTML>
+<HEAD>
+<TITLE>RUMP->PERT: Command descriptions</TITLE>
+</HEAD>
+
+<BODY><A NAME="top"></A>
+<H2><CENTER>PERT level commands</CENTER></H2>
+<HR>
+
+This command reference section deals only with RUMP commands which are
+specific to PERT.
+
+<HR>
+
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 COLUMNS=2 WIDTH=100%>
+
+<TR>
+  <TD COLSPAN=2 ALIGN=LEFT><STRONG>PERT commands</STRONG></TD>
+</TR>
+<TR>
+  <TD align=center><A HREF="#composition"><CODE>COmposition</CODE></A></TD>
+  <TD>Allows composition of a layer to be varied</TD>
+</TR>
+<TR>
+  <TD align=center><A HREF="#equation"><CODE>EQuation</CODE></A></TD>
+  <TD>Allows parameters in a diffusion equation to be varied</TD>
+</TR>
+<TR>
+  <TD align=center><A HREF="#fwhm"><CODE>FWHM</CODE></A></TD>
+  <TD>Allows the detector resolution FWHM to be varied</TD>
+</TR>
+<TR>
+  <TD align=center><A HREF="#fuzz"><CODE>FUZZ</CODE></A></TD>
+  <TD>Allows the fuzz parameter between layers to be varied</TD>
+</TR>
+<TR>
+  <TD align=center><A HREF="#go"><CODE>GO</CODE></A></TD>
+  <TD>Starts multiple or single variable search</TD>
+</TR>
+<TR>
+  <TD align=center><A HREF="#help"><CODE>Help</CODE></A></TD>
+  <TD>Types this listing</TD>
+</TR>
+<TR>
+  <TD align=center><A HREF="#mev"><CODE>MEV</CODE></A></TD>
+  <TD>Allows the incident beam energy to vary in search</TD>
+</TR>
+<TR>
+  <TD align=center><A HREF="#multiple"><CODE>MULtiple</CODE></A></TD>
+  <TD>Selects multiple variable mode</TD>
+</TR>
+<TR>
+  <TD align=center><A HREF="#normalize"><CODE>NOrmalize</CODE></A></TD>
+  <TD>Sets normalization window</TD>
+</TR>
+<TR>
+  <TD align=center><A HREF="#parms"><CODE>PArms</CODE></A></TD>
+  <TD>Display settings currently in effect</TD>
+</TR>
+<TR>
+  <TD align=center><A HREF="#return"><CODE>Return</CODE></A></TD>
+  <TD>Returns from PERT to RUMP</TD>
+</TR>
+<TR>
+  <TD align=center><A HREF="#single"><CODE>SIngle</CODE></A></TD>
+  <TD>Selects single variable mode (default</TD>
+</TR>
+<TR>
+  <TD align=center><A HREF="#species"><CODE>SPecies</CODE></A></TD>
+  <TD>Allows composition of the species to be varied</TD>
+</TR>
+<TR>
+  <TD align=center><A HREF="#straggle"><CODE>STRAGgle</CODE></A></TD>
+  <TD>Allows the straggle constant to vary in the search</TD>
+</TR>
+<TR>
+  <TD align=center><A HREF="#thickness"><CODE>THickness</CODE></A></TD>
+  <TD>Allows layer thickness to be varied in search</TD>
+</TR>
+<TR>
+  <TD align=center><A HREF="#volume"><CODE>VOLume</CODE></A></TD>
+  <TD>Sets level of information messages (debug)</TD>
+</TR>
+<TR>
+  <TD align=center><A HREF="#window"><CODE>WIndow</CODE></A></TD>
+  <TD>Sets the window for error minimization</TD>
+</TR>
+</TABLE>
+
+<p>
+The PERT subprogram is designed to work with the SIM module to search for a
+"best" fit to your data.  It does so by varying one or more parameters of
+the sample description or experimental parameters (thicknesses, compositions,
+equation parameters, MEV, etc.) and comparing the resulting theoretical
+spectrum with the actual spectrum.  PERT iterates the process until it a finds
+the best set of parameters to match the spectrum.  
+
+<p>
+The definition of "best" fit is the fit which maximizes the Poisson
+likelihood function $\chi^2$ between the experimental spectrum and the
+simulation over a selected region called the error window.  $\chi^2$ is
+computed using Poisson statistics.  To avoid errors from inaccuracies in the
+charge integration, a second window, the normalization window, is also
+defined.  The total number of counts over the normalization window are made
+equal by varying the <tt>CORR</tt> factor of the experimental data before
+$\chi^2$ is computed.  See the references at the beginning of the RUMP manual
+for more details.
+
+<p>
+Before starting <tt>PERT</tt>, you must have
+
+<ol>
+<li>Have your experimental data in Buffer 1.  Unlike other commands, PERT
+   currently requires that the comparison spectra be in buffer 1.  Use
+   <tt>COPY</tt> or <tt>MOVE</tt> to put the experimental spectra in buffer 1.
+
+<li> Have a qualitatively correct simulation described within <tt>SIM</tt>.
+</ol>
+
+Within PERT, you must
+
+<ol>
+<li> Define the normalization window using the PERT <tt>NORM</tt> command. 
+This should be in the substrate (or any other region) where the simulation
+does not depend strongly on the parameters to be varied.
+
+<li> Select an error window using the PERT command <tt>WINDOW</tt>.  The
+theory and the experiment will be compared only within this window.
+
+<li> Make sure that the theory spectra never goes to zero within the error
+window since a zero will wreak havoc with the Poisson statistics.  One
+ubiquitous source of background, pulse pileup in the counting electronics, can
+be used to assure non-zero counts everywhere.  Set the rms Beam Current (<tt>
+CURRENT</tt>) to a finite value to recreate background in the simulation.
+
+<li> Select the parameters to be varied, either in <tt>SINGLE</tt> or <tt>
+MULTI</tt> variable mode.  For each layer in the sample structure, PERT can vary
+the <tt>THICKNESS</tt>, the <tt>COMPOSITION</tt> of any element, the <tt>SPECIES</tt>
+composition or any <tt>EQUATION</tt> parameter.  In the experimental parameters,
+PERT will search over the beam energy <tt>MEV</tt> or detector <tt>FWHM</tt>.  PERT
+can also vary the <tt>STRAGGLE</tt> constant or <tt>FUZZ</tt> parameters.
+
+<li> Let PERT run with the <tt>GO</tt> command. Once PERT completes its
+search, {\it you must} compare the resulting simulation with the experimental
+data and determine if the fit is appropriate or if better starting conditions
+to PERT are indicated.
+
+</ol>
+
+Each of the commands are described below.  They are arranged first by control
+of the search itself and then by parameters which can be specified for
+variation.
+
+<!-- Command section start -->
+<A NAME="pert"></A>
+<P><HR><FONT SIZE=+2 COLOR="339999"><B>PERT</B></FONT>
+
+<!-- Syntax -->
+<center><table columns=3 width=95% border=0><tr>
+    <td><em>Brief:</em></td>
+    <td COLSPAN=2>Enters PERT level from RUMP level</td>
+</tr>
+<tr><td VALIGN=TOP><em>Syntax:</em></td>
+    <td VALIGN=TOP><tt>PERT</tt></td>
+    <td VALIGN=TOP><tt></tt></td>
+</tr></table></center>
+
+<!-- @@{HELP--PERT} -->
+
+<P>
+From RUMP level, the command <tt>PERT</tt> will enter the PERT subprocessor.
+RUMP is automatically returned to if a command is given which the PERT
+subprocessor does not understand.
+
+<!-- Command section start -->
+<A NAME="help"></A>
+<P><HR><FONT SIZE=+2 COLOR="339999"><B>Help</B></FONT>
+
+<!-- Syntax -->
+<center><table column=3 width=95% border=0><tr>
+    <td><em>Brief:</em></td>
+    <td COLSPAN=2>Lists the known command to screen</td>
+</tr>
+<tr><td VALIGN=TOP><em>Syntax:</em></td>
+    <td VALIGN=TOP><tt>Help | ?</tt></td>
+    <td VALIGN=TOP><tt></tt></td>
+</tr></table></center>
+
+<!-- @@{HELP--PERT--RUMP} -->
+
+<P>
+The <tt>HELP</tt> command will display the list of commands available within <tt>
+PERT</tt> sub-process.  The listing is in a different format from other help
+listings in RUMP.  
+
+<P>
+<P><CENTER><TABLE BORDER=1 CELLPADDING=7 CELLSPACING=2 COLUMNS=1 ROWS=1 WIDTH=90%>
+<TR><TD><PRE><CODE>
+Hey, man, what next? <B>pert help</B>
+ PERT subcommands are:
+    HELP     types this listing
+    SINGLE   Selects single variable mode (default)
+    MULTI    Selects multiple variable mode
+    WINDOW   sets the window for error minimization
+    NORMALIZ sets the window for normalization
+    PARMS    Display settings currently in effect
+    THICKNES searches for best fit by varying thickness
+    COMPOSIT searches for best fit by varying composition
+    SPECIES  searches for best fit by varying species composition
+    EQUATION searches for best fit by varying equation parameter
+    MEV      searches for best fit by varying beam energy
+    FWHM     searches for best fit by varying detector resolution
+    STRAGGLE searches for best fit by varying straggling constant
+    FUZZ     searches for best fit by varying fuzz parameter
+    GO       Starts multiple variable analysis
+    RETURN   returns you to RUMP (Your wish?)
+Perturbation subcommand: 
+</CODE></PRE></TD></TR></TABLE></CENTER>
+
+
+<!-- Command section start -->
+<A NAME="parms"></A>
+<P><HR><FONT SIZE=+2 COLOR="339999"><B>Parms</B></FONT>
+
+<!-- Syntax -->
+<center><table column=3 width=95% border=0><tr>
+    <td><em>Brief:</em></td>
+    <td COLSPAN=2>Display settings currently in effect</td>
+</tr>
+<tr><td VALIGN=TOP><em>Syntax:</em></td>
+    <td VALIGN=TOP><tt>Parms</tt></td>
+    <td VALIGN=TOP><tt></tt></td>
+</tr></table></center>
+
+<!-- @@{PARMS--PERT--RUMP} -->
+
+<P>
+The <tt>PARMS</tt> command lists the current setting of the PERT system,
+including the normalization and error windows, the mode (single or multiple)
+and a list of variables which will be varied.  This command should be used
+before the GO command to verify that PERT is properly set up.  Frequent use
+of <tt>PARMS</tt> is strongly recommended.
+
+<P>
+<P><CENTER><TABLE BORDER=1 CELLPADDING=1 CELLSPACING=2 COLUMNS=1 ROWS=1 WIDTH=90%>
+<TR><TD><PRE><CODE>
+Your wish? <B>pert</B>
+Perturbation subcommand: <B>parms</B>
+
+<P>
+ Channel range for error window:  200 to 600
+ Channel range for normalization: 100 to 200
+Variable      Quantity     Search range:   Min           Max
+   1          beam energy                 1.00000       3.00000
+   2     thickness of layer  1            1000.00       3000.00
+   3  composition of Ni in layer  2       1.00000       1.30000
+
+<P>
+Perturbation subcommand: 
+</CODE></PRE></TD></TR></TABLE></CENTER>
+
+
+<!-- Command section start -->
+<A NAME="return"></A>
+<P><HR><FONT SIZE=+2 COLOR="339999"><B>Return</B></FONT>
+
+<!-- Syntax -->
+<center><table column=3 width=95% border=0><tr>
+    <td><em>Brief:</em></td>
+    <td COLSPAN=2>Returns to the RUMP processor</td>
+</tr>
+<tr><td VALIGN=TOP><em>Syntax:</em></td>
+    <td VALIGN=TOP><tt>Return</tt></td>
+    <td VALIGN=TOP><tt></tt></td>
+</tr></table></center>
+
+<!-- @@{RETURN--PERT--RUMP} -->
+
+<P>
+Returns you to from PERT to RUMP command level.
+
+
+<!-- Command section start -->
+<A NAME="normalize"></A>
+<P><HR><FONT SIZE=+2 COLOR="339999"><B>Normalize</B></FONT>
+
+<!-- Syntax -->
+<center><table column=3 width=95% border=0><tr>
+    <td><em>Brief:</em></td>
+    <td COLSPAN=2>Sets the window for normalization</td>
+</tr>
+<tr><td VALIGN=TOP><em>Syntax:</em></td>
+    <td VALIGN=TOP><tt>Normalize</tt></td>
+    <td VALIGN=TOP><tt>&lt;cursor_entry&gt;</tt></td>
+</tr></table></center>
+
+<!-- @@{NORMALIZE--PERT--RUMP} -->
+
+<P>
+The <tt>NORMALIZE</tt> command sets a window in the spectrum for normalization
+of the experimental and simulation spectra.  Within in this window, PERT will
+force the integrals of the simulation to exactly match the intergral of the
+experimental data within this window by varying the <tt>CORRection</tt> factor
+of the experimental buffer.  This window must be defined, and should (1) lie in
+a region of the spectrum which will not vary rapidly with changes in the search
+parameters and (2) which is generally well simulated (no resonances, etc.).
+A portion of the substrate just below the active layers is usually a safe bet.
+
+
+<!-- Command section start -->
+<A NAME="window"></A>
+<P><HR><FONT SIZE=+2 COLOR="339999"><B>Window</B></FONT>
+
+<!-- Syntax -->
+<center><table column=3 width=95% border=0><tr>
+    <td><em>Brief:</em></td>
+    <td COLSPAN=2>Sets or adds a window for error minimization</td>
+</tr>
+<tr><td VALIGN=TOP><em>Syntax:</em></td>
+    <td VALIGN=TOP><tt>Window</tt></td>
+    <td VALIGN=TOP><tt>&lt;cursor_entry&gt;</tt></td>
+</tr></table></center>
+
+<!-- @@{WINDOW--PERT--RUMP} -->
+
+<P>
+The <tt>WINDOW</tt> command selects the window in the spectra over which $\chi^2$
+error function will be evaluated.  PERT will attempt to minimize the diffences
+between the experimental and simulation spectra only over this window -- all
+others regions of the spectra, except the normalization window, will be
+ignored.  The simulation must not go to zero over the error window.
+
+
+<!-- Command section start -->
+<A NAME="single"></A>
+<P><HR><FONT SIZE=+2 COLOR="339999"><B>Single</B></FONT>
+
+<!-- Syntax -->
+<center><table column=3 width=95% border=0><tr>
+    <td><em>Brief:</em></td>
+    <td COLSPAN=2>Executes a single variable search</td>
+</tr>
+<tr><td VALIGN=TOP><em>Syntax:</em></td>
+    <td VALIGN=TOP><tt>Single</tt></td>
+    <td VALIGN=TOP><tt>&lt;variable spec&gt; &lt;lower limit&gt; &lt;upper limit&gt;  </tt></td>
+</tr></table></center>
+
+<!-- @@{SINGLE--PERT--RUMP} -->
+
+<P>
+The <tt>SINGLE</tt> command places PERT in the single parameter search mode.  The
+single mode is considerably more robust since there are no interactions
+between several parameters being simultaneously varied.  In single mode, the
+search for the best fit occurs each time a search parameter is specified.  The
+alternative is the <tt>MULTIPLE</tt> mode described below.
+
+
+<!-- Command section start -->
+<A NAME="multiple"></A>
+<P><HR><FONT SIZE=+2 COLOR="339999"><B>Multiple</B></FONT>
+
+<!-- Syntax -->
+<center><table column=3 width=95% border=0><tr>
+    <td><em>Brief:</em></td>
+    <td COLSPAN=2>Selects multiple variable search mode</td>
+</tr>
+<tr><td VALIGN=TOP><em>Syntax:</em></td>
+    <td VALIGN=TOP><tt>Multiple</tt></td>
+    <td VALIGN=TOP><tt></tt></td>
+</tr></table></center>
+
+<!-- @@{MULTIPLE--PERT--RUMP} -->
+
+<P>
+The <tt>MULTIPLE</tt> command switches PERT into a multiple dimensional search
+mode. In multiple variable mode, the search commands add variables to a list
+of variables.  The command <tt>GO</tt> actually starts the search through the
+n-dimensional space.  To clear the list of variables, execute the <tt>
+MULTIPLE</tt> command again.  The <tt>SINGLE</tt> command will return PERT from
+multiple to single mode.
+
+
+<!-- Command section start -->
+<A NAME="go"></A>
+<P><HR><FONT SIZE=+2 COLOR="339999"><B>Go</B></FONT>
+
+<!-- Syntax -->
+<center><table column=3 width=95% border=0><tr>
+    <td><em>Brief:</em></td>
+    <td COLSPAN=2>Starts multiple variable analysis</td>
+</tr>
+<tr><td VALIGN=TOP><em>Syntax:</em></td>
+    <td VALIGN=TOP><tt>GO</tt></td>
+    <td VALIGN=TOP><tt></tt></td>
+</tr></table></center>
+
+<!-- @@{GO--PERT--RUMP} -->
+
+<P>
+The command <tt>GO</tt> starts the multiple variable search.  The current list of
+parameters will be searched to find the minimum deviation of the simulation
+spectrum from the experimental spectrum over the error window.  The algorithm
+is described in the references at the beginning of the RUMP manual.  <tt>GO</tt>
+is only active in the multiple mode.  To clear the search list before a new
+<tt>GO</tt>, execute the <tt>MULTIPLE</tt> command again.
+
+
+<!-- Command section start -->
+<A NAME="composition"></A>
+<P><HR><FONT SIZE=+2 COLOR="339999"><B>Composition</B></FONT>
+
+<!-- Syntax -->
+<center><table column=3 width=95% border=0><tr>
+    <td><em>Brief:</em></td>
+    <td COLSPAN=2>Adds a variable describing composition of a layer to search list</td>
+</tr>
+<tr><td VALIGN=TOP><em>Syntax:</em></td>
+    <td VALIGN=TOP><tt>Composition</tt></td>
+    <td VALIGN=TOP><tt>&lt;layer&gt; &lt;element&gt; &lt;min&gt; &lt;max&gt;</tt></td>
+</tr></table></center>
+
+<!-- @@{COMPOSITION--PERT--RUMP} -->
+
+<P>
+Varies the composition of a single element within a given layer.  If the
+minimum and maximum range are identical, the variable is removed from the
+list of parameters to vary and the composition is set to the specified value.
+
+
+<!-- Command section start -->
+<A NAME="thickness"></A>
+<P><HR><FONT SIZE=+2 COLOR="339999"><B>Thickness</B></FONT>
+
+<!-- Syntax -->
+<center><table column=3 width=95% border=0><tr>
+    <td><em>Brief:</em></td>
+    <td COLSPAN=2>Adds the thickness of a layer to the search list</td>
+</tr>
+<tr><td VALIGN=TOP><em>Syntax:</em></td>
+    <td VALIGN=TOP><tt>Thickness</tt></td>
+    <td VALIGN=TOP><tt>&lt;layer&gt; &lt;min&gt; &lt;max&gt;}</tt></td>
+</tr></table></center>
+
+<!-- @@{THICKNES--PERT--RUMP} -->
+
+<P>
+Varies the thickness of the specified layer.  If you set the min/max range of
+a variable to be null, for example <tt>THICK 1 350 350</tt>, that variable is
+deleted from the list and is set to the constant chosen. 
+
+
+<!-- Command section start -->
+<A NAME="species"></A>
+<P><HR><FONT SIZE=+2 COLOR="339999"><B>Species</B></FONT>
+
+<!-- Syntax -->
+<center><table column=3 width=95% border=0><tr>
+    <td><em>Brief:</em></td>
+    <td COLSPAN=2>Adds the concentration of a diffusing species element to the search list</td>
+</tr>
+<tr><td VALIGN=TOP><em>Syntax:</em></td>
+    <td VALIGN=TOP><tt>Species</tt></td>
+    <td VALIGN=TOP><tt>&lt;layer&gt; &lt;element&gt; &lt;min&gt; &lt;max&gt;</tt></td>
+</tr></table></center>
+
+<!-- @@{SPECIES--PERT--RUMP} -->
+
+<P>
+Varies the composition of a single element within the species definition of a
+given layer.  If the minimum and maximum range are identical, the variable is
+removed from the list of parameters to vary and the composition is set to the
+specified value.
+
+
+<!-- Command section start -->
+<A NAME="equation"></A>
+<P><HR><FONT SIZE=+2 COLOR="339999"><B>Equation</B></FONT>
+
+<!-- Syntax -->
+<center><table column=3 width=95% border=0><tr>
+    <td><em>Brief:</em></td>
+    <td COLSPAN=2>Adds a parameter in the SIM equation of a layer to the search list</td>
+</tr>
+<tr><td VALIGN=TOP><em>Syntax:</em></td>
+    <td VALIGN=TOP><tt>EQUATION</tt></td>
+    <td VALIGN=TOP><tt>&lt;layer&gt; &lt;parameter&gt; &lt;min&gt; &lt;max&gt;</tt></td>
+</tr></table></center>
+
+<!-- @@{EQUATION--PERT--RUMP} -->
+
+<P>
+The <tt>EQUATION</tt> command allows the parameters used in the SIM diffusion
+(or impurity profile) equations to be varied.  The correspondence between the
+parameter number and the actual meaning is documented in the <tt>EQUATION</tt>
+command under SIM.  The parameter to a user equation can only be varied if you
+used $p(i)$ within the definition of the user function.  If you set the
+min/max values for the variable to the same number, that variable is deleted
+from the list and is set to the constant chosen.  
+
+
+<!-- Command section start -->
+<A NAME="fwhm"></A>
+<P><HR><FONT SIZE=+2 COLOR="339999"><B>FWHM</B></FONT>
+
+<!-- Syntax -->
+<center><table column=3 width=95% border=0><tr>
+    <td><em>Brief:</em></td>
+    <td COLSPAN=2>Adds the FWHM for the detector resolution as a variable in the search parameter list</td>
+</tr>
+<tr><td VALIGN=TOP><em>Syntax:</em></td>
+    <td VALIGN=TOP><tt>FWHM</tt></td>
+    <td VALIGN=TOP><tt>&lt;min&gt; &lt;max&gt;</tt></td>
+</tr></table></center>
+
+<!-- @@{FWHM--PERT--RUMP} -->
+
+<P>
+The command <tt>FWHM</tt> varies the detector resolution to obtain best fit.
+The error window for this command should only include the front edge of a
+surface element.  Use <tt>FUZZ</tt> or <tt>STRAGGLE</tt> to simulation deep edges.
+<tt>FWHM</tt> and <tt>MEV</tt> are commonly fit together before any other parameters
+are varied.
+
+
+<!-- Command section start -->
+<A NAME="mev"></A>
+<P><HR><FONT SIZE=+2 COLOR="339999"><B>Mev</B></FONT>
+
+<!-- Syntax -->
+<center><table column=3 width=95% border=0><tr>
+    <td><em>Brief:</em></td>
+    <td COLSPAN=2>Adds the incident beam energy (MEV) as a variable in the search parameter list</td>
+</tr>
+<tr><td VALIGN=TOP><em>Syntax:</em></td>
+    <td VALIGN=TOP><tt>Mev</tt></td>
+    <td VALIGN=TOP><tt>&lt;min&gt; &lt;max&gt;</tt></td>
+</tr></table></center>
+
+<!-- @@{MEV--PERT--RUMP} -->
+
+<P>
+The command <tt>MEV</tt> varies the incident energy defined by the experimental
+spectrum to obtain best fit.  The error window for this command should only
+include the front edge of a surface element.  <tt>FWHM</tt> and <tt>MEV</tt> are
+commonly fit together before any other parameters are varied.
+
+
+<!-- Command section start -->
+<A NAME="fuzz"></A>
+<P><HR><FONT SIZE=+2 COLOR="339999"><B>Fuzz</B></FONT>
+
+<!-- Syntax -->
+<center><table column=3 width=95% border=0><tr>
+    <td><em>Brief:</em></td>
+    <td COLSPAN=2>Adds the fuzz parameter for a layer to the search parameter list</td>
+</tr>
+<tr><td VALIGN=TOP><em>Syntax:</em></td>
+    <td VALIGN=TOP><tt>Fuzz</tt></td>
+    <td VALIGN=TOP><tt>&lt;index&gt; &lt;min&gt; &lt;max&gt;</tt></td>
+</tr></table></center>
+
+<!-- @@{FUZZ--PERT--RUMP} -->
+
+<P>
+The <tt>FUZZ</tt> command allows the fuzz constant between layers to be varied to
+obtain the best fit.  If you set the min/max values for the variable to the
+same number, the fuzz parameter will be set to the value and deleted.
+<tt>STRAGGLE</tt> and <tt>FUZZ</tt> are used to fit the back edges of a layer.
+
+
+<!-- Command section start -->
+<A NAME="straggle"></A>
+<P><HR><FONT SIZE=+2 COLOR="339999"><B>Straggle</B></FONT>
+
+<!-- Syntax -->
+<center><table column=3 width=95% border=0><tr>
+    <td><em>Brief:</em></td>
+    <td COLSPAN=2>Adds the straggle scaling factor to the search parameter list</td>
+</tr>
+<tr><td VALIGN=TOP><em>Syntax:</em></td>
+    <td VALIGN=TOP><tt>STRAGgle</tt></td>
+    <td VALIGN=TOP><tt>&lt;min&gt; &lt;max&gt;</tt></td>
+</tr></table></center>
+
+<!-- @@{STRAGGLE--PERT--RUMP} -->
+
+<P>
+The <tt>STRAGGLE</tt> command varies the straggle constant in the Bohr
+approximation to obtain the best fit.  If you set the min/max values the same,
+the straggle constant will be set to the value and deleted.
+<tt>STRAGGLE</tt> and <tt>FUZZ</tt> are used to fit the back edges of a layer.
+
+
+<!-- Command section start -->
+<A NAME="volume"></A>
+<P><HR><FONT SIZE=+2 COLOR="339999"><B>Volume</B></FONT>
+
+<!-- Syntax -->
+<center><table column=3 width=95% border=0><tr>
+    <td><em>Brief:</em></td>
+    <td COLSPAN=2>Sets the level of information messages printed during a search</td>
+</tr>
+<tr><td VALIGN=TOP><em>Syntax:</em></td>
+    <td VALIGN=TOP><tt>VOLume</tt></td>
+    <td VALIGN=TOP><tt>&lt;level&gt;</tt></td>
+</tr></table></center>
+
+<!-- @@{VOLUME--PERT--RUMP} -->
+
+<P>
+The <tt>VOLUME</tt> command is primarily intended for debugging complex
+search problems during development and beta testing.  If enabled in
+production or debug versions, levels between 0 and 10 will increasingly
+print internal parameters and search parameters as a search is
+underway.  Normally this command is ignored in production versions of
+the code.
+
+<P>
+</p><hr><small>
+Last modified: June 16, 1997
+<address>Michael O. Thompson <a href="mailto:mot1@cornell.edu">(mot1@cornell.edu)</a> </address></small>
+</body>
+</html>

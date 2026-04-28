@@ -1,0 +1,129 @@
+<html>
+
+<head>
+<title>User and System Requirements</title>
+</head>
+
+<body>
+<h3><FONT COLOR="339999">The User</FONT></h3>
+
+<p> GENPLOT is an extremely powerful and flexible plotting package for the
+analysis of scientific and engineering data.  However, this flexibility comes
+at the cost of complexity, and the program is optimized for power at the
+expense of the novice computer user.  The current expectation in software,
+fostered by Macintoy and Windoze applications, is that one should be able to
+sit down at a new program without reading any manual and be immediately
+productive.  This is <em>not</em> the model for GENPLOT.  If simple command
+line prompts bring chills and tingles to your spine, this program is probably
+not for you.  However, even as a novice, you can very successfully use the
+program if you are willing to invest some time to read the manual, and if you
+can avoid being intimidated at first by the large set of commands and
+relatively long learning curve.  Eventually, a subset of the commands will
+become like a second language and the true power and flexibility of this
+program will be made manifest.
+
+<p> For installation and efficient use of this program, you must have certain
+minimal skills with the computer, the operating system, and simple programming
+concepts.  For example, in OS/2, you should be familiar with the
+<tt>CONFIG.SYS</tt> file, environment varialbles, and the <tt>PATH</tt>
+and <tt>LIBPATH</tt> settings.  Although the install scripts are nearly 100%
+automated, it helps to have some idea what the program does to your computer.
+
+<p> The requirements on the user for a UNIX install are much more severe.
+Since the program must be compiled locally, the location of key operating
+system files must be known, and you must be able to obtain appropriate
+privileges.  In general, seek out your system administrator to install this
+program.
+
+<p> The minimum requirements for all users include:
+<ul>
+
+<li> Moving around the directory structure via <tt>cd</tt> commands; searching
+and listing files using wildcards specifications; creating, copying and
+deleting files and directories using <tt>copy, delete, mkdir</tt> and
+<tt>rmdir</tt> (or the UNIX equivalents <tt>cp</tt> and <tt>rm</tt>).
+
+<li> Ability to create, edit and save ASCII text files.  An editor that will
+not convert spaces to tabs nor automatically break long lines.  Any editor
+will work, but <tt>EMACS</tt> has many distinct advantages and satisfies
+these requirements.
+
+<li> Understanding the concept of environment variables and knowing how to
+define them in the particular operating system: <tt>CONFIG.SYS</tt> for OS/2,
+the system utility for NT, and <tt>.cshrc</tt> or <tt>.login</tt> for UNIX.
+
+</ul>
+
+<h3><FONT COLOR="339999">The Computer</FONT></h3>
+
+<p> Specific requirements for each operating system are listed with the
+installation instructions.  In general, since all of the OS's implement
+virtual memory, the minimum requirements for the OS are adequate for the
+program.  The configurations below are `useful' recommended configurations,
+with sufficient memory to be useful in a networked environment.  
+
+</P><CENTER><TABLE SIZE=90% COLUMNS=4 CELLPADDING=5 BORDER=3>
+<TR><TH>     </TH><TH ALIGN=CENTER>OS/2</TH><TH ALIGN=CENTER>NT</TH><TH ALIGN=CENTER>UNIX</TH></TR>
+<TR><TH>Processor</TH>
+     <TD ALIGN=CENTER>486/50</TD>
+     <TD ALIGN=CENTER>Pentium 60</TD>
+     <TD ALIGN=CENTER>&gt;SPARC</TD></TR>
+<TR><TH>RAM Memory</TH>
+     <TD ALIGN=CENTER>16 MB</TD>
+     <TD ALIGN=CENTER>32 MB</TD>
+     <TD ALIGN=CENTER>32 MB</TD></TR>
+<TR><TH>Hard Disk Space</TH>
+     <TD ALIGN=CENTER>10 MB</TD>
+     <TD ALIGN=CENTER>10 MB</TD>
+     <TD ALIGN=CENTER>30 MB (1)</TD></TR>
+<TR><TH>File System</TH>
+     <TD ALIGN=CENTER>HPFS (2)</TD>
+     <TD ALIGN=CENTER>NTFS (2)</TD>
+     <TD ALIGN=CENTER>unknown (3)</TD></TR>
+<TR><TH>Video Display</TH>  
+     <TD ALIGN=CENTER>1024x768x256 (4)</TD>
+     <TD ALIGN=CENTER>1024x768x256 (4)</TD>
+     <TD ALIGN=CENTER>X-windows (5)</TD></TR>
+<TR><TH>Printer</TH>
+     <TD ALIGN=CENTER>Postscript (6,7)</TD>
+     <TD ALIGN=CENTER>Postscript (6,7)</TD>
+     <TD ALIGN=CENTER>Postscript (6)</TD></TR>
+<TR><TH>Compiler</TH>
+     <TD ALIGN=CENTER>IBM VisualAge C (8)</TD>
+     <TD ALIGN=CENTER>MS Visual C++ (9)</TD>
+     <TD ALIGN=CENTER>ANSI/POSIX C (10)</TD></TR>
+</TABLE></CENTER>
+
+</P><STRONG>Notes:</STRONG>
+<OL>
+<LI> Hard disk space may be reduced to 10 MB after compilation by deleting
+all library and object modules.
+<LI> The source code, programming extensions, and some of the examples
+require long filename support.  HPFS and NTFS automatically provide for long
+filenames; FAT with kludged long filename support (Win-95) may or may not be
+adequate and has not been tested (nor is it supported).
+<LI> UNIX filesystem must support filenames of up to 32 characters,
+with multiple extensions, and paths up to 64 characters in length.
+<LI> Any supported display resolution is valid.  GENPLOT and RUMP use only
+16 colors in normal modes, but 256 colors will be supported for 3D shaded
+images.
+<LI> X-windows is the preferred display driver.  However, a Tektronix graphics
+emulator (4014 or 4105 for example) can also be used with reduced capabilities.
+<LI> Postscript is the preferred output format.  Drivers are included for a 
+wide variety of other printers (Epson, HP LaserJet, etc.) but full capabilities
+are implemented only on Postscript.  
+<LI> In addition to internal device drivers, any printer supported by the
+operating system may be used.
+<LI> OS/2 version is dynamically linked and extensions may be readily
+programmed.
+<LI> NT version is statically linked; compiler is only useful if entire
+source code is requested and modules are added to the base code.
+<LI> Compiler must support POSIX system calls and a few extensions (pipes)
+beyond the ANSI standard.
+</OL>
+
+</p><hr><small>
+Last modified: November 3, 1996
+<address>Michael O. Thompson <a href="mailto:mot1@cornell.edu">(mot1@cornell.edu)</a> </address></small>
+</body>
+</html>

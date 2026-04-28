@@ -1,0 +1,100 @@
+<html>
+
+<head>
+<title>Getting Started</title>
+</head>
+
+<body>
+<h1 align=center>Getting Started</h1>
+<hr>
+
+<h3><FONT COLOR="339999">This manual</FONT></h3>
+
+<p>This HTML based manual consists of numerous command reference sections
+plus an introduction, some short examples, a few tutorials, and an index.
+The tutorials range from first time user applications to extremely subtle
+and complex analysis problems.  The command sections are ordered by
+function, hopefully in the relative order of usefulness.  The summary
+sections and index hopefully will help you find things.  The online help
+will remain as it is, but this HTML based document will soon supercede all
+other on-line information.
+
+<p>There are numerous internal changes from version 1.0 to 2.0, in particular
+the fact that arrays index from 0 now instead of 1.  Due to the many changes,
+we would suggest that old time users at least scan the summary section.  First
+time (and older) readers are warned that there are some subtleties to the
+command parsing language in GENPLOT, and all users should attempt to muddle
+through the discussion in Section J and Appendix T at some point.  For those
+delving deeply into GENPLOT, Appendix T attempts to instill an understanding
+of the token concept and how GENPLOT splits up command lines, an understanding
+which is of immense value in making GENPLOT work the way you want within the
+syntax which is built into the program.  Section J likewise explains the
+function and expression evaluators within the command processors.
+
+<h3><FONT COLOR="339999">Invoking the program</FONT></h3>
+
+<!-- @@{NPT} @@{NPTMAX} -->
+
+<p>During installation, a desktop icon will have been created for GENPLOT,
+or the executable for GENPLOT will have been installed into a directory on
+the path.  For OS/2 and NT, there are the two programs - GENPLOT and XGENPLOT.
+They differ only in the command window -- as long as it is stable, XGENPLOT
+is the preferred program.  GENPLOT, a non-window application, may be useful
+for batch file processing.
+
+<p> GENPLOT wakes up to the user with a blank data set of X,Y points.
+Associated with this X,Y data set are two variables called NPT and NPTMAX.
+NPT specifies the number of points which are currently valid in the X,Y set
+while NPTMAX gives the dimensioned size of the X,Y arrays (or the initial
+maximum value of NPT).  This X,Y curve is referred to as the DEFAULT curve and
+is used by most of the GENPLOT commands unless you specify otherwise.  Other
+curves may also be defined, as discussed later.  By definition, a CURVE refers
+to a collection of real X,Y points and an integer representing the number of
+points, NPT.
+
+<!-- @@{Curve} -->
+
+<p> The full format of the (X)GENPLOT initialization is:
+<pre>
+  <tt>GENPLOT [-Buffer <npoints>] [-Inifile <file>] [-Quiet] [-Help]</tt>
+</pre>
+The initial buffer size may be modified from the default 2048 points using
+the <tt>-buffer</tt> option; however, this is seldom necessary since GENPLOT
+will automatically expand the curve as necessary to accomodate the data. 
+Likewise, an initialization file may be specified using the <tt>-ini</tt>
+option; if no file is specified, the program assumes <tt>GENPLOT.INI</tt>.
+The <tt>-HELP</tt> option lists out the format of the GENPLOT command and
+returns immediately.
+
+<p> Once GENPLOT is running, commands are typed at a <tt>GENPLOT:</tt> prompt
+in a pseudo English format.  Commands and arguments are taken from the typed
+command line sequentially.  The command processor (see Appendix T) allows
+multiple commands and arguments to be given on a single command line.  There
+is little difference to GENPLOT if commands are given entirely on a single
+line or broken into multiple lines; GENPLOT will prompt in each case for the
+information necessary to continue.  For the first time user, it is probably
+better to let GENPLOT prompt each time for the information until one learns
+the order of parameters for each command.  Like many computer programs, the
+format of the commands is somewhat strict and arguments are usually required
+in a specific order.  The order of these arguments is considered ``natural''
+by the author, but if in doubt the command reference and online help provide
+the specific format for each command.  Some commands also accept optional
+arguments or modifiers which may be given in any order following all required
+arguments.
+
+<h3><FONT COLOR="339999">GENPLOT as a Subroutine</FONT></h3>
+
+<p> GENPLOT can also be called as a subroutine from within your own C
+programs.  This capability allows you to generate data from within your own
+program and use the GENPLOT interface for the graphics.  Alternatively,
+GENPLOT has the ability to call user subroutines which may manipulate the data
+in ways we never imagined necessary.  These capabilities are detailed in
+Appendix S.
+
+<!-- @@{Subroutine} -->
+
+</p><hr><small>
+Last modified: November 3, 1996
+<address>Michael O. Thompson <a href="mailto:mot1@cornell.edu">(mot1@cornell.edu)</a> </address></small>
+</body>
+</html>

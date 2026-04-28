@@ -1,0 +1,4 @@
+LIBRARY ziegler03
+EXPORTS
+   ZStop
+	

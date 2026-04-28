@@ -1,0 +1,38 @@
+#
+#   Makefile for LEXP
+#
+# this file goes in clib/lexp
+
+include ../makegnu.h
+
+###########################################################################
+OBJS    = lexp.o     lexp2.o     system.o      help.o      \
+          gvcode.o   gvcalc.o    gvparse.o     gvsolve.o   gvmath.o
+###########################################################################
+LIBRARY:  $(INCDIR)lexp.h $(LIBDIR)lexp.a
+
+$(INCDIR)lexp.h : lexp.h
+	cp lexp.h $(INCDIR)lexp.h
+
+$(LIBDIR)lexp.a : $(OBJS)
+	$(LIBMGR) $(LIBDIR)lexp.a $(OBJS)
+	ranlib $(LIBDIR)lexp.a
+	@echo 'Lexp LIBRARY MADE'
+
+$(OBJS)            : $(INCDIR)preload.h $(INCDIR)mytypes.h $(INCDIR)extends.h \
+                     $(INCDIR)lexp.h
+$(OBJDIR)system.o  : $(INCDIR)defaults.h
+$(OBJDIR)gvcalc.o  : gvdefs.h
+$(OBJDIR)gvcode.o  : gvdefs.h
+$(OBJDIR)gvparse.o : gvdefs.h
+
+# Some UNIX are specific about POSIX compliance.  popen/pclose are not defined
+# except via the extended compiler.  Specifically define compile route here
+lexp.o  : lexp.c
+	$(ECC) $(EFLAGS) -c lexp.c
+
+system.o    : system.c
+	$(ECC) $(EFLAGS) -c system.c
+
+gvcalc.o    : gvcalc.c
+	$(ECC) $(EFLAGS) -c gvcalc.c

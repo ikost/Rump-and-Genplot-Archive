@@ -1,0 +1,44 @@
+#
+#   Makefile for LEXP
+#
+# this file goes in clib/lexp
+
+include ../makelnx.h
+
+###########################################################################
+OBJS    = lexp.o     lexp2.o     system.o      help.o      \
+          gvcode.o   gvcalc.o    gvparse.o     gvsolve.o   gvmath.o \
+          FermiIntegral.o
+MERSENNE_OBJS = ../mtwist-1.1/mtwist.o ../mtwist-1.1/randistrs.o 
+###########################################################################
+LIBRARY:  MERSENNE_ $(INCDIR)lexp.h $(LIBDIR)lexp.a
+
+MERSENNE_:
+	cd ../mtwist-1.1 ; $(MAKE) -f makelnx
+
+$(INCDIR)lexp.h : lexp.h
+	cp lexp.h $(INCDIR)lexp.h
+
+$(LIBDIR)lexp.a : $(OBJS) $(MERSENNE_OBJS)
+	$(LIBMGR) $(LIBDIR)lexp.a $(OBJS) $(MERSENNE_OBJS)
+	ranlib $(LIBDIR)lexp.a
+	@echo 'Lexp LIBRARY MADE'
+
+$(OBJS)            : $(INCDIR)preload.h $(INCDIR)mytypes.h $(INCDIR)extends.h \
+                     $(INCDIR)lexp.h
+$(OBJDIR)system.o  : $(INCDIR)defaults.h
+$(OBJDIR)gvcalc.o  : gvdefs.h FermiIntegral.h
+$(OBJDIR)gvcode.o  : gvdefs.h
+$(OBJDIR)gvparse.o : gvdefs.h
+$(OBJDIR)FermiIntegral.o : FermiIntegral.h
+
+# Some UNIX are specific about POSIX compliance.  popen/pclose are not defined
+# except via the extended compiler.  Specifically define compile route here
+lexp.o  : lexp.c
+	$(ECC) $(EFLAGS) -c lexp.c
+
+system.o    : system.c
+	$(ECC) $(EFLAGS) -c system.c
+
+gvcalc.o    : gvcalc.c
+	$(ECC) $(EFLAGS) -c gvcalc.c

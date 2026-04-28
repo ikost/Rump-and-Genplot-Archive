@@ -1,0 +1,252 @@
+<html>
+
+<head>
+<title>Preface to Version 2.0</title>
+</head>
+
+<body>
+<h2 ALIGN=CENTER><FONT COLOR="339999">Preface to Version 2.0</FONT></h2>
+
+<p> It has been nearly 5 years since the last major modification to this
+manual, during which time development on GENPLOT has certainly not ceased.
+Version 2.0 has been in `beta' test for nearly the same period of time serving
+a number of research groups very efficiently.  As I've told many users,
+development will never be finished as long as I remain active in research
+because I will always need the program to do something new - indeed the major
+driving force behind continued development have been my own requirements.
+Most of the beta users are well aware that the fastest way to get a new
+feature enabled is to either (1) get me involved in their problem or (2)
+challenge my abilities as a programmer.
+
+<p> So why, after 5 years, should I undertake now to finally edit an update
+the manual for version 2.0.  Well, it is in fact for the very same reasons
+that the first manual was written.  First, I find that I can no longer myself
+remember all of the features and commands and I find myself going back to the
+code itself too many times to ascertain exactly how a particular feature or
+command worked.  Second, I'm beginning to answer the same questions over and
+over from other users; do it once right and the number of questions drop
+rapidly.  And finally, there are enough new features in the program that a
+large number of users do not know about - and cannot know about unless I
+document them.  So with these thoughts in mind, I finally made the effort to
+again tackle the daunting effort of revising and updating the manual.
+
+<p> The beginnings of GENPLOT in its current form can be traced to at least
+1982 in the days of the PC-AT when 640&nbsp;kB of RAM memory was as much as anyone
+could possibly imagine using, much less affording, hard disks were still
+measured in 10's of MB, and processor speeds had not yet exceeded even the
+10&nbsp;MHz speed limits.  But it was an exciting time from the scientific
+computing world - finally a chance to have a computer for working with data in
+the lab with relatively high speed graphics and ones own control of the
+machine.
+
+<p> Much has changed since those days.  Processors now approach 300&nbsp;MHz
+clock speeds with pipelined architectures and embedded co-processors, RAM
+memory of 16&nbsp;MB is the minimum with 1&nbsp;GB not unheard of in
+scientific circles, and any hard disk not measured in gigabytes is no disk at
+all.  These hardware changes have brought about paradigm shifts striking at
+the very core of our interaction with computers.  The raw computational power
+of today's desktop machines makes the GUI (graphical user interface)
+responsive enough even for those of us with absolutely no patience.  No longer
+is the computer the reserved privilege of the computer geeks.  Even a computer
+phobe and neophytes can sit down today to a GUI word processor and very
+effectively compose letters, draw figures, even make movies.  For the creative
+arts, the age of the GUI has allowed artists to be artists, just on computers.
+
+<p> Reading the old manual, I note with humor my comments concerning the
+Macintosh.  In some sense, I regret my comments because I have always admired
+the vision of Apple especially in user aesthetics -- their interface and the
+uniformity of applications in particular.  But for serious scientific work,
+the computation power simply did not exist to support the complexity of the
+GUI and handle our needs.  Today, with the computation power now available,
+the Mac faces a serious challenges from the markedly inferior imitation of
+Microsoft Windows (be it 3.1 or 95, 96, ...).  (Unfortunately, the Mac still
+harbors its own grudges toward me and is sure to hang at my briefest of
+attempts at serious use.)
+
+<p> However, while the paradigm for computer interfaces has markedly changed
+over the past decade, the task facing scientists and engineers has not (though
+some may argue the current emphasis on relevant research is as much a
+revolutionary paradigm shift as the command line interface to a GUI).  We are
+still faced primarily with trying to discern nature around us - trying to
+identify trends in data, extracting features from data, fitting data to
+models, critically testing models, building intuition on behavior of
+mathematical functions, and only then generating pretty pictures for inclusion
+in papers.  
+
+<p> Unfortunately, the advent of the GUI has, in many cases, actively reduced
+the quality of the work we do.  Watching students in my own university, I see
+them spend enormous amounts of time generating viewgraphs to show data that
+was collected in less than 10 minutes.  At the next scientific meeting, note
+the inverse correlation between the actual scientific content of a talk and
+the quality of the viewgraphs.  Why?  Because it looks really neat to have a
+blue background with yellow bulleted letters and a 3D border.  Manuscripts are
+the same way - I've gone so far now as to give extra credit for simple typed
+reports.
+
+<p> So what does this tirade about the failing qualities of modern students
+have to do with the revisions to GENPLOT?  Well, nothing with the changes, but
+much to do with what remains the same.  GENPLOT began as a simple command line
+driven program, albeit very flexible, and it will probably end its life in the
+same way (possibly in proof that I am wrong).  As a scientist, I am still very
+much a linear thinker - consider one model and if it fails, try another.
+Change parameters to see how they change, smooth the data and look again,
+compare the data to a previous experiment.  Understanding and fore-knowledge
+of what is being done is a critical requirement to quality research.
+
+<p> The GUI in modern programs has also eliminated power and flexibility for
+the ease of learning.  This is not always such a great tradeoff - and putting
+back in the complexity bloats programs in a way that only Microsoft can love
+(aka Word 6.0).  The GUI learning curve is rapid, but levels out quickly with
+no further productivity enhancements in time.  A powerful command driven
+program, like UNIX, on the other hand has a long learning curve but the curve
+never saturates - as one gains experience with the commands the productivity
+continues to increase seemingly without end.  It is toward this latter model
+that GENPLOT continues to evolve.
+
+<p> There are other problems I have with GUI based programs that try to dumb
+down the effort of data analysis.  There is an advertisement in my
+`competition' folder for a commercial program that touts its ability to fit
+your data to 1200 different functional forms, returning a list of those that
+match most closely.  What absolute crap - the old paradigm that if you give me
+enough parameters I can fit an elephant immediately comes to mind.  If you
+don't have any idea what form the data should take, stop and do a little
+thinking first.  Similarly almost every graphing will do a linear fit and
+return that horrid correlation coefficient that less than 5% of the scientific
+population can properly interpret.  Computers have brought us fortunately and
+unfortunately to the point that data can be too easily analyzed - and many
+critical steps in the scientific process have been lost.  Much more careful
+thought must have been required in the past when comparing a model to
+experimental data meant several hours of painful calculations with a slide
+rule (no I never did it and no I don't really wish to return to such days).
+
+<p> I believe GENPLOT 2.0 remains a premiere program for testing and
+critically evaluating models against data.  The expression evaluator has been
+extensively upgraded and is now almost unlimited in the complexity which can
+be handled, including complex number expressions.  The non-linear least
+squares fitting has similarly been extended to handle arbitrary expressions
+and can even call external programs to run complex simulations.  Limitations
+posed by the old DOS architecture have disappeared and curves with millions of
+points can be routinely handled.  But it remains impossible to mold intuitive
+investigations and scientific examination of data into point and click sets of
+dialog boxes - I cannot possibly foresee all the twists and convolutions that
+will be necessary for you to perform to analyze your data.  And so GENPLOT
+remains a command driven environment at version 2.0, flying in the face of
+modern wisdom.  
+
+<p> But there is value in the GUI - if not for more than helping remind one of
+the proper command syntax.  The FFT command has so many options and parameters
+that there is no feasible way to remember them.  A simple dialog box however
+puts all them in place (albeit very busy and considered anathema to modern GUI
+design - design rules that specify no more than 3 or 4 topics per dialog box
+and require one to dig down 4 or 5 levels to get to the single parameter that
+is to be changed) and when executed, gives the command line version for future
+reference.  Or the dialog box to set all the strange parameters of the axis
+control.  The GUI can complement the command line interface, but it can never
+replace it.
+
+<p> But what about the graphics?  Well, here I have to admit that there is
+great value in the GUI and I've tried to begin incorporating more control
+based on the GUI.  The absence of a unified graphical environment (covering
+UNIX, OS/2, Mac, and perhaps even Windoze) has slowed me considerably since
+the effort is large and the payback only marginal (in terms of the science
+that can be done).  Users of OS/2 will notice much better integration than
+UNIX, but both will see substantial improvements in the presentation of
+graphics on postscript printers.  But certainly GENPLOT remains behind, in
+ease of use, programs which emphasis the presentation of data over the
+analysis.  However, though not as easy to use, I still claim that the final
+graphics produced by GENPLOT are equivalent or superior to almost every other
+drawing application.
+
+<p> The change from version 1.0 to 2.0 required considerable work since the
+entire package had to be ported from a FORTRAN 77 and assembly language base
+to a pure C base.  In the days of DOS, memory and speed were critical issues
+and the Ryan-McFarland FORTRAN compiler was the only high level, robust,
+compiler that existed (originally sold also as the IBM Professional Fortran).
+Slow operations were translated to assembly language both for speed and for
+code size.  The 640 kB barrier was rigid and self managed dynamic linking had
+to be developed.  Indeed, the complexity of the code and the dearth of tools
+to support development amazes me still today.  Once memory dropped in price,
+EMS, XMS and similar contortions began being used to shoe horn the new power
+in hardware into an already obsolete DOS. 
+
+<p> IBM and Microsoft released OS/2 in the later 80's, the first PC based
+operating system to maintain some compatibility with DOS applications
+(necessary in the lab) but bypassing the 640 kB memory barrier and running in
+true preemptive, protected, multitasking mode.  We jumped to OS/2 at version
+1.2, recognizing that for scientific work the 640 kB barrier would remain a
+nightmare, and have never looked back again (though the students sometimes
+would like to!).  FORTRAN compilers did not exist for OS/2 and the mix of
+assembly and FORTRAN was becoming a challenge to support as the complexity
+grew.  C was a more suitable language anyway and the ANSI standard made it
+feasible to write one version that ran on a variety of hardware.  Every line
+of code had to be translated and converted - and not by automatic programs but
+manually to take advantage of the features of the language.  
+
+<p> A few commands never made it across the translation - they were so seldom
+used that it was not worth the effort.  Similarly, with the new OS there was
+no need to write device drivers for every device since the operating system
+provided much of the interface.  Unfortunately, UNIX did not provide the same
+services in the area of device drivers, but X-windows and the common
+Postscript printers made their absence less noticeable.
+
+<p> The bottom line is that GENPLOT is now almost 100% ANSI standard C with
+very few extensions.  Porting from OS/2 to most flavors of UNIX can be handled
+in a day given a compliant compiler.  If the POSIX subsystem of Windows NT
+weren't such a joke, even Windows NT would be a viable platform (actually a
+native NT version does now exist, but it isn't based on the POSIX subsystem).
+Extensions can be easily written in C for new functions, for control of
+instruments, or for stand alone applications.
+
+<p> Someone always asks me how big GENPLOT is now.  The honest answer is that
+I do not know.  In UNIX or OS/2, only the necessary components of the code are
+loaded into memory at any time and so size is nearly irrelevant.  However, the
+bloat that marks Microsoft is certainly not present.  The actual executable
+code is on the order of one megabyte and the entire package compressed can
+still fits on only two diskettes.  The kitchen sink is not included and I
+don't think 35&nbsp;MB of additional fonts and pictures would do much to
+enhance the usefulness (though some more example macros will probably make it
+in the final distributions).
+
+<p> Finally, I looked to see how the average user of GENPLOT has changed over
+the past half decade; the answer I find is little.  Perhaps even more than
+before, I think the users of GENPLOT are self-selected individuals unafraid of
+the computer and keyboard, confident in their ability to understand written
+manuals, sticklers for small details, and demanding in their expectations of
+the computer.  Like me, when someone says that computer cannot do this or
+that, the first response is bull - it's only that no one has yet programmed the
+computer for that task.  For serious GENPLOT users, the computer is a slave
+and they demand that it perform for them as they desire, not as some short
+sighted and idiotic programmer thought it should perform.  Flexibility is the
+key to all things.
+
+<p> This preface would not be complete without recognizing, acknowledging, and
+thanking those users who have tested the program over these past years,
+challenged me to incorporate new features, and made so many suggestions that
+it challenges my talents to incorporate them all.  I would especially like to
+thank Roger de Reus, David Brunco, Anthony Dai, Sjoord Rooda, Larry Doolittle,
+Jon Custer, Pat Smith, William Boyer and Mike Uttormark.  Larry Doolittle and
+Mike Uttormark also assisted in various pieces of the code, with Larry in
+particular heavily involved in the early conversion of the RUMP portion of the
+program to C.  And through it all, this effort would have been unsuccessful
+without my business partner Patricia Ober, and my former partners Mike and
+Nancy Heisler.  And certainly, nothing is possible without the support and
+encouragement of my wife Lisa and son Ian!
+
+<p> I also recognize the support of the users who have bought GENPLOT and
+RUMP.  It's not the day job, but GENPLOT does provide enough income to keep me
+supplied with a reasonably powerful computer at home and so supports my
+programming habit.  This eliminates the tricky questions concerning conflict
+of interest since development of GENPLOT can be nearly independent of the day
+job, although both GENPLOT and my research certainly benefit from each other
+significantly.
+
+<p> And so, with humble apologies for all those I've insulted, let's get on
+with the real problem at hand.  How do you tame the beast called GENPLOT?
+
+<p> Michael Thompson - June 21, 1996
+
+</p><hr><small>
+Last modified: November 3, 1996
+<address>Michael O. Thompson <a href="mailto:mot1@cornell.edu">(mot1@cornell.edu)</a> </address></small>
+</body>
+</html>

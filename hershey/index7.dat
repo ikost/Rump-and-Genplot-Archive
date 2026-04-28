@@ -1,0 +1,66 @@
+Bold Serif Hellenic
+# The non-specified symbols in this set are defined as:  Ordering taken to be
+# close to that given for the symbol set encoding vectors in postscript.
+# Differences are given below.
+#
+#            normal     oddball
+# epsilon      684 e      631  V
+# theta        684 q      634  J
+# phi          686 f     2147  j
+# ?????                        v
+#
+# Note that the 1200 series is similar to the 2200 series, could be used for
+# the simplex version, and leave only the 22 series for the duplex version.
+#   "partial", 0xB6 (2265)
+#   "grad",    0xD1 (2266)
+#   "int",     0xF2 (2268)
+#   "oint",    0x91 (2269) non-PS
+#   "infty",   0xA5 (2270)
+#   "prod",    0xD5 (2401)
+#   "sum",     0xE5 (2402)
+#   "degree",  0xB0 (718/2729)
+#   "bullet",  0xB7 (850)
+#
+#   "minus",   '-' (okay)
+#   "plus",    '+' (okay)
+#   "pm",      0xB1 (2233)
+#   "mp",      0x92 (2234) non-PS
+#   "times",   0xB4 (2235)
+#   "cdot",    0xD7 (2236)
+#   "div",     0xB8 (2237)
+#   "eq",      '='  (okay)
+#   "ne",      0xB9 (2239)
+#   "equiv",   0xBA (2240)
+#   "lt",      '<'  (2241) replace
+#   "gt",      '>'  (2242) replace
+#   "le",      0xA3 (3950)
+#   "ge",      0xB3 (3951)
+#   "propto",  0xB5 (2245)
+#   "sim",     0x7E (2246)
+#   "sqrt",    0xD6 (2255)
+
+0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0
+0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0
+   0 2214 2217 2275 2274 2271 2272 2216 2221 2222  728 2232 2211 2231 2210 2220
+2200-2209                                         2212 2213 2241 2238 2242 2215
+2273 2027 2028 2048 2030 2031 2047 2029 2033 2035 2134 2036 2037 2038 2039 2041
+2042 2034 2043 2044 2045 2046 2131 2050 2040 2049 2032 2223 3927 2224  832 3928
+3930 2127 2128 2148 2130 2184 2186 2129 2133 2135 2147 2136 2137 2138 2139 2141
+2142 2185 2143 2144 2145 2146 2231 2150 2140 2149 2132 2225  723 2226 2246    0
+
+#  0x80 1    2    3    4    5    6    7    8    9    A    B    C    D    E    F
+   0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0
+#  0x90
+   0 2269 2234    0    0    0    0    0    0    0    0    0    0    0    0    0
+#  0xA0
+   0    0    0 3950    0 2270    0    0    0    0    0    0    0    0    0    0
+#  0xB0
+2729 2233    0 3951 2235 2245 2265  850 2237 2239 2240    0    0    0    0    0
+#  0xC0
+   0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0
+#  0xD0
+   0 2266    0    0    0 2401 2255 2236    0    0    0    0    0    0    0    0
+#  0XE0
+   0    0    0    0    0 2402    0    0    0    0    0    0    0    0    0    0
+#  0xF0
+   0    0 2268    0    0    0    0    0    0    0    0    0    0    0    0    0

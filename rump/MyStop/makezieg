@@ -1,0 +1,5 @@
+\iaea\rump\ziegler03.dll : ziegler03.dll
+	copy ziegler03.dll \iaea\rump\ziegler03.dll
+
+ziegler03.dll : ziegler03.c ziegler03.def
+	cl /nologo /LD /G5 /O2 $**

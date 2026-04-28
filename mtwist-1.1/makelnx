@@ -1,0 +1,18 @@
+#
+#   Makefile for MERSENNE TWISTER algorithm
+#
+# Because this comes from elsewhere, not stricly ANSI compliant
+# Just use simple compiler switches
+
+include ../makelnx.h
+
+###########################################################################
+OBJS    = mtwist.o randistrs.o
+###########################################################################
+ALL: $(OBJS)
+
+mtwist.o    : mtwist.c mtwist.h
+	$(CC) -Wall -O2 -c mtwist.c
+
+randistrs.o : randistrs.c mtwist.h randistrs.h
+	$(CC) -Wall -O2 -c randistrs.c

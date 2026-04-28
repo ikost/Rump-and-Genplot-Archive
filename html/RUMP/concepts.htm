@@ -1,0 +1,87 @@
+<html>
+<head>
+<title> RUMP: Command descriptions </title>
+</head>
+
+<body>
+<A NAME="top"></A>
+<h2><center>RUMP: General Concepts</center></h2>
+<hr>
+
+<h3> Buffers and Data Files </h3>
+
+<!-- @@{Buffers and Files--RUMP} -->
+
+RBS experimental and simulation spectra are stored in RUMP in a set of
+internal buffers.  These buffers are reused on a rotating basis to accommodate
+new spectral data.  Twelve buffers are configured in the PC version, each
+with a maximum of 1024 channels of data (mainframe versions generally increase
+the buffer size to 2048 channels).  The buffers are numbered from -1 through
+10.  The first two buffers, -1 and 0, are always reserved for temporary
+calculations (-1) and for spectral simulations (0).  The remaining ten buffers
+hold experimental spectra, copies of simulations or temporary calculations
+(PERT).  Buffers are referred to by either number or by content (the filename
+of the corresponding data).  At any point in time, one buffer is designated as
+the MAIN or ACTIVE buffer.  This designation is important in that many
+commands, for example <tt>THICKNESS</tt>, operate only on the ACTIVE buffer.  The
+ACTIVE buffer may be changed using commands such as <tt>GET</tt> or <tt>POINTAT</tt>
+and can be identified using the <tt>BUFFERS</tt> command.  The first two special
+buffers -1 and 0 cannot, in general, be retained as the ACTIVE buffer.
+
+<p>
+Buffers are actually data structures containing not only the spectral
+information (counts per channel), but also experimental parameters required
+to analyze the data.  These experimental parameters describe the incident
+particle, the beam energy, charge integration, scattering geometry, etc.  This
+information is stored on a per buffer basis and may be modified using commands
+described in this manual.
+
+<p>
+RUMP data files correspond closely to the buffer structure.  The most recent
+version of the data file utilize a format which is machine independent,
+allowing direct binary exchange of data files between different mainframe and
+micro implementations of RUMP.  An appendix to this section describes the
+internal data file format in detail.  The old format, written using FORTRAN
+unformatted I/O records, is still recognized by the READ commands.  Buffers
+are filled with experimental data by reading the files using <tt>GET</tt>, <tt>REAL</tt>, <tt>PLOT</tt> or <tt>OVERLAY</tt>.  The ACTIVE buffer can be saved, with the
+current buffer experimental parameters, using <tt>REWRITE</tt>, <tt>SAVE</tt> or
+<tt>WRITE</tt> commands.
+
+
+<h3> Specifying Elements </h3>
+
+Elements names are required in many of the commands to RUMP.  Internally,
+RUMP maintains a list of 92 elements with isotope masses, abundances, and
+atomic density.  Elements are specified by their common one or two letter
+symbol such as Si or O.  Full names are not permitted.  A specific isotope
+can also be specified for most commands by using the format 28Si or 31Si.  (An
+obsolete format Si+28 is also still supported.)  If the isotope is listed in
+the internal tables, the actual mass for the element is used.  Otherwise, the
+specified atomic weight will be used as the atomic mass.  42Si is valid in
+RUMP but don't expect meaningful results.
+
+<p>
+Charged beams are specified in the same manner except for the addition of
+plus signs after the symbol.  4He++ is the symbol for normal double plus
+backscattering alpha particles.
+
+
+<h3> SIM and PERT </h3>
+
+RUMP includes a very fast and powerful, if not overly friendly, simulations
+package referred to as SIM.  SIM couples with an even less friendly package
+called PERT which automatically varies parameters describing the simulation to
+reach a ``best fit'' with a given experimental spectrum.  Both SIM and PERT
+are sub-processors under RUMP with their own set of commands and data files.
+There is no command to do a simulation; simulations are automatically
+performed when necessary using experimental parameters from the ACTIVE spectra
+and elements and layer thicknesses from a ``sample description''.  Commands
+within SIM are primarily directed to generating the sample description and
+modifying some of the simulation parameters.  PERT is solely concerned with
+the search procedure.
+
+</p><hr><small>
+Last modified: November 3, 1996
+<address>Michael O. Thompson <a href="mailto:mot1@cornell.edu">(mot1@cornell.edu)</a> </address></small>
+</body>
+</html>

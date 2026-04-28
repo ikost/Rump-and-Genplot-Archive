@@ -1,0 +1,68 @@
+Hellenic
+# The non-specified symbols in this set are defined as:  Ordering taken to be
+# close to that given for the symbol set encoding vectors in postscript.
+# Differences are given below.
+#
+#            normal     oddball
+# epsilon      684 e      631  V
+# theta        684 q      634  J
+# phi          686 f      647  j
+# ?????                        v
+#
+# Note that the 1200 series is similar to the 2200 series, could be used for
+# the simplex version, and leave only the 22 series for the duplex version.
+# Decision is to use smaller versions for all except \int, \oint, \partial
+# and \grad.  These just look poor in the small sizes.
+#   "partial", 0xB6 (2265)
+#   "grad",    0xD1 (2266)
+#   "int",     0xF2 (2268)           362 = 1111 0010
+#   "oint",    0x91 (2269) non-PS
+#   "infty",   0xA5 (2270)
+#   "prod",    0xD5 (2401)
+#   "sum",     0xE5 (2402)
+#   "degree",  0xB0 (718)
+#   "bullet",  0xB7 (850)
+#
+#   "minus",   '-' (okay)
+#   "plus",    '+' (okay)
+#   "pm",      0xB1 (2233)
+#   "mp",      0x92 (2234) non-PS
+#   "times",   0xB4 (2235)
+#   "cdot",    0xD7 (2236)
+#   "div",     0xB8 (2237)
+#   "eq",      '='  (okay)
+#   "ne",      0xB9 (2239)
+#   "equiv",   0xBA (2240)
+#   "lt",      '<'  (2241) replace
+#   "gt",      '>'  (2242) replace
+#   "le",      0xA3 (3950) replace
+#   "ge",      0xB3 (3951) replace
+#   "propto",  0xB5 (2245)
+#   "sim",     0x7E (2246)
+#   "sqrt",    0xD6 (2255)
+
+0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0
+0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0
+   0  714  717  733  719 2271  734  716  721  722  728  725  711  724  710  720
+ 700-709                                           712  713 1241  726 1242  715
+1273  527  528  548  530  531  547  529  533  535  634  536  537  538  539  541
+ 542  534  543  544  545  546  631  550  540  549  532 1223 3927 1224  832 3928
+3929  627  628  648  630  684  686  629  633  635  647  636  637  638  639  641
+ 642  685  643  644  645  646  724  650  640  649  632 1225  723 1226 1246    0
+
+#  0x80 1    2    3    4    5    6    7    8    9    A    B    C    D    E    F
+   0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0
+#  0x90
+   0 2269 1234    0    0    0    0    0    0    0    0    0    0    0    0    0
+#  0xA0
+   0    0    0 1243    0 1270    0    0    0    0    0    0    0    0    0    0
+#  0xB0
+ 718 1233    0 1244 1235 1245 2265  850 1237 1239 1240    0    0    0    0    0
+#  0xC0
+   0    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0
+#  0xD0
+   0 2266    0    0    0 1401 2255 1236    0    0    0    0    0    0    0    0
+#  0XE0
+   0    0    0    0    0 1402    0    0    0    0    0    0    0    0    0    0
+#  0xF0
+   0    0 2268    0    0    0    0    0    0    0    0    0    0    0    0    0

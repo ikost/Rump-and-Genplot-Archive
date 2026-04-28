@@ -1,0 +1,1198 @@
+<html><head><title>Genplot Enhancements Log File</title></head><body>
+<pre>
+LIST OF ERROR FIXES IN ANSI-C DEVELOPMENT
+===========================================================================
+Prty    0:      Nice upgrade feature
+        1:      Minor bug but not severe, or high priority feature upgrade
+        2:      Major annoying bug but not computationally wrong
+        3:      Error in results -- must be fixed now
+
+===========================================================================
+QUICKIE MOD REPORTS:
+===========================================================================
+9/20/2013: implemented better means of randomizing array.  Go through
+   sequentially putting into element i randomly one of remaining n-i.
+   Only documented here in case of some later issue.
+
+8/7/2013: let could not set individual elements of an integer array or
+   a linked integer array.  Not a problem until the $AXCOLR was changed
+   from a real array to an integer array.
+
+6/13/2013: Fixed problem with binning faulting in error if all the
+   values were equal.  Had to do with trying to round 0.00 to a fixed
+   number of significant digits (duh ...).  Sometimes we are not so
+   bright.
+
+2/14/2013: *VERY OLD* bug squashed.  When printing a graph at less than
+   100% scaling, the width of the lines increased rather than decrease.
+   Was dividing by the scaling factor rather than multiplying.  Ouch ...
+   should have looked and fixed this *long* ago.
+
+2/8/2013: Fixed read so that one can use options to %digitize again. Once
+   axes are calibrated "read %digitize -hold" will once again give you
+   the ability to reuse same coordinate system.
+
+1/17/2013: Minor fix after stck problem.  Moved block code "holding" the
+   stack pointers before function calls to surround all function type
+   calls in GVPARSE.  Problem showed up with GVLINK'd functions from the
+   GPIB module.  Need to keep eye on other types for functions.
+
+1/2/2013: Fixed strange problem that's been hanging around "function"
+   evaluation functions such as sum(), prod() and integral.  Showed up
+   first in a solve() where the second version of this code failed.
+     define f(x,y) = x+y
+     eval f(solve(x-1,0,2),3)   /* succeeded
+     eval f(3,solve(x-1,0,2))   /* failed
+     eval f(sum(i,0,5),5)       /* correct
+     eval f(5,sum(i,0,5))       /* incorrect
+   Finally tracked the problem down to stack referencing in the parse
+   routine.  Should be resolved now.  I tried to test, and hopefully
+   have done enough to expose obvious problems.
+     eval f(solve(x-1.5,0,solve(x-2,0,3)),solve(x-0.5,0,2),solve(x-1,0,2))
+   But as a result, added good debug code to math operations.  For fun,
+     let $SysDebugFlag = 6
+   and then do some math operations.
+
+1/1/2013: Fixed problems with wait.  Now functions properly with time out.
+
+1/1/2013: Fixed problem with int2bin(2^32).  Now works with any value
+up to 1E19 roughly (64 bit precision).  Also modified most of the
+evaluation routines to work with 64-bit integers so won't have problem
+again.
+
+11/26/2012: The "define f(x) = 1.02x" failed to generate errors and did
+   not do the apparent implicit multiplication.  Problem is the function
+   variable substitution changes "1.02x" to "1.02&00" which was then
+   interpreted as a binary AND operation.  Changed the & in the substitution 
+   to the character 0x7F so that this will not happen anymore.
+
+10/23/2012: Fixed occasionaly problem with @median() function that would
+   fail to converge to the median.
+
+10/8/2012: Fixed overflow problem when doing convolution of data on very
+   large number scale (SIMS data at 1E21).  Not sure exactly the error,
+   but solved quickly by normalizing both arrays to [-1,1] and undoing
+   the scaling at the end.  Modified corrl() routine in fft2c.c.
+
+9/17/2012: Changed slope/offset language to slope/intercept in linear fits.
+
+9/17/2012: lrand48() and mrand48() functions used lower 32 bits of the
+   LCG sequence.  Changed to use upper bits which have better random
+   behavior.
+
+1/31/2012: Several CRT routines (such as close()) called an OS error handler
+   for invalid parameters.  The default action of this handler is to
+   terminate the program and generate a crash report.  This is annoying
+   in evaluation where such errors are common.  Used CRT function
+   _set_invalid_parameter_handler() to cause these parameter range
+   errors to be ignored.  Functions just return an error rather than
+   crashing.  Debug mode can be used with the handler to figure out
+   where the failures occured.
+
+12/6/2011: Switching arguments in BETAI_Ix did not get fully propagated
+   to all uses.  The @t_test(ar1,ar2) for example failed.  Nopefully now
+   all internal uses are again consistent.
+
+11/7/2011: Fixed problem allocating a empty string
+    Reported segment error with command
+        declare astr = ""
+    failed.  Problem with initial allocation of strings now NULL instead
+    of a default length.
+
+9/3/2011: Fixed problem with logarithmic axes that were more than 7
+    decades and all values were negative
+
+8/28/2011: sprintf function did not accept "C-language" strings with
+   embedded control characters.  Now fixed ... printf, errprintf, and
+   sprintf all work the same.
+
+7/16/2011: maxtrix insert_data / extract_data
+   Both ROW and COLUMN executed as column, and both X and Y executed as
+   FOW.  Fixed both commands so can do both column and row.
+
+7/15/2011: matrix extract
+   Off by 1 in both rows and columns.  Problem with 1-based indexing for
+   rows and columns versus 0 based indexing in code.
+
+3/11/2011: pwd() and cwd() got wrong argument list in code change for
+   arbitrary argument structure.  Complained of too few arguments.  Simple fix.
+
+3/10/2011: Still problems parsing when E is the dummy variable.
+              define f(e) = 1.07E-7*E-3
+was failing since there E-3 looked an awful like 1.07E-7.  Had to
+add check that character preceeding was not a decimal digit or decimal
+point.
+
+1/5/2010: sprintf() could not accept a string replacable argument
+             define f(#text) = sprintf("a%sb", text)
+          failed.  Now should work
+
+10/10/2010: binomial(x,n,p) modified to return 0 for x<0 or x>n
+
+9/20/2010: Minor change to @skew() and @kurt() to return proper
+estimator of parent moments in case of small skew/kurt and small sample
+number.  Now done correctly (or at least as most other definitions
+implement these moments).
+
+9/x/2010: Fix ls so "ls adir/" succeeds as if "ls adir" rather than fail.
+
+7/27/2010: isatof() and isatoi() now return FALSE (0) for an empty string.
+
+5/17/2010: Changed the flow of the GENPLOT read to fail gracefully with
+     bad options.  Attempting to do a binary bitmap read from the
+     console now just gracefully gives an error message.
+
+5/17/2010: Change to allow recursion within function of functions.  Now
+     valid
+            solve(integral(t^2|t,0,x)-1|x,0,2)
+
+4/19/2010: 0j+SQRT(-1) returned -j instead of j!!!  Windows compiler
+     seems to randomly change between +/-0 and distinguish the two.
+     Added line "if (z.y == 0) z.y = 0" which fixed the problem :-(
+
+3/16/2010: Fixed minor problem with "click" start of XGenplot or Genplot.
+     Was failing to terminate the string from command line options.  Now
+     should behave better if you associate .mac and .dat files with
+     XGenplot (or .rbs files with RUMP).
+
+2/26/2010: Ouch - very strange problem.
+        define f(e) = 3*e*1E-7
+     would fail because the E in 1E-7 was considered a dummy variable.
+     Put in essentially a specific check for this problem (gvcode).
+       define f(E) = 3*E*1.0e-7 create y = f(x) -range -10 10 lt 1 pl
+
+2/3/2009: Fixed minor problem when running shell commands in a directory
+     path that contains spaces.  In XGenplot or XRump, external commands
+     must be passed to the command processor to execute as if they had
+     been typed at a console session.  That means quotes around the
+     executable path if it contains a space.  Oops - forgot that since
+     never put spaces in names normally.
+
+10/26/2008: Selecting an invalid palette (-palette <name>) with plot
+     would crash GENPLOT hard.  Now just defaults to some palette to
+     continue running with error message
+
+2/6/2008: The bit-wise operators & and | failed due to addition of new
+     math operations.  They needed to be one of the first 255 listed and
+     that condition was violated.  Now moved to the very early part of
+     the list to avoid in the future.
+
+12/11/2007: The common "-curve <cv>" modifier for commands failed to allow
+     for a 3D curve.  Had "(itype != GV_2DCURVE) && (itype != GV_2DCURVE)"
+     where the second one should have been GV_3DCURVE.  The implicit check
+     was valid.
+
+11/28/2007: Minor correction to the @t_test(ar1,ar2) code.  Now uses
+           fully proper expressions for the pooled standard deviation.
+
+10/7/2007: Long overdue fix to ls.  sizeof(ptr) versus strlen(ptr)
+
+10/4/2007: One fix to string arrays broke key use.  Temporary use of a
+           variable that got fully utilized in new code.  Quit kludging!
+
+10/1/2007: Fixed problem with Rank-Spearman which appeared with last
+           change to heap_sort procedures
+
+9/20/2007: The error with DIR on huge directories has finally been
+           resolved.
+
+9/12/2007: Allocating of string arrays tied maxsize to size.  Has been
+           fixed so changing size doesn't modify the allocated size.
+
+9/12/2007: The forlist (var) failed if length of var was greater than 4096.
+           This arose from a test
+               if (space availble < size of var) {
+                   increase space by 4096
+               }
+           changed so increase is at least bigger than sizeof var.
+           Single items in the final list still cannot exceed PATH_MAX
+           characters, currently 256.
+
+8/30/2007: The -range command in fit commands has been failing for some
+           time.  Not a problem with specification of an XRANGE, but
+           always with Y.  Ouch ...
+
+8/23/2007: Some bitmaps report negative height or width.  Now use absolute 
+           values, but report as a warning.
+
+6-2-2007:  *Very* minor fix to evaluator precedence.  Bitwise or was
+           given precedence of logical or.  Doubt anyone hit that bug :-)
+
+5-12-2006: Revised slightly the operation of the matrix read code.  The
+           read will only proceed as far as the request for data extends
+           from the -ROWS <low> <high> option on the read command line.
+
+3-22-2006: Fixed memory leak in matrix rotation code.  Dumb mistake :-(
+
+10-10-2005: Put in a "GVTrimToReal" for all ASCII reads.  Reading a number
+            out of range (10^309) was causing overflow exceptions.
+
+8-2-2005:  Tired of slow main-curve expansion when reading millions of
+           points.  Now number of points doubles each time an ASCII read
+           must expand the main curve size.
+
+8-2-2005:  Modified the AVI read code to permit reported image sizes that
+           are greater than the product of the width*height*bytes.  Do not
+           understand the underlying cause, but just choose to print a
+           warning and ignore the trailing information.
+
+6-27-2005: Fixed error reading "lookup-table" AVI files.  Returns the index
+           of the table entry, not the actual color.  B/W files will range
+           from 0-255 instead of 0-765 under this circumstance.
+
+6-24-2005: Change to curfit/nlsfit.  At some point, the alpha matrix was
+           normalized to improve/stabilize the matrix inversion.  Some
+           data sets however do generate diagonal values of zero which
+           then cause divide-by-zero error in code.  This is now explicitly
+           checked in the code, turning off the normalization if zero.
+           As it indicates a variable with no chi-square change, there
+           is likely to remain a real problem with fitting, but at least
+           the code won't hang.
+
+11-9-2004: Forced pl -lt 0 -sym 0 to no longer hang up forever :-)
+
+10-19-2004: Cleaned up internal code in allocate() and added help. alloc -?
+            gives a reasonable explanation of how it works.
+
+10-18-2004: Minor problem in NLSFIT.  If working with a 3D function, it only
+            defined the function f(x) instead of f(x,y).  Fixed while drinking
+            heavily on flight to SFO, so hope no other problems introduced.
+
+9-20-2004: If you just start GENPLOT, create y = sin(x) will crash.  Ill defined
+           limits.  All of the @xxxx(array) functions now return 0 if there is no 
+           data in the array (n = 0).
+
+7-3-2004: Finally resolved the issue of fft-filter crashing after just
+          starting xgenplot (occasionally).  Failure to reset the
+          pointers after increasing the curve size was at fault.
+
+6-7-04:   Return of coordinates from cursor -box were exchanged.  Had
+          xbox$[1] and ybox$[0] exchanged.
+
+2-5-04:   Despite writing a help for RUMP WRITE command, no way to get it
+          to display.  Had to revise LexCheckHelp() so that a "test" could
+          be performed and have request moved from bmanip.c to rdwr.c.
+
+9-26-03:  Fix bug in drawing of grid lines on a non-linear axis.  RD
+          discovered problem of lines going off bottom of graph.  Oh well...
+
+4-9-03:   Fix minor bug in string variable editing dialog box.  The C
+          function sprintf(szTmp, "%-20s %s", name[i], adr[i]) fails at
+          something like 1500 characters in adr[i].  Replaced it with a
+          safer string copy and concatenation functions.  Also changed
+          the string editing dialog box to AutoHScroll to allow editing
+          of these rediculously long strings :-).  Have got to get
+          procedures implemented soon.
+
+4-1-03:   The addition of the code to make ^Z auto-minimize the XGENPLOT
+          window broke the code for writing macro's and logfiles.  These
+          commands used ^Z as the end-of-text indicator and hence failed
+          with no recourse :-(  This has been fixed - the behavior of ^Z
+          is now state dependent, working properly in each case as expected.
+
+3-31-03:  Fixed annoyance with variable name translation in the presence
+          of % characters in the existing strings.  Occurred in places where
+          the entire command string would be interpreted as a single object,
+          such as echo or ok;.  The behavior occurs with expressions such as
+               echo power=54%/filename is %newname%
+          The parser saw the first percent and interpreted as the beginning
+          of a possible variable name.  Scanning to the first %, it looked
+          for the variable name "/filename is " which - obviously - did not
+          exist.  This however got everything out of sync looking for more
+          names. The code now tries ignores the % pair if the string it
+          would enclose contains whitespace.
+
+3-14-03:  Trivial.  rand() now is on interval [0,1).  Value 1 is never
+          actually observed.  Previously had same probability as 0.
+
+12-15-02: TRANFORM ZERO_PAD failed to expand the size of the main curve if
+          npt request was greater than nptmax.  Now does so.
+
+11-11-02: Random number generator is now initialized to a random (time based)
+          seed in RUMP as well as GENPLOT.  OOPS ...
+
+10-10-02: The file handing had a slight problem with some names and FCLOSE.
+          It was often necessary to deallocate the variable before reusing
+          or risk getting hung up.  The code was changed to refer so that,
+          on fclose, the variable is reset to NULL and is known to be closed.
+
+4-29-02: Identified the source of the failure of XGenplot and XRump on Dell
+         4100 laptops.  In redirect.c, reset stdio and stdout handles were
+         relinked to the SetStdHandle.  Have to have STD_OUTPUT_HANDLE to
+         get output from external programs to the screen (! dir).  But don't
+         have to have STD_INPUT_HANDLE as long as programs do not require
+         input.  If they do, we may crash.
+
+4-18-02:  Pipe stream reads now finishes with a full purge of the pipe.  This
+          eliminates the annoying "GZIP Pipe Closed" message for instance.
+          Could be a problem if the pipe never shuts up, so there is also
+          a limit on the total number of purges.  Minimum read is 100 kB
+          but actual will depend on previous read increases in buffer size.
+
+3-9-02:   CURSOR -TRACK gave meaningless message when npt was zero.  Modified
+          error message so explains real problem.
+
+3-4-02:   Fixed problem with fopen in pipe-driver for UNIX.  The fopen() in
+          Linux is now adament and will not permit "wb" (binary) options. 
+          #ifdef segment to switch between needs of UNIX and Windows.  Also
+          minor fix in UNIX to null-op on VIRTUAL_SHIFT_TAB characters (only
+          useful for reverse tracking filename completion in Windows).
+
+1-28-02:  Fixed problem with color failure on PM graph screen.  Not sure of
+          the exact root cause, but clearly a race condition.  Inserted
+          100 ms of sleep in the thread dispatching plot commands to the
+          main graph window from drvchild.  Seems to have fixed many
+          of the stability problems.
+
+9-18-01:  PLOT -PLX TOP has failed for some time.  Apparently nobody uses
+          it, including me, until now.  But has been fixed.
+
+4-30-00:  FIT POLY 0 now fits y to a constant.  Crazy way to do it, but
+          makes it at least consistent.  Same as @ave(y),@std(y).
+
+8-7-00:   Fixed problem with filled symbols in reversed color orientation on
+          the PM screen.
+
+8-2-00:   Checked for negative index setting in arrays.  c1:y[-2] will now
+          print the same warning as going beyond the end of the array.
+
+5-16-00:  Powerpoint bug squashed!!!!!  Maybe.  See comments in dialog box.
+          
+03-14-00: Minor fix in deallocation of command structures with error bar
+          plotting.  Should not impact anything - showed up in new compiler.
+
+02-29-00: YEAH! Maybe a fix for the ocassional window going totally crazy.
+          Switch to MSC 6.0 compiler identified wrong parameters to calls
+          on EndPaing and DeleteDC.  These may have been cause of resource
+          overload that appeared in font selection, etc.  Fixed now.
+
+          Bad news: There seems to be another hang introduced by MSC 6.0.
+          Must be careful.
+
+09-30-99: Made \box work from within annote.
+08-13-99: Minor fix to wordpos() to handle whitespace in needle, and to 
+          avoid matching start of words.  Must match full word.
+07-09-99: Some problems in function parsing - involves string functions
+          only.  Should be resolved.
+                define f(#x) = strlen(strcat(x,"hi   "))
+          would lose the spaces in the character constant.
+01-14-99: Changes xcur,ycur,icur,ccur from being dynamic variables within
+          the GENPLOT common block to being static variables.  The use
+          of pop_state would pull these variables out from under their
+          definition and lead to potential invalid memory references.
+01-04-99: Dieckmann pushes the limits again.  Got me looking into ERFC
+          again for extreme arguments.  Modified handling between 4.0 and
+          15 or 27 (depending on machine) to have fractional error within
+          1E-7.  Now uniform over range [-be with 1E-7 of correct.
+          Also implemented lnerfc(x) to handle really bad arguments from
+          diffusion profiles.
+12-28-98: Subtle problem with functions of no arguments.  The following 
+          was failing.  
+            define h0 = 2
+            eval 1*h0
+          Tracked down and fixed -- but in midst of major overhaul of the
+          function evaluation so may have other problems.
+12-21-98: Spent too many hours searching for a NLSFIT problem where the 
+          limits were incorrectly given in reverse order (lower > upper).
+          Added code to check and spontaneously reverse - but with warning.
+          At the same time, extended massively the information printed
+          in mode VERBOSE 4.  Recommend not running this mode :-)
+12-17-98: Request to extend ERFC function to rediculous limits.  Now will
+          do to arguments of 15.065574, where ERFC(x) is 1E-100 (UNIX) or
+          to 27.226 where ERFC(x) is 4.94E-324 (minimum of Pentium math
+          precision).
+9-16-98:  Yet yet another minor fix to @median to handle case where the 
+          median is exactly equal to the maximum or minimum of the range.
+          Boy, talk about bad data sets :-)
+9-2-98:   @median(y) failed for wide dynamic range (1E-5 to 4000).  Modified
+          so much more likely to converge, plus now gives error message if 
+          it fails to converge.
+8-14-98:  Radius for ANNOTE->CCIRCLE now properly registered from cursor.
+8-4-98:   PAGESPLIT -? now gives help (as well as ? alone).  Also added
+          SPLITPAGE as alias for PAGESPLIT.
+7-10-98:  For P. Smith.  Added check in nlsfit so can be used for function
+          minimization where there is perfect error correlation between all
+          of the variables.  Removes the divide by zero error.
+7-7-98:   Fixed word(xxx) and subword(xxx) functions to return null string
+          if ask for word more than in string.
+7-7-98:   Fixed subtle problem so that "substr silicon" is interpreted as
+          a non-string -- looking now for () to mark function calls in the
+          expression type guesser.
+5-3-98:   Fixed problem with difficulty moving windows when the cursor
+          was active in XGENPLOT.  Windows would have their mouse posns
+          constantly changed by the cursor even when it didn't have focus.
+2-20-98:  Functions of no arguments may again be given no arguments.
+             time(), rnd(), etc.
+2-19-98:  Modified the ROUND(x,n) function to handle exactly 0.5 better.
+          Had always rounded one way -- now has modification to round on
+          average up and down equally.
+2-16-98:  Duh!!! A minus sign is considered punctuation.  Well what planet
+          was I born on?  Matrix read now deals with negative numbers
+          properly.
+2-13-98:  Added skipping over comments to 3D matrix read routine.
+1-20-98:  Added translation of %var% to expression in &encode usage.  Fixed
+          so following works as expected.
+               declare var = ids
+               echo &encode "The value of %s is: %s" var %var%
+1-18-98:  Improved handling of large X offsets in convolution (and related)
+          routines.  Should avoid the subtle shift noticed in some convolution.
+1-15-98:  Fixed argument pulling in LEXP so block statements (if blocks)
+          don't prevent the use of &getarg
+11-29-97: Fixed so all of the axes get background colored with pagesplit.
+10-22-97: Changed the environment variable "DYNT_LIB" to "GenplotSearchPath_NT".
+          This allows the setting inside the registry to be overridden at
+          run time via an environment variable.
+10-21-97: Finally found the resource problem in the "pipe" internal calls.
+          The continual opening of handles is solved and should no longer
+          cause the desktop to "hang-up" when running out of resources. 
+          Forgot that CreateProcess() returned open handles to both the
+          process and the main thread -- wasn't releasing the thread handle.
+          Seems to have resolve the problem.
+07-24-97: Fixed gptfit so that "create 0 fit poly 2" does not crash with a
+          math divide by zero error.  Range of data = 0 was a problem.
+06-24-97: Finally found a way around the Windows 95 crash with internal
+          commands via the OK: command (I think).  An extra parameter is
+          required on the command line which is now automatically generated.
+06-14-97: There appear to be some conditions where @rms(array) is hitting a
+          DOMAIN error on SQRT.  This appears to occur when the RMS is very
+          small compared to the average of the data set.  The code has been
+          changed so that if the @RMS is within 1E-4 of the absolute value of
+          the average, it is computed by the direct average of <(x-<x>)^2>
+          instead of the algebraically expanded equivalent. (gvcalc.c)
+05-25-97: Apparently I added the horizontal scroll for RDR in OS/2.
+05-19-97: Eliminated divide-by-zero problem with dy/dx transform where data
+          was not strictly changing (x[i+1] = x[i]) making derivative very
+          difficult.
+05-17-97: Stack overflow problem when specifying file*cmdline in XGENPLOT
+          fixed.  May resolve other problems also. (OS/2 version only)
+04-01-97: Minor problem - fflush() for GNU was only a flush() in con_unix.c.
+03-21-97: Under Win95, VSORT.EXE (and all of the pipe drivers) failed.  Had
+          to remove \LD compiler switch to force 95 compatibility.
+03-20-97: Subtle error with ClipSymbols -- if an erase was not done before
+          the plot with autoerase off, then the symbol no-clipping failed.
+          Required adding ClipSymbol into HCOPY file structure.
+03-20-97: NT: Printer dialog now retains the last used printer.  Metafile
+          dialog now writes in the correct directory.
+02-18-97: Screwup at Microsoft again (does this surprise me??? no.....).
+          Powerpoint does not interpret graphics on the clipboard the same
+          as any other Microsoft product.  Copying a graph and then pasting
+          into Powerpoint screws up any letters not drawn along the 
+          horizontal.  Pasting the exact same clipboard into Word, Excel,
+          or the clipboard viewer works absolutely fine.  Only Powerpoint.
+          The solution from Microsoft???  You should ask.  Paste it into
+          Word, then copy it from Word to Powerpoint.  Great!  My solution,
+          make it obvious that Microsoft is screwed up -- add a separate
+          button to copy to the clipboard for Powerpoint.  This distorts the
+          characters exactly as is necessary to compensate for Powerpoint's
+          screwups.  Why oh why am I back fighting with Microsoft?????
+02-17-97: Fixed problem with PLOT -SYM 31 - memory read buffer overrun.  Syms
+          now wrap around at the appropriate point.
+02-17-97: Added TrueType font support to NT PM screen driver (and printing)
+02-17-97: Fix NT problem with special symbols in Postsript driver
+01-29-97: Problem in NT with a particular spline.  Not sure if compiler or
+          operating system or what -- fixed by increasing internal work of
+          spline to double precision and carefully converting back to REAL
+          via GVTrimToReal().
+01-25-97: Fixed failure of CLIPSYMBOL NO in PORTRAIT mode.  Modified
+          PlotInBound() to use new PlotConvert3DScale().
+01-23-97: Fixed SUB_PLOT erasing too much on NT PM screen driver.
+01-23-97: Fixed introduced bug where &getarg failed - changed code of GetToken
+          to safely save backup pointers.
+01-17-97: Fixed minor problem which caused commands like ACTIVE alone from
+          SIM in RUMP to be ignored (returned to RUMP but did not execute).
+          Arose from default check for automatic variable setting.
+01-03-97: Fixed GRID command in NT/95 (illegal address reference)
+12-20-96: Maximum length of IDS on plots now DFLT_STR_SIZE (256) characters.
+          Previos was 80.  Also won't overwrite other structures if too long.
+12-16-96: SORT -STRICT on a 3D curve now looks at both X and Y to be identical
+          before dropping the point.  Real screwup before.
+12-16-96: "Typing" a file clears the entire buffer in OS/2 XGenplot version.
+          This now is modified so it just puts out 5 blank lines before
+          starting to output the file.
+12-16-96: Fixed -L&S so works if common points in dataset
+12-2-96:  Squigg labelling (annote squigg label <frac> <text>) failed in
+          PORTRAIT mode.  Now fixed.
+9-16-96:  Compiler patch to CTC005 installed -- seems to fix problem with
+          "sort" and "fixgrid" identified in latest version.  Who knows
+          what has broken now ...
+9-7-96:   Initial NT port complete.  Relatively small changes so that don't
+          expect major problems cropping up in the OS/2 and UNIX versions.
+8-23-96:  Fixed 3D axis problem when in other than landscape orientation.
+8-23-96:  Fixed read ~mot/xxx format usage on UNIX.
+8-8-96:   Documentation.  OS/2 TCP/IP screwup.  It is not possible to pipe
+          binary input into the lpr function from the TCP/IP 3.0 package.
+          While text can be sent via stdin, binary gets translated no matter
+          what one does!  -b only works for files that are opened by lpr.
+
+8-2-96:   Changed reading for pen colors to use math mode allowing complex
+          functions such as mod(%c,7)+1 (which failed before due to the ,)
+7-13-96:  The file reading routines stripped the | sign before it could
+          be passed to user routines.  This is now left as part of the
+          filename so can be processed elsewhere also.
+               read "| mac2os2 terminal.log" -user
+          can be used to read a Macintosh file in some strange format.
+5-28-96:  Increased size of equation and weighting functions in NLSFIT to
+          256 characters from 80 characters.
+5-2-96:   Fixed possibility of memory overwrite when first comment line in
+          an ASCII data file was longer than 80 characters.  Now, the
+          comment is truncated before being assigned as the curve IDS.
+2-11-96:  Fixed problem with Lines_And_Symbols in flipxy mode.
+2-11-96:  Compiler bug causing failure of RUMP smooth bypassed with dummy
+          code under CSET/2.  See anlytc.c for problem.
+1-4-96:   Pentium bug check removed from executable code and placed in the
+          install code instead.  Hopefully it is now robust enough to not
+          falsely flag the error.  Will only be warned at install and then
+          it up to the user to worry about later.
+1-4-96:   Modified character handling in pmdriv so that ~C will toggle the
+          cursor view window whether the focus is on the main graph window
+          or the cursor window itself.
+1-4-96:   Fixed the symbol definitions for \varphi in Hershey set.
+12-15-95: Fixed the problem with error bars running through the center of
+          open symbols.  Will again work as intended.
+8-17-85:  Added tilt,rotate, etc. to parms listing in GENPLOT.
+8-17-95:  Fixed failure of ANNOTE to handle user coordinate system when in
+          Portrait mode.  Oh well ...
+8-15-95:  Increased a number of internal string variables to 256 characters
+          or more.  Resolves pain in "declare" usage with very long strings.
+8-13-95:  Specifying a linewidth of less than 0.14 in the "LINEWIDTH" command
+          will now set the linewidth to the minimum .001 inches.  
+8-13-85:  Well, actually put in code to support the "Disable Math/Greek"
+          and "No cursor display" buttons in PM Driver configuration.  Looks
+          like I started to implement it and went to bed several months ago.
+7-20-95:  Changed handling of temporary files slightly.  If the TMP
+          variable points to an invalid directory, it now prints an error
+          message and proceeds to use the current directory.  Won't trap
+          on all invalid TMP names, but most.  For example, set tmp=m: will
+          fail non-graciously if m: is not a real disk.  Also,
+          "set tmp=e:\tmp\" is considered invalid, though "set tmp=e:\" and
+          "set tmp=e:\tmp" are all valid.
+7-20-95:  Changed shortcut-key for "FIT" menu to "I" so doesn't conflict.
+7-20-95:  Fixed problem with ^Z in macro files (I think).  If a logical end
+          of file character is seen on any line in a macro, the line is
+          taken to mark the end of the macro and the line is executed only
+          to that point.  The file is then considered as closed.  On OS/2,
+          the logical end of file is ^Z, in UNIX, it is the ^D.
+6-2-95:   3D failed to draw axes.  Problem in transfering the 2D clipping
+          box (margin, offset) in a 3D environment.  FIXPLT.C modified.
+5-4-95:   Check on let/setvar to see if string variable.  Processing to
+          handle lists of numbers enclosed as single token disabled in
+          this case.  'let ids = "Sample 18, T=200"' works again while
+          'setvar a,b,c = "27,38,38"' will also work (more importantly
+          'setvar a,b,c,d = &boxcursor'.
+4-20-95:  1 pixel error on left side of all symbols fixed (now slightly bigger)
+4-20-95:  Double release of memory in vsort.c fixed.
+4-20-95:  More problems with the Postscript driver.  Ancient fix to bad
+          "include" programs like dvi2ps required a redefinition of 'def'.
+          This fix now breaks Postscript Level II.  Decision to tolerate
+          only slight bad insertion programs on Level I printers, while
+          never breaking Level II printers.  Might say tough, but let us
+          know if something else breaks.  Symptoms will be a DictFull error
+          on Level I postscript printers.
+4-10-95:  Fixed last point being lost in average/squish/compress operations.
+4-5-95:   Fixed so "create y = x -range 1 0" (inverted range) works.
+3-31-95:  Put in #defines for fgetpos/fsetpos for GNU_EXTENSIONS for
+          really brain-dead old versions of GNU C.  Don't think the rest
+          of the code has any chance of working with such non-ANSI compilers,
+          but at least it will now compile without fatal errors.
+3-18-95:  Fixed simple 5-pt smoothing in GENPLOT so less edge effects.
+3-18-95:  Fixed so "setv a,b,c,d = &boxcursor" works.
+3-18-95:  Fixed problem with \degree, and with many upper characters
+          expressed as \xx strings (\thorn, \eta, etc.)
+3-17-95:  Fixed problem with negative angle text in PM driver looking like
+          italics.  Problem stuffing signed (negative) into unsigned.
+3-17-95:  Fixed so that read <<text will succeed even if next occurance
+          of text has trailing spaces.  Maximum significant length of
+          token to terminate is 32 characters.
+1-28-95:  define f(m) = (m>0)?0:m  failed.  Modifed parsing of fncs exprs.
+1-28-95:  Histogram IDS don't automatically use solid lines.
+1-28-95:  create -by <val> would actually modify the by parameter in order
+          to exactly fit the range.  New behavior is to use by exactly and
+          create all points that lie within the range.
+1-18-95:  Menu on PM screen changed to reflect usage of <ALT>P for print.
+1-18-95:  LEX processor would only switch to mathmode on first try of getting
+          a token.  Second attempt after prompt switched back to default
+          mode.  "define f(x,y) sin(x)*cos(y)" would fail if you entered the
+          f(x,y) after the prompt for a function name.
+1-18-95:  Title and timestamp fixed with new fonts.
+1-12-95:  Try once more to get the prompting right!  Had been that giving
+          both -prompt and -default always took the default without ever
+          prompting.  Oh well.
+1-6-95:   Added #ifdef around use of Bessel functions in gvcalc.c to handle
+          non-Bessel enabled compilers.
+12-28-94: Minor change that may have fixed "load pearson" problem.  On my
+          machine, "load pearson" is successful from any directory.  .mdl
+          files loaded in this way should not require an extension, nor
+          being in a specific directory.
+12-28-94: Changed the binary mode reading of files so that reading from a pipe
+          should be successful in all cases.  Binary files no longer need
+          to be seekable.  Use of -binary switch in pipe mode is required
+          however.
+12-28-94: Per MOT request.  Fixed so "setv a,b=7,8 eval (a>b)?a:b" works.
+12-16-94: Per request by Pat Smith, the behavior of &GETARG has reverted to
+          an earlier mode.  Giving a -DEFAULT action, but no -PROMPT string
+          will cause the DEFAULT to be accepted without user input if no
+          token exists on the previous command line.  If you have an option
+          to a macro requiring only occassional setting, this can reduce the
+          amount of typing.  But it also can be dangerous!
+12-7-94:  Fixed spelling of asterisk.  Asterix still accepted though since
+          it is my preferred spelling (yes - it is from the comics).
+12-7-94:  Compiler optimizer optimized out the Pentium error check so all
+          machine report as pentiums with bug.  OOPS.  New version should
+          eliminate this annoyance!
+12-4-94:  Fixed invalid color problem when linewidth enabled on PM screen
+          or when rendering to printer, metafile or clipboard.  Sorry
+          folks - got a bit too fancy for myself.
+12-4-94:  Changed storage of (REAL *) in HCOPY so should work with double
+          precision version of the code.  Use memcpy instead of fancy
+          typecasts.  Hope compilers are bright!
+12-4-94:  static () the routines in user_aix.c so names don't conflict with
+          versions in full RUMP package.
+12-4-94:  Fixed so histogram with npoint != 1 works properly.
+12-4-94:  HP7000/730 has major problems with X include files.  Appears to be
+          related to strict ANSI compliance.  For trial test, set
+          XCOPT to same as ECOPT plus defining _XOPEN_SOURCE.  Someone will
+          hopefully let me know if this solves the HP7000 problem.
+12-4-94:  Fixed minor typecast problems in OSF make (hopefully)
+          Still some problem remaining in preprocessor handling of indented
+          #<directive> declarations.
+12-4-94:  Prompt in AUTOY now correct.
+12-4-94:  172! and above now return largest representable number (not 1.0)
+          Also for negative numbers.  However, since ! has precedence over
+          unary -, -100! will not fail.
+10-18-94: Fixed problem in first points of TRANFORM AVERAGE and TRANSFORM
+          COMPRESS due to early setting of new value.  (Thanks to LRD).
+10-14-94: Attempted fix of segment fault when using locmin method in 
+          nlsfit two times in a row.  NextGuess not being initialized
+          soon enough in code.
+10-14-94: alignment problem with allocation of variables manually in big
+          block and then local suballocation (first identified in NLSFIT).
+          Resolve by using malloc() freely without regard for efficiency
+          of heap management.  (Reported and problem identified by MJU)
+10-9-94:  gamma(x) optimized with double precision version of GENPLOT.  Now
+          max fractional error < 2E-10, average rms fractional error 8E-11.
+10-9-94:  All code checked to enable compilation with REAL defined as DOUBLE.
+          Can be handled by undef'ing the REAL_IS_FLOAT in sys/mytypes.h,
+          cleaning, and rebuilding.
+10-8-94:  Fixed lngamma in both real and complex mode so that behaves
+          properly with negative arguments.  In real mode lngamma(int x) 
+          will return exact for x < 20.
+9-29-94:  Fix to xdriver.c code from LRD.  Frees driver structure only after
+          X-window fully exits in ENDFNC.  Should eliminate spurious X Error
+          messages at shut down or device change.
+9-18-94:  Rewrote most of dialog box control in XTERM control windows. 
+          Should be transparent at user level, but removes spaghetti code
+          and increase supportability.  Maybe now the rest can be completed.
+9-02-94:  Fixed whole bunch of pstex devices in devixes.xxx to use subdev
+          7 for the encapsulated postscript format.  Should add a device
+          "epsf_p" and "epsf_l" for generating portrait and landscape
+          encapsulated postscript files.
+9-02-94:  Due to problems with some code, the %%EOF end of file marker is
+          no longer written for EPSF POSTSCRIPT files.  Also, to improve
+          exchange capability, the output from POSTSCRIPT is now in binary.
+          This will write only a <LF> instead of <CR><LF> pair at end of
+          each line.  os22unix filter not needed to print - other programs
+          seem to tolerate either line ending without problems.
+9-02-94:  Incorporate LRD's code for a better X-window cursor - tried to
+          fix the compile errors on AIX, others can be reasonably expected.
+8-29-94:  Increased size of "expression" to 1024 chars in define, let, setv
+          so DPB's rediculous expressions don't overrun
+8-3-94:   Fixed so echo doesn't come on in NLSFIT when using GENPLOT_MACRO
+          or any of the other MACRO processes.
+8-1-94:   Fixed so &getarg with no arguments does actually prompt and return
+          a value.
+8-1-94:   Fixed an unreported error in grid - not sure what the error would
+          have done, but it is no more.  Something about if axes were set
+          to top or right I think.
+6-10-94:  Identified and fixed error in calculation of Q(x^2|v) in both
+          the linear and NLSFIT routines.  Oh well, only if x^2>v was there
+          an error, and I think few people actually understand it anyway.
+          (Kudos to D.P. Brunco for identifying the error.)
+6-9-94:   FIT NLSFIT modified to give more accurate error estimates.  The
+          errors reported now are consistent with the full statistics given
+          by the LINEAR fit.  If no error bar estimates on Y are given, then
+          NLSFIT estimates the uniform Y sigma needed to make this a
+          "reasonable" fit; error bars on parameters returned for this value.
+          If error bars are given, then error estimates on parameters are
+          correct.  Q(chi^2) reported also with warning if it falls outside
+          the range [0.01,0.99].
+6-9-94:   FIT LINEAR modified.  CHISQR$ variable is set to the reduced chi^2
+          if sigma error estimates are given.  Otherwise, returns full chi^2.
+          This is consistent with the behavior of NLSFIT.
+6-7-94:   VSORT is now very quiet by default when started under UNIX.  For
+          OS/2, it remains verbose.
+6-7-94:   Checks to see if disk really exists when ChangeDisk requested.
+          Ie., command m: will fail if m: disk is not real.  There are still
+          problems with attaching to a CD when a music disk is there, but you
+          shouldn't be listening to music while you work anyway.
+6-7-94:   The USER -LOAD dll is no longer automatically released on a 
+          "genplot reset" command.  "reset -full" will release it.
+6-7-94:   ANNOTE now reports coordinates in %.4g format so works better when 
+          in "coormode user" mode.
+6-7-94:   Length of the I/O channel string in devices.dat is extended so long
+          pipe* commands can be handled.  Now 80 characters.
+5-26-94:  Several problems related to loading dynamic modules should have
+          been resolved. pearson.mdl no longer requires local DDE4MBS.DLL.
+5-22-94:  Minor changes to a large number of files to reduce/eliminate the
+          number of compiler warnings.  Improves automated testing of the
+          compilation process - but should cause minimal operational changes.
+5-20-94:  Fix the HCOPY APPEND problem.  Clearly no-one is using these
+          features anymore :-)
+5-4-94:   Maximum total # of characters on command lines extended to 2048.
+          Single function define f(x) = now allows 1024 characters
+5-4-94:   Problem with orientations on PM drivers.  Rotation not recognized
+          on the fly in plots - behavior changes with redraw (PS)
+4-29-94:  Read of a large number of 3D points generates segment violation.
+          Bad pointer modification corrected. (RDR)
+4-22-94:  HCOPY SAVE error fixed.  Warning message on exit deleted.
+4-16-94:  Fully fixed solid symbols on all LaserJet style output.  Also
+          fixed very subtle bug in vsort causing system hang.
+4-5-94:   PLOT -HISTOGRAM now recognized with full option name
+4-5-94:   LT 4 does not disappear from "no-option" PM screen
+4-4-94:   Range in FIX_GRID now unconstrained as in DOS version.
+3-28-94:  Fixed the failure of 2^2 that crept in from fixes 3-25-94.
+3-25-94:  Modified the exception handling from expression evaluator.  Should
+          shut up the underflow exceptions and give valid results (0) for
+          underflow conditions.   Also turned off denormalize error so can
+          work with numbers to 5E-324, though precision lost below 2.225E-308.
+3-21-94:  Added GENPLOT as a default RETURN from CONFIG
+3-21-94:  Fixed so "eval 3==sqrt(9)" works as expected
+3-21-94:  Fixed fix_grid so range can include entire X range
+3-9-94:   Fixed black page printing with postscript driver.
+2-27-94:  More rigid checking of disk change command.  C: or D: alone is now
+          required.  Previously, any path beginning with x: was recognized
+          as a disk change - these now generate errors.
+2-15-94:  Moderate speedup of some math routines by inline math functions
+          instead of function calls.  FFT benefits in particular.
+1-27-94:  Enable 3D axes.  They work as far as I can tell including the HCOPY
+          redraws.  Only problem is with massive skew, but too bad.  Will not
+          be fixed.  Only question is whether X,Y axis should flip "down" for
+          tilts beyond +/- 45 degrees, as happens for Z.
+1-24-94:  Fixed so "cd /" now works.  "cd \" still fails because the \ is
+          read as request for continuation char.  Always use / in UNIX and
+          OS/2.
+1-24-94:  Fixed labelling of non-linear Y axis with some increment values.
+1-19-94:  Maybe fixed strange error that caused first line of some data files
+          to be ignored.  fseek(lun, 0L, SEEK_SET) replaced by rewind(lun).
+          This will be reported as a compiler bug.
+1-19-94:  Eliminated annoying crash of SVOUT on some operations.  Easiest to
+          demo was:  "axis hc dev null shrink 1.6".  No longer crashes.
+1-19-94:  Solved crash that occured when bad device driver specified (LRD)
+1-5-94:   Fixed bug so 3D fitting allows "equ f(x,y)" without added quotes
+1-4-94:   Retrieve of a 3D structure now switches GENPLOT into 3D mode
+1-4-94:   Cull'ing of a 3D structure now works properly, though maybe not
+          exactly as expected for average, compress etc.
+9-23-93:  Fixed POSTDRV driver in sub-device 8 mode.  Negative bounding box
+          values overwriting the %% comment of PAGES comment.
+5-18-93:  Timestamp indicated 12 hour with no AM/PM.  Default is now 24 hour
+          but can be changed using "let $TSTAMP:FORMAT = '%X on %x'"
+1-15-93:  Palette choice in PM graph screen now saved in profile.  Device
+          options in DEVICES.DAT has no effect now.
+6-10-93:  Changed output from ANNOTE cursor report so X and Y don't ever
+          run together without a space in between.
+6-17-93:  Made sample draw (2draw, 1draw) close straight.  Still needs
+          arbitrary angles.
+
+===========================================================================
+FIXED PROBLEMS:
+===========================================================================
+Report: 9-1-92          From:   MOT                     Prty:   1
+Error:  Lines of graph are lost if DEV PM and PLOT commands on same line
+Source: The threads for PM drawing appear not to be fully initialized before
+        the first drawing commands come through from the main program.  Will
+        need another semaphore to indicate when actual drawing is available.
+FIX:    3/1/94 - think this is resolved.
+
+Report: old
+Error:  Multiple graphs to postscript printer cause subsequent pages to be
+        printed shrunk and rotated.
+Fix:    Added document level save and restore of state around entire graph
+        component.  No longer requires printer reset by spooling software.
+
+Report: old
+Error:  If you kill a command line (^K), you can't get it back with yank (^Y)
+Fix:    Can do now (I think)
+
+Report: old
+Error:  If the HCOPY vector save file filled up or generated an error, the
+        file would remain open and could not be deleted until GENPLOT ended.
+Fix:    Code now attempts to robustly close and delete the HCOPY file. 
+        Message indicates fully the SAVE is now inactive.
+
+Report: old
+Error:  Linewidth control did not work on PM screen
+Fix:    Finally figured out how to do it.  Works well, and should work with
+        all hardcopy devices as well.  On screen, it slows things down a fair
+        bit so must be enabled on options before run.  There is another
+        control bit that is supposed to use thick lines when drawing.  Not
+        clear if this works, but it slows things down so must be doing
+        something.  See new options menu on PM graph screen.
+
+Report: 11-18-93        From:   linux users             Prty:   3
+Error:  CONWaitChr fails causing help to be non-functional.  No proper
+        implementation of setitimer() in linux GCC compiler.
+Fix:    Code for CONWaitChr has been completely rewritten to utilize
+        only POSIX terminal control operations, CANON and VTIME/VMIN
+        controls.  WARNING: THIS MAY BREAK OTHER NON-COMPLIANT COMPILERS.
+        SEE THE TEST CODE IN NEW DIRECTORY UNIX_TESTS.
+
+Report: 07-xx-93        From:   LRD                     Prty:   1
+Error:  X display would crash if you tried to plot immediately after open
+Fix:    Problem traced to XdrawPoints() and XDrawSegments() being called
+        with 0 valid pts.  Do own check to avoid crash (Fix 8/3/93 LRD)
+
+Report: 07-28-93        From:   LRD                     Prty:   3
+Error:  FIX_GRID fails if you specify the range
+Fix:    Bad programming - shoot the author.
+
+Report: 06-29-93        From:   KB                      Prty:   4
+Error:  Inequality comparisons backward in mathmode complex mode.
+Fix:    Bad programming - shoot the author.
+
+Report: 06-13-93        From:   RDR                     Prty:   3
+Error:  -errx, etc. error bars no longer work.
+Fix:    Determine length of function command buffer before resetting the
+        starting point.  After resetting, length appeared to be 0.
+
+Report: 10-29-92        From:   Thompson                Prty:   2
+Error:  If ^C typed while waiting for input on command line, program will halt
+        with SYS3171 error.  This is compiler bug in the getch() routine and
+        there is no indication if/when it will be fixed.  The problem will
+        disappear anyway with the introduction of the PM window interface.
+Fix:    New compiler fix has eliminated problem, mostly.  After ^C, break is
+        not recognized until the next character.  Solves much of the problem,
+        though not as elegant as the PM window will be.
+
+Report: 06-01-93        From:   MOT
+Error:  xeq now2 fails (as does any name starting with NOW for macros)
+Fix:    Running the internal created macro only works with "xeq n", "xeq now" or "xeq /".
+
+Report: 06-01-93        From:   MOT
+Error:  UNIX version asks that you end comments and macros with a ^Z
+Fix:    Modified prompts so ^Z is used for OS/2, but ^D is used for UNIX environments.
+
+Report: 03-01-93        From:   LRD                     Prty:   2
+Error:  On LINUX, fails to byte reverse properly on binary data file write
+Fix:    Original code byte reversed only on OS2 operating systems.  Code now
+        changed so looks are architecture type.  Currently i486 is recognized
+        as byte reversed format.  All others are assumed to have normal byte
+        order (high byte to low byte on disk).  This will affect ability to
+        read older data files written on LINUX.
+WARNING: All machine architecture names have changed to be consistent with
+         other software.  In particular, names are now nominally lowercase
+         with many more defined.
+
+Report: 05-10-93        From:   MOT                     Prty:   999
+Error:  sqrt(-1) returns -j
+Fix:    Default branch cut was taken along the negative real axis, so
+        sqrt(-1) could be + or -j.  Fixed by making the branch cut a
+        selectable paramter.  Added "MATHMODE BRANCH [positive | negative]"
+        as well as "MATHMODE STATUS".
+
+Report: 05-07-93        From:   MJH                     Prty:   2
+Error:  HPGL driver no longer does any pen colors except pen 1
+Fix:    min/max exchanged in limit instruction
+
+Report: 05-06-93        From:   DPB                     Prty:   1
+Error:  In function definitions, special characters not allowed in dummy
+        variables.  define f(m_m) = fails.
+Fix:    Add special characters to allowed set [0-9][a-z][:$_]
+
+Report: 05-06-93        From:   KB                      Prty:   2
+Error:  define f(x) = {x} fails to recognize the replacement variable
+Fix:    Correct handling of {}[] as well as () in define expressions
+
+Report: 03-17-93        From:   RDR                     Prty:   2
+Error:  Following macro would fail
+           autoerase off erase
+           size 7 7 axis hcopy dev /
+Fix:    Don't leave extraneous code laying about
+
+Report: 03-17-93        From:   RDR                     Prty:   2
+Error:  Portrait mode on Postscript driver has problems
+Fix:    Change handling of size so reports proper limits to GENPLOT
+
+Report: 02-28-93        From:   BL                      Prty:   3
+Error:  @std(y) returns wrong value
+Fix:    Learn to code correctly, twit!
+
+Report: 02-17-93        From:   BL                      Prty:   2
+Error:  GENPLOT crashes drawing string '{abc}{def}'
+Fix:    Well, let's pass addresses if I want to get information back from
+        a subroutine.  Fixed it, stupid!
+
+Report: 02-17-93        From:   AV's partner            Prty:   2
+Error:  Plots to POSTSCRIPT fail with new driver
+Fix:    Command stack was being flushed before the page was "drawn". 
+        Exchanged the order of the those commands and all is okay.
+
+Report: 02-5-93         From:   JSC                     Prty:   3
+Error:  Functions calling functions with args fail.  g(a,f(b)) for example.
+Fix:    Critical failure in stack maintenance.  Exhibited as wierd math
+           define f(x) = x define g(x,y) = x+y
+           eval g(f(10),0) works, but eval g(0,f(10)) fails.
+        Parsing modified to keep better track of internal evaluation stacks
+
+Report: 02-4-93         From:   DPB                     Prty:   1
+Error:  Transforms SQUISH and COMPRESS are reversed in sense from DOS version
+Fix:    Okay, now switched.  Wish I could remember which did what without
+        the help.
+
+Report: 02-1-93         From:   LRT                     Prty:   0
+Error:  GENPLOT now starts with curve of 2048 points, all undefined
+Fix:    This arose when RDR requested curves be "allocated" with size set
+        to maximum.  Special case on initialization now resets number of
+        points to 0.
+
+Report: 01-25-92        From:   LRD/DPB                 Prty:   0
+Error:  The format (E12.6) doesn't work in &ENCODE - compatibility problem
+Fix:    Okay, now it does.
+
+Report: 01-25-92        From:   LRD/DPB                 Prty:   0
+Error:  \circ in symbol table is inconsistent with TeX format
+Fix:    \circ, \triangle and \star are now defined and similar to TeX
+        \degree replaces usage of \circ for degree symbol (\degree C).
+        Also, added the thin space command \, as in TeX.
+
+Report: 01-15-92        From:   RDR                     Prty:   0
+Error:  The prompt in an &GETARG structure doesn't allow %xx% replacements
+Fix:    Okay, now it does.
+
+Report: 01-15-92        From:   TJ                      Prty:   1
+Error:  genplot_.ini is created in current directory rather than on path
+Fix:    Has been fixed.  Failed to use os2.ini variable in code other than
+        main routine.  It should open the first genplot_.ini that it finds
+        in the path when it starts.  This should be in
+        /usr/genplot/os2/genplot_.ini.  Saving the profile should overwrite
+        the one already open.
+
+Report: 1-1-92          From:   MJU                     Prty:   0
+Error:  Postscript output is not available in encapsulated format.
+Fix:    Incorporated much of DCS level 3.0 code from MJU as new postscript
+        driver.  Devices 1-5 are normal postscript output, and 6-10 are
+        encapsulated output.  Output conforms to DCS level 3.
+
+Report: 9-8-92          From:   JSC                     Prty:   1
+Error:  OS/2 Postscript driver places graph slightly different than DOS
+Fix:    Entire postscript code has been rewritten (see above). If this is 
+        still a problem, it is now a new one.  Old report is now defunct.
+
+Report: 1-15-93         From:   LRT                     Prty:   1
+Error:  CURSOR -TRACK has problems with pressing arrow keys too fast
+Fix:    Any key pressed within 200 msec of a return from any cursor function
+        will now be ignored.
+
+Report: 1-13-93         From:   LRD, DS                 Prty:   1
+Error:  Minor corrections to UNIX makefiles.
+Fix:    (1) Made GNU_EXTENSIONS consistent in all files (OOPS)
+        (2) Added (char *) casts to read() and write() calls
+        (3) Fixed spelling errors in abusive error messages
+
+Report:                 From:   Annil                   Prty:   2
+Error:  Help is non-functional on UNIX based machines.
+Fix:    After several tries, revised help file to include indexes based on
+        both big and little endien architectures.  Should automatically
+        detect and handle either type machine in UNIX environment.
+
+Report: 1-13-93         From:   JK                      Prty:   1
+Error:  Create form y=f(x) no longer works. y= f(x), y =f(x) and y = f(x) okay
+Fix:    How many different syntax choices can there be.  I think they are
+        all enumerated now.
+
+Report: 1-12-93         From:   JK                      Prty:   0
+Error:  Under some circumstances, ls will put machine into lost state with
+        continuous SEGMENTATION FAULTS.
+Fix:    Very subtle bug - only occured if all files were of xxxx.aaa format
+        exactly 8 character long.  Memory overwrite fixed.
+
+Report: 1-10-93         From:   LRT                     Prty:   1
+Error:  HCOPY UNDO will undo the effect of an IDENTIFY -PLACE if executed
+        shortly after being place is set.
+Fix:    Moved TIMESTAMP and IDENTIFY control variables out of HCOPY save
+        structure.  Are now static relative to HCOPY, but dynamic with respect
+        to multiple plot windows.
+
+Report: 10-29-92        From:   Thompson                Prty:   2
+Error:  (1) Axis scales change each time you plot.  Set range of -7,7.
+            First time gives range -8,8 but next time stabilizes to -10 10.
+        (2) Top axis often out of sync with bottom axis - see 1 above.
+        (3) XTOP off does not completely track bottom.  AXCTRL will only
+            affect the dx/dx2 spacings of the specified axis.
+        (4) Grid fails to use the DX spacings set by AXCTRL.
+        (5) Y axis labels never shrink in size, even if DX made very small
+Fix:    The autoscaling routine now iterates until it finds a stable solution.
+        This should solve problems 1 and 2.  -7,7 will always go to -10,10.
+        0 to 14 will always go 0 to 14.   AXIS now checks first tops own
+        axctrl() settings, then uses BOTTOM's if in tracking mode.  Made
+        grid look at axctrl settings also.  Y labels now rescale properly if
+        too many included.
+
+Report: early           From:   MOT/RDR                 Prty:   1
+Error:  Keyboard keystrokes do not work with cursor on PM device.
+Fix:    Key strokes are now trapped properly for moving the cursor in normal
+        and box cursor modes.  It should operate again like the DOS cursor
+        except that the "f" key will not free the cursor when in tracking
+        mode.  You must use the mouse to go into find mode in cursor -track.
+
+Report: 1-04-93         From:   RDR                     Prty:   1
+Error:  DOS allocates curves assuming filled with data, OS2 as empty
+Fix:    Changed so ALLOCATE C1 will return with arrays zero and C1:NPT
+        set to C1:NPTMAX.  All arrays and curves now calloc() instead of
+        malloc() so will be initialized to zero (assuming IEEE floating)
+
+Report: 12-20-92        From:   RDR                     Prty:   2
+Error:  Crash in SPLINE -SMOOTH for large npt, small <rms>
+Fix:    Underflow condition on matrix inversion.  Promoted all args to
+        double - will avoid crash for reasonable conditions.
+
+Report: 12-16-92        From:   SRussell                Prty:   3
+Error:  Complex power function fails (z**2)
+Fix:    OOPS - that's what beta tests are for.  z*z was okay, z**2 bad.
+
+Report: 11-xx-92        From:   Joo                     Prty:   3
+Error:  Spline fails to extend properly below lowest X value
+Fix:    This was fixed with new code earlier, but I left the offending code
+        in the file immediately after the fix.  Sorry.  Spline should be okay
+        now.
+
+Report: 12-10-92        From:   Shirish                 Prty:   1
+Error:  The ^D not working for command line editing is a pain in the butt
+Fix:    ^D is the UNIX end of file specifier.  Code modified so that EOF
+        is only recognized as the first character of an otherwise blank
+        input line.
+
+Report: 10-29-92        From:   TJ                      Prty:   1
+Errors: The ^C can only be used once - second time aborts program
+Fix:    Again, stupid IBM C compiler - requires resetting signal() after
+        every use.  Done.  However, still have problems with ^C crashing if
+        waiting for text input.
+
+Report: 11-01-92        From:   RDR                    Prty:   2
+Errors: FILE*DEFAULT opens a file "default" instead of temporary filename
+Fix:    11-05-92
+        OOPS! Forget that little detail.
+
+Report: 11-01-92        From:   RDR                    Prty:   2
+Errors: Generating more than one plot to LaserJet crashes GENPLOT
+Fix:    11-05-92
+        Error attempting to write to a closed file handle.  vsort.run now
+        remains active until the handle is closed by GENPLOT exiting.  Error
+        in file deletion appears to be C bug - added sleep(1) to wait after
+        closing .vec file before attempting to unlink() it.
+
+Report: 10-31-92        From:   RDR                     Prty:   1
+Error:  Complex commands missing the ARG(z) function.
+Fix:    11-05-92
+        Added it.  Value of 0 return 0 as arg, otherwise ln(z/abs(z))
+
+Report: 10-23-92        From:   Thompson                Prty:   3
+Errors: Apparent stack overflow in complex math trashing file reads
+Fix:    10-24-92
+        Allocated correct type variable in gv_eval_complex_expression()
+
+Report: 10-20-92        From:   Thompson                Prty:   3
+Errors: min(x,y), max(x,y) fail in complex mode
+        setvar of an already complex variable gives error, but works correct
+Fix:    10-20-92
+        Small modifications to the complex code.  MIN/MAX now check only the
+        real component.  If real components are equal, then checks imag.
+        RND(x) now returns only real component, imag = 0.  Allows ndtri(rnd(x)).
+
+Report: long ago        From:   Everyone                Prty:   2
+Errors: Unable to use cursor from device XTERM on X-window terminal emulator
+Fix:    10-4-92
+        Screwup in the IO_GetInput routine.  Assumed all the characters would
+        be read when in fact only a single character was read.  Also fixed so
+        left mouse button returns '0' and right returns '1', corresponding to
+        expected return of a <sp> for repeat cursor commands.
+
+Report: while back      From:   MOT                     Prty:   2
+Error:  Macro's cannot be executed until a base directory is specified.
+Fix:    25-Sep-92
+        Fixed.  Also added aliases SAVEMacro and BASEMacro to SAVE_Macor and
+        BASE_Macro commands.
+
+Report: while back      From:   DWS                     Prty:   2
+Errors: Impossible to exit from entering text for MACRO and WRITE -BINARY
+Fix:    10-4-92
+        Failed to define an "end-of-file" character in the keyboard routine.
+        ^D now works on UNIX systems just like ^Z on the OS/2 systems.  Screen
+        will show ^Z always, but must use ^D on UNIX systems.
+
+Report: various         From:   various                 Prty:   2
+Errors: numerous oddities (axis labels to 1.09 for instance)
+Fix:    9-16-92
+        There were strange occurances with some numbers near one.  Exhibited
+        as things like 1.09 on graph where 1.0 was expected.  COMPILER BUG!
+        Installed compiler patches 9/16 and these bugs disappeared!
+
+Report: 9-8-92          From:   DPB                     Prty:   3
+Error:  cotd(x) returned sind() instead of 1/tand(x)
+Fix:    9-8-92                  
+        Programmer failure (not enough sleep obviously)
+
+Report: 9-8-92          From:   RDR                     Prty:   2
+Error:  axis -grid failed for "reg left 1 0 reg bot 1 0"
+        axctrl left -grid failed for reg left 1 0
+Fix:    9-8-92
+        Programmer failure (not enough sleep obviously)
+
+Report: 9-22-92         From:   JSC                     Prty:   3
+Error:  The gamma(x) function does not return gamma.  
+Fix:    9-23-92
+        AARGH!  Believe it or not, IBM CSET/2 provides a gamma() intrinsic 
+        function  that returns ln(|gamma(x)|) for x>=0.  So much for functions 
+        doing  what their name implies.  Since they also disallow - arguments, 
+        it is back to my routines.  Not sure slower or faster, but fixed.
+
+Report: 9-22-92         From:   JSC                     Prty:   3
+Error:  setv t = 2**-127 fails,  t=2**-126 succeeds
+Fix:    9-23-92
+        Problem is storing a number <1E-38 into REAL*4 space.  The compiler is
+        supposed to simply store as 0, but instead gives math exception.  Now
+        testing for < FLT_MIN and storing 0 if it is too small, no warning!
+
+Report: 9-22-92         From:   JSC                     Prty:   2
+Error:  "sgraph list" failed miserably with exception fault
+Fix:    9-23-92
+        Caused by passing an unitialized variable.  ENHANCEMENT:  Added the ? 
+        as a response to sgraph to do list.  Commands "sgraph ?", "sgraph /" 
+        and sgraph "list" are all synonymous now.
+
+Report: 8-1-92          From:   MOT                     Prty:   1
+Error:  "macro" fails unless BASE_Macro set, no error accompanies failure
+Fix:    9-24-92
+        Empty base directory name was not expected.  Changed behavior so that
+        without Base_Macro set, default is to store new macro file in the
+        TEMP directory (pointed to by TEMP or TMP environment variables).
+        Added aliases BASEMacro for BASE_MACRO and SAVEMacro for SAVE_MACRO.
+
+Report: 9-23-92         From:   MS                      Prty:   1
+Error:  Aliased commands are not recognized inside NLSFIT
+Fix:    9-24-92
+        Added the check for an alias to NLSFIT, ANNOTE and SAMPLE
+        subprocessors.  Essentially, anywhere the command processor is sticky,
+        ie. hitting just a return leaves you in the processor, an aliased
+        command will be recognized.  Note that ALIASES are only expanded if
+        they occur at the command level.  ie., ANNOTE GO will expand GO into
+        it's alias, while ANNOTE LABEL GO will not recognize GO as an alias.
+
+Report: 10-01-92        From:   RDR                     Prty:   0
+Errors: Request sign(x) return -1 for x<0, 0 for x==0, and 1 for x>0
+Fix:    In absence of any pressing need for the FORTRAN standard, as it is
+        currently configured, change has been made.  Let me know if this is
+        a problem.
+
+Report: 06-24-92        From:   MOT                     Prty:   2
+Error:  Default cursor position failed to be recognized in ANNOTE
+Fix:    Removed use of -999.9 as default value since it is not exact in
+        IEEE FP representation.  Switched to FLMAGIC parameter (currently
+        1824724) for the default value.
+
+Report: 06-24-92        From:   DPB                     Prty:   2
+Error:  PMDRIV will fail printing plot if device closed shortly after request
+Fix:    Modified code so PMDRIV will no terminate until after print is
+        complete.  Still may be a problem if you request multiple plots from
+        the screen device.
+
+</pre>
+</body></html>

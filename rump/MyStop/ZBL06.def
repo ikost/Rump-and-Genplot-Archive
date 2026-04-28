@@ -1,0 +1,3 @@
+LIBRARY ZBL06
+EXPORTS
+   ZStop

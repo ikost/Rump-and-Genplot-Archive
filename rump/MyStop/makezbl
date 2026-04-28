@@ -1,0 +1,12 @@
+DLLDIR = c:\Progra~1\cgs\rump\NT\Local\ 
+
+ALL: $(DLLDIR)ZBL08.dll \iaea\rump\ZBL08.dll 
+
+$(DLLDIR)ZBL08.dll : ZBL08.dll
+	copy $** $@
+
+\iaea\rump\ZBL08.dll : ZBL08.dll
+	copy $** $@
+
+ZBL08.dll : ZBL08.c ZBL08.def
+	cl /nologo /LD -W3 -D_CRT_SECURE_NO_WARNINGS /O2 $**

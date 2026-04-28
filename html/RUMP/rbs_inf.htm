@@ -1,0 +1,1090 @@
+<HTML>
+<HEAD>
+<TITLE>RUMP Binary Data File Format</TITLE>
+</HEAD>
+
+<BODY><A NAME="top"></A>
+<hr>
+<center>
+  <h2> RUMP Binary [v 1.1] Data Format Specification </h2>
+  <h3> August 1, 1994</h3>
+</center>
+<hr>
+
+<h3>Table of Contents</h3>
+<ol>
+<li> Introduction
+  <ol type=i> 
+  <li> <a href="#history">     History of binary RUMP file format</a>
+  <li> <a href="#rev_history"> Revision history</a>
+  </ol>
+<li> General Specifications
+  <ol type=i>
+  <li> <a href="#rev_reqd">  Revision requirements </a>
+  <li> <a href="#represent"> Data Representations </a>
+  <li> <a href="#records">   Record Representations </a>
+  <li> <a href="#excess">    Handling of excess or missing data in a record </a>
+  <li> <a href="#difffmt">   Differential integer format specification </a>
+  </ol>
+<li> Record Types
+  <ol type=i>
+  <li> <a href="#progID"> Program ID and data block descriptors </a>
+  <li> <a href="#rumpinfo"> RUMP information, accelerator and MCA descriptors </a>
+  <li> <a href="#spectra"> RBS/FRES/PIXE spectrum descriptors </a>
+  </ol>
+<li> Programming Support
+  <ol type=i>
+  <li> <a href="#example"> Example Data File </a>
+  <li> <a href="#APIref"> Programming API reference </a> 
+  <li> <a href="#code"> Example programming code </a>
+  </ol>
+</ol>
+
+</p><hr>
+
+<h3> Introduction </h3>
+
+<a name="history">
+<h4> History of binary RUMP file format</h4>
+
+<!-- @@{RUMP files} @@{Files -- RUMP} -->
+
+<p> RUMP, in early 1980's versions, stored RBS spectral data in a
+machine dependent format dictated by the FORTRAN compiler on each
+computer.  Files written by one machine were generally incompatible
+with other machines due to variations in computer architectures and
+compiler implementation (byte ordering, integer length, real number
+format, record blocking, etc.).  These incompatibilities became
+sufficiently annoying in the age of networked computers to force a
+transition in 1984 to a machine independent and extensible format.
+
+<p> Although a few of the old FORTRAN format data files may still
+exist, they have mostly disappeared since the commercial release of
+RUMP.  Intel architecture versions of RUMP still carry code to read the
+old data format; continued validity however depends on the whims of
+non-portable compiler constructs.  If necessary, source code for old
+VAX and PC format converters are available from CGS.
+
+<p> In 1984, a new machine independent and easily extendable data
+format was adopted and incorporated as the default in released
+versions of RUMP.  The advantages of transparently moving data files
+between computers quickly guarenteed the general acceptance of the new
+format.  With only very minor changes, this RBS file format has
+remained for over a decade.  The current version is 100% backward
+compatible ensuring the long term accessibility of archival data.
+
+<p> General concepts for the file format were derived from a study of
+the TIFF image file format.  If you are familiar with that standard,
+the concepts below should be familiar.  To meet future requirements,
+the specification is designed to be easily extensible with the
+definition of new record types.  Additional record types may be created
+to support new modes of RBS analysis, or other similar analytical
+techniques.
+
+<a name="rev_history">
+<h4>Revision history</h4>
+
+<ul>
+
+<li> <b>Version 1.0 [5/84].</b> Original specification.
+
+<li> <b>Version 1.0a [1/94].</b> Added time constant (tau) parameter
+to the MCA record in order to implement a more accurate pulse pileup
+algorithm in RUMP.  This extra parameter is ignored by earlier readers as
+per standard specification.
+
+<li> <b>Version 1.1 [8/94].</b>.  Implemented additional data compression
+algorithm (structure 3) for zero element compression.  Added record
+types 12h-15h for override of default compression.  Added record type
+20h for storing arrays or multiple spectra as a single data record.
+These formats were introduced to support efficient three dimensional
+RBS spectrum storage. <em>(Not implemented in DOS versions of RUMP.)</em>
+
+</ul>
+
+<p> RUMP, as of 7/97, reads at the 1.1 format, but by default writes
+only to the 1.0 standard (changable using the <tt>CONFIG
+WRITE_LEVEL</tt> command).  The additional compression available at
+level 1.1 is really only useful for 3D time-of-flight spectral data
+which contain extremely long runs of zeros.  Unless storage space is a
+critical issue, it is recommended that 1.1 features not be used to
+maintain back-level compatability.
+
+</p><hr>
+
+<h3> General Specifications </h3>
+
+<a name="rev_reqd">
+<h4> Revision requirements </h4>
+
+Major and minor revision levels will be specified in the first record of
+the file as defined below.  At major revision levels, the format may change
+substantially and while a level 2.0 reader may be able to read level 1.x
+files, a level 1.x reader will unlikely be able to read the 2.0 files.
+
+<p>
+Within a major revision, however, files should be as much as possible
+upward compatible and downward flexible.  A reader at a higher minor
+revision level must be able to read files from all lower revision level
+using default values for any new features or missing data.  A reader at
+a lower minor revision may or may not be able to read higher revision level
+files, but should flag any problems during reading.  A high level writer
+should attempt to write files which will be fully compatible with all lower
+minor revision level by, for example, filling in obsoleted parameters with
+default values.
+
+
+<a name="represent">
+<h4>Data Representations</h4>
+
+<ol>
+
+<li> The term "word" below refers exclusively to a 32 bit data item,
+either in memory or as stored on any media, referred to generically as
+"disks".
+      
+<li> Disk files are considered to be byte oriented.  Each word is
+stored as 4 sequential bytes labeled in order of storage from 1 to 4.
+The individual bits of a word are labeled from 0 to 31 with bit 31
+occupying the upper order bit of byte 1 (see below).  Since word
+storage differs between processors, byte swapping may be necessary
+before and after file accesses.  The standard does not support non-byte
+oriented storage devices.
+
+<pre><code>
+    |31........24|23........16|15.........8|7..........0|  bit order
+    |   Byte 1   |   Byte 2   |   Byte 3   |   Byte 4   |  byte order
+    |  offset i  | offset i+1 | offset i+2 | offset i+3 |  disk storage
+</code></pre>
+
+<li> Integers are long signed integers (I*4) using the two's complement
+representation.  Bit 31 is the sign bit and bit 0 is the least
+significant bit.  Range is limited to -2^{31}-1 to 2^{31}-1 with sign
+bit only (80000000h) considered invalid by this specification.  Where used,
+short and tiny integers refer to two's complement 16 bit and 8 bit values
+respectively with the high order bit remaining the sign bit.  Two short or
+four tiny integers may be packed in a single word.  The first short integer
+occupies bits 31-16 and the first tiny occupies bits 31-24.
+
+<li> Real numbers must conform to the 32 bit single precision IEEE (REAL*4)
+representation.   Range allowed is 1.1754944E-38 to 3.4028235E38
+fully normalized plus zero.  Plus and minus zero are equivalent.  The
+bit representation is shown below.  The sign bit is 0 for positive
+numbers and 1 for negatives.  The exponent is an 8 bit unsigned integer
+with a bias of 127 (the actual exponent is field value minus 127). 
+An implicit 1 bit is assumed to the left of bit 22 and the binary
+decimal point occurs between the implicit 1 and bit 22.
+
+<pre><code>
+    |31........24|23........16|15.........8|7..........0|  bit order
+    |S| Exponent |              Mantissa                |  REAL*4
+    |  offset i  | offset i+1 | offset i+2 | offset i+3 |  disk storage
+</code></pre>
+
+<li> Logical values are undefined and are not used.  If required,
+logical values may be stored as integers where 0 will be interpreted as
+false and non-zero true.
+
+<li> Character strings are stored as a structure consisting of a
+integer specifying the number of valid characters in the string
+followed by the string itself, packed 4 characters per word.
+Characters are packed with the first character in byte 1 followed by
+the second character in byte 2, etc.  Any unused bytes are undefined
+(do not assume a null value nor blank filled).  The total number of
+words required to store a string of length n is 1+(n+3)/4 (using
+integer arithmetic).  Character values 00h-7Fh are defined as the ASCII
+standard sequence.  Characters 80h-FFh are considered valid but are not
+specified by this standard.
+
+</ol>
+
+<a name="records">
+<h4>Record Representations</h4>
+
+<ol>
+
+<li> File format must be <b>sequential</b> and <b>binary</b>.
+Records must be stored on disk exactly as specified in this standard.
+No intervening blocking bytes, index entries, checksums or
+terminating markers are permitted.
+
+<li> All records will start and terminate on word boundaries.
+
+<li> Each record consists of 3 to 1027 words.  The first word specifies
+the total length of the record (in words), the second defines the type of
+record, and the last is a checksum word.
+<p>
+<table column=3 border=1><code>
+<tr><td> WORD 1:     </td><td> Record length in words        </td><td> (long integer) </td></tr>
+<tr><td> WORD 2:     </td><td> Record type                   </td><td> (long integer) </td></tr>
+<tr><td> WORD 3:     </td><td> First data element of record  </td><td> (arbitrary) </td></tr>
+<tr><td ALIGN=CENTER>.....</td><td ALIGN=CENTER>.....</td><td ALIGN=CENTER>.....</td></tr>
+<tr><td> WORD 3+N-1: </td><td> Last of N data elements in record </td><td> (arbitrary)</td></tr>
+<tr><td> WORD 3+N:   </td><td> Checksum           </td><td>               (long integer)</td></tr>
+</code></table>
+
+<p> All entries are treated as 32 bit unsigned integers for evaluating
+the checksum regardless of their actual types.  The sum of all entries in 
+the record (including the length, type and checksum) must equal
+00000000h (overflow ignored).  
+
+<li> Subsequent records begins immediately following the checksum.
+
+<li> Records are limited to 1024 data words. The total length of
+any record including the type, length and checksum is 1027 words
+(4108 bytes).
+
+<li> The first record in a file must be type 0000h as specified below.
+
+</ol>
+
+<a name="excess">
+<h4>Handling of excess or missing data in a record</h4>
+
+<ol>
+
+<li> If any record contains more data elements than expected, the extra
+should be ignored.  This is to permit enhancements to record types by
+the addition of new parameters at the end.
+
+<li> If too few data elements are given, a program may either generate
+an error or proceed assuming zero, blank, or some default for the
+missing elements.
+
+<li> Unrecognized record types should be skipped.
+
+</ol>
+
+<a name="difffmt">
+<h4>Differential integer format</h4>
+
+<p>
+The differential integer format is efficient for storing integer
+values which change only slowly from one element to the next.  It
+requires byte manipulation capabilities to implement.  Records
+containing compressed data may be any length less than 1024 words.
+If compression would require more than 1024 words, the data must be
+written in uncompressed INTEGER or REAL format.  Each block of compressed
+data must contain exactly 1024 data elements or the number of
+elements remaining to be read.  For example, 1920 data elements would
+be packed with 1024 elements in the first 11h record and 896 elements
+in the second.  
+
+<p>
+The first element in each block is the 4 byte value of the first data element.
+Subsequent values are encoded as changes from the previous value, either as
+byte offset, a 2 byte offsets, or a 4 byte absolute number.  The next byte
+following one data element is the byte offset (-127 to +127) from the current
+value.  If the offset is out of range, an 80h is written as the byte offset and
+the next two bytes are read as a 2 byte offset (-32767 to +32767).  If the
+difference is still out of range, an 8000h is written and the next four bytes
+give the absolute value of the data element.  The process continues until all
+1024 bytes have been read or written.
+
+<pre><code>
+Unpacked:        100   120      284   300       93275        93274
+Packed:     00000064    14   8000A4    10    80800000016C5B     FF
+</code></pre>
+
+<p>
+In addition, at revision level 1.1, a zero compression algorithm has been
+implemented following the delta compression.  This optional compression
+reduces runs of 00 bytes to a [FLAG][REPEAT] byte sequence.  This
+compression is on a record-by-record basis; a record ZeroCompressed is
+identified by an initial byte of 80h followed by the [FLAG] byte pattern.
+True [FLAG] bytes in the data stream are stored as [FLAG][00] patterns.
+
+<p>
+Note that enabling of compression will cause a level 1.0 reader to break.
+This is unfortunate but accepted for the 10-50% additional compression,
+especially for extremely large spectra such as three dimensional microprobe
+or time-of-flight spectra.
+
+<pre><code>
+Unpacked:        100   120      284   300       93275        93274
+Packed:     00000064    14   8000A4    10    80800000016C5B     FF
+Compressed: 80 81 81 03 64 14 80 00 A4 10 80 80 81 02 01 6C 5B FF
+</code></pre>
+
+</p><hr>
+
+<h3>Record Types</h3>
+        
+There are only two billion possible record numbers.  These will be allocated
+on a first come, first serve basis to anyone requesting them.  The first
+1000h are reserved for RUMP and other Thompsonware software.  Record types
+above 1000h may be freely used by other applications.   We will maintain
+lists of allocations requested by other groups. The following blocks are
+generally reserved for following uses.
+<ul>
+<li> <code>0000h-00FFh</code> - General data and record specifiers
+<li> <code>0100h-01FFh</code> - RUMP data files descriptors
+<li> <code>0200h-0FFFh</code> - reserved for Thompsonware
+</ul>
+
+<a name="progID">
+<h4>Program ID and data block descriptors</h4>
+
+<hr WIDTH=75%>
+
+<center><table column=2 border=0 cellpadding=2 CELLSPACING=0 WIDTH=95%>
+<tr><td VALIGN=TOP ALIGN=RIGHT NOWRAP WIDTH=20%> <b>Record type 0000h:</b> </td>
+    <td> Program/Version identifier.  This record identifies the 
+         program type and the revision level.  The current revision
+         level is 1.0.  The first record of all files must be type
+         00h record.  Subsequent 00h records will be ignored as long
+         as they continue to specify the same program type.  An error
+         is generated if the identifier is unrecognized.</td></tr>
+
+<tr><td ALIGN=RIGHT>WORD 1:</td><td>Program specifier.  10211210h ====> RUMP</td></tr>
+<tr><td ALIGN=RIGHT>WORD 2:</td><td>Major/minor version number, packed as 2 short integers</td></tr>
+<tr><td ALIGN=RIGHT>Example:</td><td>00010000h ====> Revision 1.00</td></tr>
+<tr><td ALIGN=RIGHT>        </td><td>00100003h ====> Revision 2.03</td></tr>
+</table></center>
+
+<hr WIDTH=75%>
+
+<center><table column=2 border=0 CELLPADDING=2 CELLSPACING=0 WIDTH=95%>
+<tr><td VALIGN=TOP ALIGN=RIGHT NOWRAP WIDTH=20%> <b>Record type 0001h:</b> </td>
+    <td> Printed comments.  The character string specified in this
+         record should be printed to the standard output device when
+         reading the file.  Multiple 0001h records may be included in the
+         file.</td></tr>
+<tr><td ALIGN=RIGHT>WORD 1-n:</td><td>Character Structure</td></tr>
+<tr><td ALIGN=RIGHT>WORD 1:</td><td>string length in bytes (integer)</td></tr>
+<tr><td ALIGN=RIGHT>WORD 2-n:</td><td>packed string</td></tr>
+</table></center>
+
+<hr WIDTH=75%>
+
+<center><table column=2 border=0 CELLPADDING=2 CELLSPACING=0 WIDTH=95%>
+<tr><td VALIGN=TOP ALIGN=RIGHT NOWRAP WIDTH=20%> <b>Record type 0002h:</b> </td>
+    <td> Unprinted comments.  Similar to record 01h, but unprinted.
+         Used to store information such as the generating program
+         name or the current date/time stamp.  Multiple 0002h records
+         may also be included in the file.</td></tr>
+<tr><td ALIGN=RIGHT>WORD 1-n:</td><td>Character Structure</td></tr>
+<tr><td ALIGN=RIGHT>WORD 1:</td><td>string length in bytes (integer)</td></tr>
+<tr><td ALIGN=RIGHT>WORD 2-n:</td><td>packed string</td></tr>
+</table></center>
+
+<hr WIDTH=75%>
+
+<center><table column=2 border=0 CELLPADDING=2 CELLSPACING=0 WIDTH=95%>
+<tr><td VALIGN=TOP ALIGN=RIGHT NOWRAP WIDTH=20%> <b>Record type 0010h:</b> </td>
+    <td> Data field initiator.  Must immediately preceed a
+         series of type 11h-15h records which actually store the
+         data array.  The data initiator specifies the total number
+         of elements in the array (after unpacking) and the storage
+         algorithm.  Minimal data compression is implemented at rev
+         1.0.  Additional zero compression implemented at rev 1.1.
+         Because of the possibility of adding new compression
+         methods at minor revisions, an unrecognized compression 
+         flag should be reported as an error.</td></tr>
+<tr><td ALIGN=RIGHT>WORD 1:</td><td>Default data packing format (for 11h records).</td></tr>
+<tr><td></td><td>00 -> unpacked real values<br>
+                 01 -> unpacked integer values<br>
+                 02 -> differential integer format (see below)<br>
+                 03 -> differential and possibly zero compressed</td></tr>
+<tr><td ALIGN=RIGHT>WORD 2:</td><td>Total number of elements in the array (unpacked).</td></tr>
+</table></center>
+
+<hr WIDTH=75%>
+
+<center><table column=2 border=0 CELLPADDING=2 CELLSPACING=0 WIDTH=95%>
+<tr><td VALIGN=TOP ALIGN=RIGHT NOWRAP WIDTH=20%> <b>Record type 0020h:</b> </td>
+    <td> Array field initiator.  Must immediately preceed a 
+         series of type 11h-15h records which actually store the
+         data. The data initiator specifies the array size -- data
+         is actually stored as a linear array in C format ([0][0],
+         [0][1], [0][2], ... [1][0], ... [n][m]).  Because of the
+         possibility of adding new compression methods at minor
+         revisions, an unrecognized compression flag should be
+         reported as an error.</td></tr>
+<tr><td ALIGN=RIGHT>WORD 1:</td><td>Default data packing format (for 11h records).</td></tr>
+<tr><td ALIGN=RIGHT>WORD 2:</td><td>Number of points in each spectra (columns in C array convention).</td></tr>
+<tr><td ALIGN=RIGHT>WORD 3:</td><td>Number of spectra (rows in C array convention).</td></tr>
+</table></center>
+
+<hr WIDTH=75%>
+
+<center><table column=2 border=0 CELLPADDING=2 CELLSPACING=0 WIDTH=95%>
+<tr><td VALIGN=TOP ALIGN=RIGHT NOWRAP WIDTH=20%> <b>Record type 0011h:</b> </td>
+    <td> Actual data record.  Must immediately follow a 
+         type 10h record or a previous 11h-15h record.  Each data 
+         record contains a maximum of 1024 unpacked data items
+         (actual record size may be substantially below 1024 words
+         if compression was successful).</td></tr>
+<tr><td ALIGN=RIGHT>WORD 1-N:</td><td>Data items (or compressed data items)</td></tr>
+</table></center>
+
+<hr WIDTH=75%>
+
+<center><table column=2 border=0 CELLPADDING=2 CELLSPACING=0 WIDTH=95%>
+<tr><td VALIGN=TOP ALIGN=RIGHT NOWRAP WIDTH=20%> <b>Record type 0012h:</b> </td>
+    <td> Override data record in compression 0 format.
+         Allows occasional alternate compression records within
+         the default compression method defined in the 0010h or 0020h record.
+         Contains 1024 (or number remaining) values.</td></tr>
+<tr><td ALIGN=RIGHT>WORD 1-N:</td><td>Data items</td></tr>
+</table></center>
+
+<hr WIDTH=75%>
+
+<center><table column=2 border=0 CELLPADDING=2 CELLSPACING=0 WIDTH=95%>
+<tr><td VALIGN=TOP ALIGN=RIGHT NOWRAP WIDTH=20%> <b>Record type 0013h:</b> </td>
+    <td> Override data record in compression 1 format.
+         Allows occasional alternate compression records within
+         the default compression method defined in the 0010h or 0020h record.
+         Contains 1024 (or number remaining) values.</td></tr>
+<tr><td ALIGN=RIGHT>WORD 1-N:</td><td>Data items</td></tr>
+</table></center>
+
+<hr WIDTH=75%>
+
+<center><table column=2 border=0 CELLPADDING=2 CELLSPACING=0 WIDTH=95%>
+<tr><td VALIGN=TOP ALIGN=RIGHT NOWRAP WIDTH=20%> <b>Record type 0014h:</b> </td>
+    <td> Override data record in compression 2 format.
+         Allows occasional alternate compression records within
+         the default compression method defined in the 0010h or 0020h record.
+         Contains 1024 (or number remaining) values.</td></tr>
+<tr><td ALIGN=RIGHT>WORD 1-N:</td><td>Data items</td></tr>
+</table></center>
+
+
+<hr WIDTH=75%>
+
+<center><table column=2 border=0 CELLPADDING=2 CELLSPACING=0 WIDTH=95%>
+<tr><td VALIGN=TOP ALIGN=RIGHT NOWRAP WIDTH=20%> <b>Record type 0015h:</b> </td>
+    <td> Override data record in compression 3 format.
+         Allows occasional alternate compression records within
+         the default compression method defined in the 0010h or 0020h record.
+         Contains 1024 (or number remaining) values.</td></tr>
+<tr><td ALIGN=RIGHT>WORD 1-N:</td><td>Data items</td></tr>
+</table></center>
+
+</p><hr>
+
+<a name="rumpinfo">
+<h4>RUMP information, accelerator and MCA descriptors</h4>
+
+<center><table column=2 border=0 CELLPADDING=2 CELLSPACING=0 WIDTH=95%>
+<tr><td VALIGN=TOP ALIGN=RIGHT NOWRAP WIDTH=20%> <b>Record type 0101h:</b> </td>
+    <td> Identifier. Character string identifier for the data set.</td></tr>
+<tr><td ALIGN=RIGHT>WORD 1-n:</td><td>Character Structure</td></tr>
+<tr><td ALIGN=RIGHT>WORD 1:</td><td>string length in bytes (integer)</td></tr>
+<tr><td ALIGN=RIGHT>WORD 2-n:</td><td>Identifier string</td></tr>
+</table></center>
+
+<hr WIDTH=75%>
+
+<center><table column=2 border=0 CELLPADDING=2 CELLSPACING=0 WIDTH=95%>
+<tr><td VALIGN=TOP ALIGN=RIGHT NOWRAP WIDTH=20%> <b>Record type 0102h:</b> </td>
+    <td> Livetime/Clocktime.  String containing MCA information.</td></tr>
+<tr><td ALIGN=RIGHT>WORD 1-n:</td><td>Character Structure</td></tr>
+<tr><td ALIGN=RIGHT>WORD 1:</td><td>string length in bytes (integer)</td></tr>
+<tr><td ALIGN=RIGHT>WORD 2-n:</td><td>Livetime/Clocktime string</td></tr>
+</table></center>
+
+<hr WIDTH=75%>
+
+<center><table column=2 border=0 CELLPADDING=2 CELLSPACING=0 WIDTH=95%>
+<tr><td VALIGN=TOP ALIGN=RIGHT NOWRAP WIDTH=20%> <b>Record type 0103h:</b> </td>
+    <td> Date.  Character string with collection date and time.</td></tr>
+<tr><td ALIGN=RIGHT>WORD 1-n:</td><td>Character Structure</td></tr>
+<tr><td ALIGN=RIGHT>WORD 1:</td><td>string length in bytes (integer)</td></tr>
+<tr><td ALIGN=RIGHT>WORD 2-n:</td><td>Date string</td></tr>
+</table></center>
+
+<hr WIDTH=75%>
+
+<center><table column=2 border=0 CELLPADDING=2 CELLSPACING=0 WIDTH=95%>
+<tr><td VALIGN=TOP ALIGN=RIGHT NOWRAP WIDTH=20%> <b>Record type 0110h:</b> </td>
+    <td> Correction factor.  Catch all multiplicative correction
+         factor to scale the data.</td></tr>
+<tr><td ALIGN=RIGHT>WORD 1:</td><td>(REAL) Correction factor</td></tr>
+</table></center>
+
+<hr WIDTH=75%>
+
+<center><table column=2 border=0 CELLPADDING=2 CELLSPACING=0 WIDTH=95%>
+<tr><td VALIGN=TOP ALIGN=RIGHT NOWRAP WIDTH=20%> <b>Record type 0111h:</b> </td>
+    <td> Accelerator Parameters</td></tr>
+<tr><td ALIGN=RIGHT>WORD 1:</td><td>(REAL) Beam Energy (MeV)</td></tr>
+<tr><td ALIGN=RIGHT>WORD 2:</td><td>(INT4) Z of incident beam</td></tr>
+<tr><td ALIGN=RIGHT>WORD 3:</td><td>(REAL) Mass of incident beam (AMU)</td></tr>
+<tr><td ALIGN=RIGHT>WORD 4:</td><td>(INT4) Charge state of beam</td></tr>
+<tr><td ALIGN=RIGHT>WORD 5:</td><td>(REAL) Total integrated charge (micro-Coulombs)</td></tr>
+<tr><td ALIGN=RIGHT>WORD 6:</td><td>(REAL) Beam current (nano-Amps)</td></tr>
+</table></center>
+
+<hr WIDTH=75%>
+
+<center><table column=2 border=0 CELLPADDING=2 CELLSPACING=0 WIDTH=95%>
+<tr><td VALIGN=TOP ALIGN=RIGHT NOWRAP WIDTH=20%> <b>Record type 0112h:</b> </td>
+    <td> Data Collections Parameters</td></tr>
+<tr><td ALIGN=RIGHT>WORD 1:</td><td>(REAL) keV/channel (keV)</td></tr>
+<tr><td ALIGN=RIGHT>WORD 2:</td><td>(REAL) keV of channel 0 (keV)</td></tr>
+<tr><td ALIGN=RIGHT>WORD 3:</td><td>(REAL) Starting channel of data (really REAL)</td></tr>
+<tr><td ALIGN=RIGHT>WORD 4:</td><td>(REAL) FWHM detector resolution (keV)</td></tr>
+</table></center>
+
+</p><hr>
+
+<a name="spectra">
+<h4>RBS/FRES/PIXE spectrum descriptors</h4>
+
+The following record types (12x) are mutually exclusive.  Once a data record
+begins (record type 10h), the spectra is assumed to correspond to the last
+12x record read.  All spectral information must be complete before the 10h
+record is read.   Multiple spectra may be contained in a single data file with
+the parameters set in the first to be used for all subsequent spectra unless
+explicitly changed.  Examples of multiple data sets in a single file are:
+ 
+<ul>
+<li> simultaneous PIXE/RBS  - different 0110h, 0112h and 012xh records for each
+<li> simultaneous FRES/RBS  - different 0110h, 0112h and 012xh records for each
+<li> channeling/random RBS - possibly different 0120h records
+<li> series of energy scans - different 0111h records
+</ul>
+
+<hr WIDTH=75%>
+
+<center><table column=2 border=0 CELLPADDING=2 CELLSPACING=0 WIDTH=95%>
+<tr><td VALIGN=TOP ALIGN=RIGHT NOWRAP WIDTH=20%> <b>Record type 0120h:</b> </td>
+    <td> RBS spectrum type.  Geometry set as follows.</td></tr>
+<tr><td ALIGN=RIGHT>WORD 1:</td><td>(INT4) Scattering Geometry (see below)</td></tr>
+<tr><td ALIGN=RIGHT>WORD 2:</td><td>(REAL) Theta - incident target angle (degrees)</td></tr>
+<tr><td ALIGN=RIGHT>WORD 3:</td><td>(REAL) Phi - 180-scattering angle (degrees)</td></tr>
+<tr><td ALIGN=RIGHT>WORD 4:</td><td>(REAL) Psi - exit target angle (degrees)</td></tr>
+<tr><td ALIGN=RIGHT>WORD 5:</td><td>(REAL) Omega - detector solid angle (millisteradians)</td></tr>
+<tr><td>&nbsp;</td></tr>
+<tr><td VALIGN=TOP ALIGN=RIGHT><b>Notes:&nbsp;</td><td> Angle definitions do not follow the same conventions as 
+                   common RBS texts.  This is unfortunate, but historical 
+                   usage of these definitions in RUMP now prevents change to
+                   more precise usage.  In particular, the specified scattering
+                   angle is really the complement of the scattering angle.
+                   Three angles are sufficient to fully define the scattering
+                   geometry, but usually only two are given with the third 
+                   determined by the configuration of the experimental chamber.
+     </td></tr>
+
+<tr><td VALIGN=TOP ALIGN=RIGHT>Phi&nbsp;&nbsp;&nbsp;</td>
+    <td> Supplement of the scattering angle (180-scattering angle).
+         Backscattering is typically 0-10 degrees. </td></tr>
+<tr><td VALIGN=TOP ALIGN=RIGHT>Theta&nbsp;&nbsp;&nbsp;</td>
+    <td> Angle between the surface normal and the incident beam.
+         Sample normal to incident beam is zero.</td></tr>
+<tr><td VALIGN=TOP ALIGN=RIGHT>Psi&nbsp;&nbsp;&nbsp;</td>
+    <td> Angle between the surface normal and the scattered beam.
+         Zero if sample normal points to the detector.  (PSI will be
+         calculated from THETA and PHI if the GEOMETRY is non-zero.)</td></tr>
+<tr><td VALIGN=TOP ALIGN=RIGHT>Geometry&nbsp;&nbsp;&nbsp;</td>
+    <td> In normal operation, only two angles are necessary to define
+         the full geometry.  This integer specifies the common
+         scattering geometries.  For historic reasons, one is
+         affectionately named Cornell and the other IBM.  In the
+         Cornell geometry, the sample tilt axis for THETA is in
+         the plane defined by the incident and scattered beams.
+         In the IBM geometry, the sample normal, incident beam and
+         scattered beams are all coplanar.  The sign ambiguity is
+         resolved so that PSI = THETA+PHI.  If the sample normal
+         points to the detector, then THETA should equal -PHI.</td></tr>
+<tr><td></td><td> &nbsp;0 ==> Cornell geometry.  </td></tr>
+<tr><td></td><td> &nbsp;1 ==> IBM geometry.  </td></tr>
+<tr><td></td><td> -1 ==> No geometry.  THETA/PHI/PSI all defined and valid.</td></tr>
+</table></center>
+
+</table></center>
+
+<hr WIDTH=75%>
+
+<center><table column=2 border=0 CELLPADDING=2 CELLSPACING=0 WIDTH=95%>
+<tr><td VALIGN=TOP ALIGN=RIGHT NOWRAP WIDTH=20%> <b>Record type 0121h:</b> </td>
+    <td> FRES spectrum type.  Geometry set as follows.</td></tr>
+<tr><td ALIGN=RIGHT>WORD 1:</td><td>(INT4) Scattering Geometry (see below)</td></tr>
+<tr><td ALIGN=RIGHT>WORD 2:</td><td>(REAL) Theta - incident target angle (degrees)</td></tr>
+<tr><td ALIGN=RIGHT>WORD 3:</td><td>(REAL) Phi - 180-scattering angle (degrees)</td></tr>
+<tr><td ALIGN=RIGHT>WORD 4:</td><td>(REAL) Psi - exit target angle (degrees)</td></tr>
+<tr><td ALIGN=RIGHT>WORD 5:</td><td>(REAL) Omega - detector solid angle (millisteradians)</td></tr>
+</table></center>
+
+<hr WIDTH=75%>
+
+<center><table column=2 border=0 CELLPADDING=2 CELLSPACING=0 WIDTH=95%>
+<tr><td VALIGN=TOP ALIGN=RIGHT NOWRAP WIDTH=20%> <b>Record type 0122h:</b> </td>
+    <td> PIXE spectrum type.  Parameters undefined at this time.</td></tr>
+</table></center>
+
+<hr WIDTH=75%>
+
+<center><table column=2 border=0 CELLPADDING=2 CELLSPACING=0 WIDTH=95%>
+<tr><td VALIGN=TOP ALIGN=RIGHT NOWRAP WIDTH=20%> <b>Record type 0123h:</b> </td>
+    <td> Nuclear reaction spectrum type.  Parameters undefined at this time.</td></tr>
+</table></center>
+
+<hr WIDTH=75%>
+
+The record type 0122h and 0123h are defined here for completeness in
+anticipation of some future RUMP revision level.  However, these formats are
+not fully defined yet (ie. it is not clear what other parameters will be
+required) and we do not recommend their use.  Stick to type 0120h (RBS) for the
+time being.  Type 0121h (FRES) differs from RBS only in some simulation usage.
+   
+</p><hr>
+
+<h3> Programming Support </h3>
+
+Included with the RUMP distribution are a set of ANSI Standard C routines as
+an API for reading and writing single spectrum RUMP binary files.  These are
+nearly machine independent and may be freely incorporated into user written
+applications (translators or data acquisition programs).  An example of the
+binary bytes required in the file is presented first, followed by a detailed
+description of the API.
+
+<a name="example">
+<h4>Example File</h4>
+
+The following example file contains two similar spectra, one packed and one
+unpacked real format.  Headers are shared except for the MCA scales and
+correction factor.
+
+<pre><code>
+
+00000005 00000000 10211210 00010000 efddedeb                    ;Header
+0000000b 00000002 00000019 'PC-RUMP data file [v 1.0]xxx'       ;Comment
+                  f2e1ec83
+0000000d 00000101 00000024 'Ni/NiSi/Si ....'  ced4b22f          ;ID string
+00000008 00000102 0000000f 'LT= 857 CT= 860a' ffec1d26          ;LTCT string
+0000000a 00000103 00000017 '18-JUN-1985 12:33:48.48 ' ada0c869  ;Date
+00000009 00000111 404145d0 00000002 40800c56 00000002 41200000  ;Accelerator
+                  41000000 fd1eacbc
+00000007 00000112 409e6666 3fcccccd 00000000 414282e8 3e5248cc  ;MCA
+00000008 00000120 00000000 40e00000 41100000 00000000 4059999a  ;Geometry
+                  3db6653e
+00000004 00000110 3f866666 c0799886                             ;CORR Factor
+00000005 00000010 00000002 00000400 fffffbe9                    ;1024 compressed data
+0000010e 00000011 00000000 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 02
+                  1b 8000c2 800106 80 012d 800107 8000b6 80008e 2b 58 35 0a ce
+                  16 e0 2e a6 35 c6 d1 43 80ff68 5b 0b cb e1 da e5 d7 ed 46 d5
+                  12 b8 1c f8 f4 de d5 13 27 d4 fa ba 04 0b de 2e 16 d8 10 f8
+                  c3 28 05 05 fb de 06 e6 57 b8 06 01 da 06 ad 80008a c0 f7 01
+                  e1 de 1b 34 03 cc 10 e8 06 f3 dd 1e df 25 05 dc ec 34 d9 3b
+                  f5 ca 0e 12 0a e7 26 c3 0c f7 1d 21 cc 26 c5 fa 15 f9 1c e1
+                  ......................
+                  00 00 00 00 52dbd061
+
+
+00000008 00000120 00000000 40e00000 41100000 00000000 4059999a  ;MCA parms
+                  3db6653e
+00000004 00000110 3f866666 c0799886                             ;Correction
+00000005 00000010 00000000 00000400 fffffbeb                    ;1024 reals
+00000403 00000011 00000000 00000000 00000000 00000000 00000000  ;Real data
+                  00000000 00000000 be2f8af9 bfe66666 c1033333
+                  4246a0ea 43590000 43f48ea1 4443c57c
+                  4482399a 449af249 44a97333 44b36666
+                  44bb3a84 44c2b8b0 44c24750 44c063a8
+                  ....................................
+                  441ce2be 44127e2c 440ba666 43f62f8b
+                  00000000 00000000 53f717e6
+
+</code></pre>
+
+<a name="APIref">
+<h4> API modules </h4>
+
+Programming files to support reading and writing RUMP binary files are located
+in the cgs/user/rump and the cgs/include directories.  The relevent files
+are:
+</p>
+
+<center><table column=2 border=0 CELLPADDING=2 CELLSPACING=0 WIDTH=95%>
+<tr><td VALIGN=TOP ALIGN=LEFT NOWRAP WIDTH=20%> <b>rump_rdw.h</b> </td>
+    <td> Defines structures and prototypes for the RUMP routines.  The
+         structure <code>SPECTRUM</code> contains all the parameters related
+         to RBS scattering including data.  Pointers to this structure are
+         used by the API to refer to each spectrum.  This include file also
+         contains the prototypes for the 7 external API routines.
+    </td>
+</tr>
+<tr><td VALIGN=TOP ALIGN=LEFT NOWRAP WIDTH=20%> <b>rump_rdw.c</b> </td>
+    <td> Contains the source code for the API routines.  Optional features
+         are accessible using compiler #define switch options or editing the
+         code.  For standalone applications, <code>NO_EA_MODE</code> and 
+         <code>LOCAL_MODE</code> should be defined.
+    </td>
+</tr>
+<tr><td VALIGN=TOP ALIGN=LEFT NOWRAP WIDTH=20%> <b>preload.h</b> </td>
+    <td> Contains several #defines identifying computer capabilities.  This
+         must be loaded before system #include files.
+    </td>
+</tr>
+<tr><td VALIGN=TOP ALIGN=LEFT NOWRAP WIDTH=20%> <b>mytypes.h</b> </td>
+    <td> Defines internal variable types.  Must be loaded after system
+         #include files.
+    </td>
+</tr>
+
+</table></center>
+
+<h4> Required #include files: </h4>
+
+Applications calling the RUMP API routines must load all three of the
+include files.  The order must be:<br>
+<code><pre>
+        #define _POSIX_SOURCE       /* POSIX compliance required */
+        #include "preload.h"
+
+        #include &lt;stdio.h&gt;
+          .... other system include files ...
+
+        #include "mytypes.h"
+        #include "rump_rdw.h"
+</pre></code>
+
+<h4> Required compile time switches: </h4>
+
+During compilation, several variable must be defined via the command line
+-D switches.  For Windows NT, the compile command must include the options
+<br><code>&nbsp;&nbsp;&nbsp;&nbsp;-DNT -Di486 -DMSC70</code></br>
+to define the operating system (NT, OS2, or UNIX), the architecture (i486
+for all Intel chips), and the compiler (MSC70 for the current Microsoft
+compiler).  On UNIX systems, check the makefile for the appropriate values.
+These definitions are used by <code>mytpes.h</code> to select appropriate
+routines.  
+
+<p>
+In addition, when compiling <code>rump_rdw.c</code>, the following
+definitions must also be included to disable features unavailable in stand
+alone programs.
+<br><code>&nbsp;&nbsp;&nbsp;&nbsp;-DLOCAL_MODE  -DNO_EA_MODE -DNO_PIPE_MODE&nbsp;&nbsp;&nbsp;</code><br>
+Alternatively, the <code>#define</code> for these may be uncommented in the
+source file.
+
+<h4> SPECTRUM structure </h4>
+
+<code><pre>
+typedef enum _SPECTRUM_TYPE {RBS, FRES, PIXE, NUCLEAR, OTHER} SPECTRUM_TYPE;
+typedef enum _GEOMETRY_TYPE {
+   CORNELL =  0,              /* Cornell theta/phi definitions */
+   IBM     =  1,              /* IBM theta/phi definitions     */
+   GENERAL = -1               /* Full theta/phi/psi definition */
+} GEOMETRY_TYPE;
+
+typedef struct _SPECTRUM {
+   char filename[PATH_MAX];            /* Filename                         */
+   char date[IDCHR];                   /* Date spectrum collected          */
+   char ltct[IDCHR];                   /* Live time/Clock time information */
+   char id[IDCHR];                     /* Identifier string                */
+   SPECTRUM_TYPE type;                 /* Type of spectrum                 */
+   FLOAT e0;                           /* Incident energy            (MeV) */
+   int   zbeam;                        /* Atomic Z of incident             */
+   FLOAT mbeam;                        /* Atomic mass of incident    (amu) */
+   int   cbeam;                        /* |Charge| state of beam           */
+   FLOAT q;                            /* Total accumulated charge    (uC) */
+   FLOAT current;                      /* Average beam current        (nA) */
+   FLOAT scale1,scale2;                /* Conversion MCA chan # -> keV     */
+   FLOAT first;                        /* Channel number of first data pt  */
+   FLOAT fwhm;                         /* Detector resolution        (keV) */
+   FLOAT tau;                          /* MCA shaping time constant   (uS) */
+   GEOMETRY_TYPE geom;                 /* Geometry identifier              */
+   FLOAT phi,theta,psi;                /* Scattering angles      (degrees) */
+   FLOAT omega;                        /* Detector solid angle       (mSr) */
+   FLOAT corr;                         /* Random correction factor         */
+   int   nspectra;                     /* Number of spectra in data        */
+   int   npt;                          /* Number of data points            */
+   int   nptmax;                       /* Dimensioned size of counts       */
+   FLOAT *counts;                      /* Pointer to actual data           */
+   int   dirty;                        /* Has data changed since read      */
+   int   modify;                       /* Have parameters been modified    */
+   int   iddone;                       /* Is ID been done for this spectra */
+} SPECTRUM ;
+
+</pre></code>
+
+
+<h4> API entries </h4>
+
+The available routines in <code>rump_rdw.c</code> are:
+<dl>
+<dt><b>RbsAllocateSpectrum</b>
+<dd><center><table border=0 column=1 row=1 width=90%><tr><td><pre><code>
+/* ===========================================================================
+-- Function to allocate space for a spectrum structure, and initialize to
+-- either default parameters or a copy of an existing spectrum.  On return,
+-- the buf->count array is ready to be filled with spectral data.
+--
+--  Usage:  SPECTRUM *RbsAllocateSpectrum(SPECTRUM *proto, int NumChannels);
+--
+--  Inputs: proto       - prototype for spectrum header information.  If 
+--                        NULL, default values will be used for all entries.
+--          NumChannels - number of channels for which to allocate space.
+--                        If 0 or negative, buf->counts will be left NULL.
+--
+--  Returns: Pointer to properly initialized structure or NULL on failure.
+=========================================================================== */
+</code></pre></td></tr></table></center>
+
+<dt><b>RbsFreeSpectrum</b>
+<dd><center><table border=0 column=1 row=1 width=90%><tr><td><pre><code>
+/* ===========================================================================
+-- Function to free all memory used by a SPECTRUM structure, including the
+-- structure itself (assuming it was malloc'd).
+--
+--  Usage:  int RbsFreeSpectrum(SPECTRUM *buf);
+--
+--  Inputs: *buf - Rump spectrum structure
+--
+--  Output: Free's spectrum data buffer and the structure itself.  The pointer
+--          buf will no longer be valid after this call.
+--
+--  Returns: 0
+=========================================================================== */
+</code></pre></td></tr></table></center>
+
+
+<dt><b>RbsReadSpectrum</b>
+<dd><center><table border=0 column=1 row=1 width=90%><tr><td><pre><code>
+/* ===========================================================================
+-- Function to read a binary RBS file from disk.  Modifies all entries in
+-- the structure that are defined in the file.
+--
+--  Usage:  SPECTRUM *RbsReadSpectrum(char *filename, SPECTRUM *spectra, int *err);
+--
+--  Inputs: filename - character pointer to filename to be read
+--          spectra  - pointer to a current spectrum structure.  If this
+--                     entry is NULL, a new structure will allocated,
+--                     initialized with default values, and then filled.
+--
+--  Output: err - If not NULL, will receive the error code
+--                0 - successful read of data
+--                1 - unable to open file
+--                2 - unable to allocate buffer for reading
+--               -3 - unable to allocate buffers space for counts
+--               -2 - bad file format from the beginning
+--               -1 - bad file format somewhere during reading (after headers)
+--
+--  Returns: pointer to spectrum (either spectra or the malloc'd space).  On
+--           error, will return NULL.
+--
+--  Notes:  This routine is guarenteed to load all of the spectral data, 
+--          resizing or allocating the counts buffer if necessary.
+=========================================================================== */
+</code></pre></td></tr></table></center>
+
+
+<dt><b>RbsWriteSpectrum</b>
+<dd><center><table border=0 column=1 row=1 width=90%><tr><td><pre><code>
+/* ===========================================================================
+-- Function to write a binary RBS file to disk.  The filename is taken from
+-- the SPECTRUM structure.  This is a standard write that stores all parameters
+-- currently relevent to RBS analysis.
+--
+--  Usage:  int RbsWriteSpectrum(SPECTRUM *spectra)
+--
+--  Inputs: *spectra - pointer to a spectrum structure containing all of
+--                     the current parameters and data.
+--
+--  Output: Outputs record as specified
+--
+--  Returns: 0 - successful write
+--           1 - unable to open file for writing
+--           2 - unable to allocate buffer space for writing
+--           3 - pipe failed
+=========================================================================== */
+</code></pre></td></tr></table></center>
+
+
+<dt><b>RbsCopySpectrum</b>
+<dd><center><table border=0 column=1 row=1 width=90%><tr><td><pre><code>
+/* ===========================================================================
+-- Function to copy an existing spectrum structure to a new structure.
+--
+--  Usage:  SPECTRUM *RbsCopySpectrum(SPECTRUM *dest, SPECTRUM *source);
+--
+--  Inputs: *source - spectrum to be copied
+--
+--  Output: *dest   - spectrum where data will be copied.  If NULL, then
+--                    a new structure will be allocated for the copy.
+--
+--  Return: dest, or newly allocated SPECTRUM structure if dest was NULL
+--          NULL indicates error - usually unable to allocate space
+=========================================================================== */
+</code></pre></td></tr></table></center>
+
+
+<dt><b>RbsResizeSpectrum</b>
+<dd><center><table border=0 column=1 row=1 width=90%><tr><td><pre><code>
+/* ===========================================================================
+-- Function to re-allocate space for channel data in a SPECTRUM structure 
+-- to a specified size
+--
+--  Usage:  int RbsResizeSpectrum(SPECTRUM *buf, int size)
+--
+--  Inputs: *buf - Rump spectra structure
+--          size - New size desired.  If 0, will dealloc counts buffer.
+--                 buf->npt will be adjusted if the new size is less than
+--                          than the currently data set.
+--
+--  Output: Changes size of counts buffer to specified size
+--
+--  Return: 0 if successful, 1 if could not realloc memory.
+=========================================================================== */
+</code></pre></td></tr></table></center>
+
+
+<dt><b>RbsSetFileWriteVersion</b>
+<dd><center><table border=0 column=1 row=1 width=90%><tr><td><pre><code>
+/* ===========================================================================
+-- Function to set the revision level for RbsWriteSpectrum().  The default
+-- mode is to write to the 1.0 revision level.  This call will enable writing
+-- compressed data to the 1.1 specification.
+--
+--  Usage:  int RbsSetFileWriteVersion(int minor_level);
+--
+--  Inputs: minor_level - level of writes tolerated
+--                        0 => limit to version 1.0 format
+--                        1 => limit to version 1.1 format
+--                       <0 => no change, report level only
+--
+--  Returns: previous minor_level enabled
+=========================================================================== */
+</code></pre></td></tr></table></center>
+
+</dl>
+
+<a name="code">
+<h4>Test program</h4>
+
+The following is a simple example program which will read RBS data files and
+print out the header information.  It illustrates the basic use of two of
+the APIs described above.  The compile line required for Windows NT with the
+Microsoft C compiler was:
+</p>
+<code>&nbsp;&nbsp;&nbsp;&nbsp;cl -DNT -DMSC70 -Di486 -DLOCAL_MODE -DNO_PIPE_MODE -DNO_EA_MODE test.c rump_rdw.c</code><br>
+
+</p>
+<pre><code>
+/* Example usage of the RUMP read routines */
+
+#define _POSIX_SOURCE
+#include "preload.h"
+
+#include &lt;stdio.h&gt;
+#include &lt;string.h&gt;
+#include &lt;math.h&gt;
+#include &lt;stdlib.h&gt;
+
+#include "mytypes.h"
+#include "rump_rdw.h"
+
+/* ===========================================================================
+-- Routine to encode the mass, Z and charge state of an ion into a string
+=========================================================================== */
+static char *BeamCode(int zbeam, REAL mbeam, int cbeam) {
+
+   int i;
+   char *aptr;
+
+   static char buffer[20];
+   static char *ATOM_LIST[] = {"xx","H","He","Li","Be","B","C","N",
+         "O","F","Ne","Na","Mg","Al","Si","P","S","Cl","Ar"};
+
+   sprintf(buffer,"%d%s", (int) (mbeam+0.5), ATOM_LIST[zbeam] );
+   aptr = buffer + strlen(buffer);
+   if (cbeam &gt; 0) {for (i=0; i&lt;+cbeam; i++) *aptr++ = '+';}
+   if (cbeam &gt; 0) {for (i=0; i&lt;-cbeam; i++) *aptr++ = '-';}
+   *aptr = '\0';
+   return(buffer);
+}  
+
+/* ===========================================================================
+--  ShowActive(SPECTRUM *buf)
+--
+--  Prints header block to standard output
+--     Filename:    c:\rump\example.rbs
+--     Identifier:  Ni/NiSi/Si Annealed 90 min 295^~o^+C
+--     LTCT Text:   LT= 857 CT= 860
+--     Date:        18-JUN-1985 12:33:48.48
+--     Beam:        3.000 MeV   4He++   xxxx.yy uCoul  @ xx.yy nA
+--     Geometry:    General  Theta: -180.0  Phi: -109.0  Psi: +000.0
+--     MCA:         Econv: xxx.yyy  xxx.yyy  First chan:  0.0  NPT: 1024
+--     Detector:    FWHM: 35.0 keV   Omega: 3.400
+--     Correction:  1.0041
+=========================================================================== */
+static void ShowActive(SPECTRUM *buf) {
+
+   char *geometry, *filetype, *beam_string;
+        
+/* Create string of form 4He++ for the incident beam */
+   beam_string = BeamCode(buf-&gt;zbeam, buf-&gt;mbeam, buf-&gt;cbeam);
+
+/* Look and convert geometry ID into the appropriate string */
+   if (buf-&gt;geom == CORNELL)      geometry = "Cornell";
+   else if (buf-&gt;geom == IBM)     geometry = "IBM";
+   else if (buf-&gt;geom == GENERAL) geometry = "General";
+   else                           geometry = "Unknown";
+
+/* Look and convert spectrum type into an appropriate string */
+   if (buf-&gt;type == RBS)       filetype = "RBS";
+   else if (buf-&gt;type == FRES) filetype = "FRES";
+   else if (buf-&gt;type == PIXE) filetype = "PIXE";
+   else                        filetype = "Unknown";
+
+   printf(
+      "  %-4s File:   %s\n"
+      "  Identifier:  %s\n"
+      "  LTCT Text:   %s\n"
+      "  Date:        %s\n"
+      "  Beam:       %6.3f MeV   %-7s% 7.2f uCoul  @ %5.2f nA\n"
+      "  Geometry:    %7s  Theta: %7.2f  Phi: %7.2f  Psi: %7.2f\n"
+      "  MCA:         Econv: %7.3f  %7.3f  First chan: %4.1f  NPT: %4d\n"
+      "  Detector:    FWHM: %4.1f keV  Tau: %4.1f   Omega: %5.3f\n"
+      "  Correction:  %6.4f\n",
+         filetype,
+         buf-&gt;filename, buf-&gt;id,      buf-&gt;ltct,  buf-&gt;date,
+         buf-&gt;e0,       beam_string,
+         buf-&gt;q,        buf-&gt;current,
+         geometry,      buf-&gt;theta,   buf-&gt;phi,   buf-&gt;psi,
+         buf-&gt;scale1,   buf-&gt;scale2,  buf-&gt;first, buf-&gt;npt,
+         buf-&gt;fwhm,     buf-&gt;tau,     buf-&gt;omega,
+         buf-&gt;corr);
+   return;
+}
+
+/* ===========================================================================
+-- Main routine.  Will print out the header for each file on the command line.
+=========================================================================== */
+int main(int argc, char *argv[]) {
+
+   SPECTRUM *spectrum;                 /* Pointer to spectra structure */
+   int rcode;
+
+/* Require at least a single argument */
+   if (argc &lt; 2) {
+      fprintf(stderr, "Usage: show &lt;file1.rbs&gt; &lt;file2.rbs&gt;\n");
+      return(EXIT_FAILURE);
+   }
+
+/* Go through each argument on command line showing the header information */
+   argc--; argv++;
+   while (argc) {
+      if ( (spectrum = RbsReadSpectrum(*argv, NULL, &rcode)) == NULL) {
+         fprintf(stderr, "ERROR: Read failure on %s (%d)\n", *argv, rcode);
+      } else {
+         ShowActive(spectrum);                           /* Print identifier */
+         RbsFreeSpectrum(spectrum);
+      }
+      argc--; argv++;
+   }
+
+   return(EXIT_SUCCESS);
+}
+
+</code></pre>
+
+</p><hr><small>
+Last modified: July 18, 1997
+<address>Michael O. Thompson <a href="mailto:mot1@cornell.edu">(mot1@cornell.edu)</a> </address></small>
+</body>
+</html>

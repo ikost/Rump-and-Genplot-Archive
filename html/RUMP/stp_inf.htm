@@ -1,0 +1,309 @@
+<HTML>
+<HEAD>
+<TITLE>RUMP Stopping Power Calculations</TITLE>
+</HEAD>
+
+<BODY><A NAME="top"></A>
+<hr>
+<center>
+  <h2> RUMP Stopping Power Modules</h2>
+</center>
+<hr>
+
+<h3>Table of Contents</h3>
+<ol>
+<li> <a href="#into">        Introduction</a>
+<li> <a href="#default">     Default exception for element Mylar</a>
+<li> <a href="#exceptions">  Exception modifications to stopping powers</a>
+<li> <a href="#user">        Writing an alternate stopping power calculation module</a>
+<li> <a href="#code">        Example alternate stopping power routine</a>
+</ol>
+
+</p><hr>
+
+<a name="into">
+<h3> Introduction </h3>
+
+<!-- @@{Stopping Power} -->
+
+<p> Stopping powers are critical for the simulation and analysis of
+RBS spectra since the depth scale is determined solely by the energy
+loss into the substrate.  Unfortunately, stopping powers are difficult
+to measure and semi-empirical analytical expressions have become the
+norm for analytical work.  The complexity of the semi-empirical
+algorithms prohibit their primary use in simulators like RUMP. 
+Instead, polynomial fits (normally sixth order) are typically used
+to provide both the stopping power and the low order derivatives
+with respect to energy.  Coefficients for the stopping power 
+polynomials are normally obtained by fitting to the semi-empirical
+models.
+
+<p> RUMP internally uses a sixth order polynomial either in the energy
+or in the square root of the energy.  Fitting as a function of the
+square root of the energy generally results in a better match to the
+Bragg peak, especially at low energies.  Historically though,
+polynomials linear in energy have been used and this is the default
+for RUMP.  Switching between fitting modes is accomplished using
+the command
+<br>
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;config stop_type [sqrt | linear]</tt>
+<br>
+
+<p> Stopping power polynomial coefficients are generated on an as-needed
+basis during simulation and analysis.  Separate tables are maintained for
+each incident particle, with different incident isotopes potentially handled
+by energy scaling.  For each target element, stopping powers are calculated
+via some semi-empirical method over a relevent energy range.  This range
+is set nominally from 0.12 E<sub>max</sub> to 1.15 E<sub>max</sub>
+for fits linear in energy and from 0.06 E<sub>max</sub> for fit in square of
+energy.  Below 0.03 E<sub>max</sub>, the table <it>cuts off</it> to avoid
+problems with the Bragg peak.  These semi-empirical calculated stopping
+powers are then fit to the desired polynomial (automatic within RUMP).
+
+<p> Several algorithms exist for the semi-empirical calculation of the
+stopping powers.  The default algorithm to handle all elements in all
+targets is the <it>Empirical Stopping Powers for Ions in Solids</it>
+by J.F. Ziegler, J.P. Biersack, and U. Littmark, IBM Research Report
+RC9250 (1982).  This series of routines is adequate for light elements
+but is known to be relatively poor for high Z projectiles.  Unfortunately,
+this is the last <it>public domain</it> algorithm available for
+direct incorporation into a quasi-commercial package like RUMP.
+
+<p> The semi-empirical stopping power calculation proceeds as follows:
+<ol>
+<li> Check for an appropriate pre-loaded  (STOP_LOAD) stopping power table
+(seldom used anymore).
+<li> If a user routine (STOP_USER) is defined, check if the given
+(z1,m1,z2) pair is handled.  If yes, calculate stopping powers.
+<li> If no user routine is defined, calculate stopping powers via
+the Ziegler algorithm.  
+<li> Check for a stopping power exception to the given pair (STOP_LOAD).
+Exception tables may totally recalculate the stopping powers, or may simply
+scale the calculated values by a constant.
+<li> Fit the stopping powers to a polynomial form and save the coefficients.
+</ol> 
+
+<p> The casual RBS user can likely all of the alternate algorithms and
+just use the defaults.  Simple modifications to the tables, such as
+increasing the stopping power of a given target by a constant, can be
+handled using the <a href="#exceptions">exception mechanism</a>.  Only
+if working with high Z ion beams should it be necessary to consider
+the more powerful <a href="#user">user DLL</a> mechanism.
+
+</p><hr>
+
+<a name="default">
+<h3> Default exception for element Mylar</h3>
+
+To remain compatible with old DOS simulation files, element 93 is defined
+to be Mylar.  Only the stopping power is defined and this element should
+only be used for absorber foils.   The sixth order polynomial for H, D and
+He in mylar, as used in the DOS version, is coded as an exception.  The
+origin of these particular polynomials has been lost in time.
+
+</p><hr>
+
+<a name="exceptions">
+<h3> Exception Tables </h3>
+
+<p> An exception table entry is essentially a mathematical expression
+modifying or setting the stopping power of a particular (Z1,M1,Z2)
+triplet.  Any arbitrary number of exception entries may be defined,
+although only the last one defined for any given triplet will be used
+(ie. they are not cummulative).  For standard RBS, these exceptions are
+only ocassionally used and then only to provide a multiplicative
+scaling to the Ziegler algorithm values.  However, the mechanism is
+sufficiently general to be used extensively in high Z scattering.
+
+<p> To load an exception file, use:
+<br><tt><b>&nbsp;&nbsp;&nbsp;&nbsp;config stop_load exception.stp</b></tt></br>
+where <tt>exception.stp</tt> is the name of the exception data file.  RUMP
+will assume an extension of <tt>.stp</tt> if none is given.  Loading a new
+exception file automatically deletes all existing tables so that the table
+takes effect immediately.
+
+<p> An exception file consists of simple ASCII text.  Any line beginning with
+a # sign is considered a comment.  The first non-comment line must be the
+text
+<br>
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;EXCEPTION TABLE</tt>.
+<br>
+Each subsequent non-comment line defines an exception
+<br>
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;z1 m1 z2 expression(zgl,kev)</tt>
+<br>
+where <tt>z1</tt> is the incident particle Z, <tt>m1</tt> is the mass
+in AMU, <tt>z2</tt> is the target Z and <tt>expression</tt> is an
+arbitrary mathematical expression involving potentially the
+semi-empirically determined stopping power (as the variable
+<tt>zgl</tt>) or the incident ion energy <tt>kev</tt>.  The expression
+must be a single line calculation, but may be arbitrarily long.  Use an
+isolated backslash character (\) at the end of the line as a logical
+continuation character.
+
+<p> To scale the stopping power for He in Si by 20%, the appropriate line is
+<br><tt>&nbsp;&nbsp;&nbsp;&nbsp;2 4 14 1.2*zgl</tt>.</br>
+To add 10% modulation on top of the stopping power of Ni, use
+<br><tt>&nbsp;&nbsp;&nbsp;&nbsp;2 4 28 zgl*(1+0.10*sin(kev/100))</tt>.</br>
+To slowly increase the stopping power above 5 MeV:
+<br><tt>&nbsp;&nbsp;&nbsp;&nbsp;2 4 14 (kev.lt.5000)?zgl:zgl*(1+.01*(kev-5000))</tt></br>
+More usefully, the exceptions for Mylar (which are now hardcoded in RUMP)
+would have been
+<br><tt>&nbsp;&nbsp;&nbsp;&nbsp; 1 1 93 13.37-1.969E-2*kev+1.551E-5*kev^2-...</tt>
+<br><tt>&nbsp;&nbsp;&nbsp;&nbsp; 1 2 93 10.37-4.430E-4*kev-6.729E-6*kev^2+...</tt>
+<br><tt>&nbsp;&nbsp;&nbsp;&nbsp; 2 4 93 12.71+5.538E-2*kev-5.557E-5*kev^2+...</tt>
+
+<p> The <tt>cgs/Rump/Data</tt> directory contains an example exception
+stopping power file <tt>except.stp</tt>.  This file can be easily modified
+using any programming text editor, including notepad.  
+
+</p><hr>
+
+<a name="user">
+<h3> User written stopping power routines </h3>
+
+<p> Because of the difficulty matching high energy stopping powers, it is 
+possible (actually easy) to write your own routine to calculate the stopping
+powers.  If possible, CGS would like to obtain a copy of user written stopping
+power routines, especially ones for high Z incident particles that may be
+released to other users.  At this time, user stopping power routines are
+possible only in the Windows NT version of RUMP -- UNIX does not generally
+support the dynamic loading of modules and I haven't had any requests for 
+this capability from OS/2 users.
+
+<p> A user written stopping power routine is a simple DLL containing a
+single entry point (routine) that returns the stopping power of a given
+triplet at a given energy.  Because it is a DLL, any algorithm that can be
+programmed in C can be used.  The most major limitation is that the routine
+must be compiled with a compatible version of the Microsoft C compiler --
+how long any given compiler is compatible is up to the whims and wishes of
+the evil Gates empire.  A very simple example user routine is provided in
+the <tt>cgs/Rump/MyStop</tt> directory of the distribution.  This code is
+also reproduced <a href="#code">below.</a>
+
+<p> To load a user stopping power routine, 
+<br><tt><b>&nbsp;&nbsp;&nbsp;&nbsp;config stop_user mystop.dll</b></tt></br>
+where <tt>mystop.dll</tt> is the name of user written DLL.  RUMP will assume
+an extension of <tt>.dll</tt> if none is given, and will search for the file
+along the normal RUMP search directories.  Loading a new user stopping power
+routine automatically deletes all existing tables so that the changes will
+take effect immediately.
+
+
+</p><hr>
+
+<a name="code">
+<h3> Example user stopping power code </h3>
+
+</p>
+<pre><code>
+/* ===========================================================================
+-- Example file of user defined stopping power calculations.
+--
+-- This program traps the Z=93 element (defined as Mylar) and calculates
+-- the stopping power values for H, D and He from a simple polynomial
+--
+-- Requirements:
+--               (1) ZStop must be an exported entry point to this DLL
+--                   (see the .def file)
+--               (2) ZStop must be prototyped as in this file
+--               (3) Zstop returns an integer
+--                     0 => This incident/target combination is handled
+--                    !0 => Don't use this routine for that pair
+--               (4) Must return stopping power in ev/1E15 at/cm^2 units ONLY
+--
+-- Under NT, this must be compiled with at least /LD option.  Typical is
+--    cl /nologo /LD /G5 /W3 /O2 mystop.c mystop.def
+-- where mystop.def includes at least
+--    LIBRARY mystop
+--    EXPORTS
+--      ZStop
+--
+-- To verify that the code is being used, check the reports after first sim:
+--   Fitting particle 2H   for Z = 93 ... usf ... maximum deviation:  0.00%
+-- The "u" in "usf" indicates user routine.  z is ziegler, e is exception
+-- and "m" is mylar kludge.
+--
+-- Stopping powers are only generated once unless conditions are changed
+-- dramatically.  Unloading this routine, or loading a new one, will 
+-- automatically release all of the modules and recalculate stopping powers.
+=========================================================================== */
+
+/* ------------------------------ */
+/* Feature test macros            */
+/* ------------------------------ */
+#define _POSIX_SOURCE                  /* Always require POSIX standard */
+#define TRUE  1
+#define FALSE 0
+
+/* ------------------------------ */
+/* Standard include files         */
+/* ------------------------------ */
+#include &lt;stdlib.h&gt;
+
+
+/* ===========================================================================
+-- Usage:       int ZStop(int z1, double m1, int z2, double kev, double *stop);
+--
+-- Description: Calculates the stopping power in eV/1E15 for pair
+--
+-- Inputs:      z1 - incident particle Z
+--              m1 - incident particle mass
+--              z2 - target Z
+--              keV - particle energy in KeV
+--
+-- Outputs:     stop - returned stopping power in eV/1E15 at/cm^2
+--
+-- Returns:     0 ==> routine handles this pair
+--             !0 ==> routine does not handle this pair
+--
+-- Notes:   (1) The "handles this pair" is only checked once, with keV set
+--              to the maximum it will ever be.  If the routine handles the
+--              incident/target pair, it must do so for all energies below
+--              the given keV.
+--          (2) No distinction is made between nuclear and electronic stopping.
+--          (3) If this routine chooses not to handle the pair, the default
+--              calculation will be automatically used, possible modified by
+--              the exception tables.
+--          (4) This routine will be called many (currently 201) times for each
+--              particle pair.  The values are fit to the internal RUMP
+--              polynomial before use.
+=========================================================================== */
+int ZStop(int z1, double m1, int z2, double kev, double *stop) {
+
+   double *p;
+
+   static double h_in_my[6] =
+      {13.37, -1.969E-2, +1.551E-5, -6.592E-9, +1.426E-12, -1.229E-16};
+   static double d_in_my[6] =
+      {10.37, -4.430E-4, -6.729E-6, +4.674E-9, -1.239E-12, +1.172E-16};
+   static double he_in_my[6] =
+      {12.71, +5.538E-2, -5.557E-5, +2.440E-8, -5.175E-12, +4.274E-16};
+
+/* Check for everything we don't handle */
+   if (z2 != 93 || z1 > 2)  return(-1);         /* We don't handle */
+   if (z1 == 1 && m1 > 2.1) return(-1);         /* really bad anyway */
+   if (z1 == 2 && m1 != 4)  return(-1);
+
+/* Select one of the polynomial sets */
+   if (z1 == 1 && m1 &lt; 1.1) {       /* Hydrogen table */
+      p = d_in_my;
+   } else if (z1 == 1) {            /* Deuterium table */
+      p = d_in_my;
+   } else {                         /* Helium table */
+      p = he_in_my;
+   }
+
+/* Calculate the value */
+   *stop = ((((p[5]*kev + p[4])*kev + p[3])*kev + p[2])*kev + p[1])*kev + p[0];
+
+/* Return that we did indeed calculate */
+   return 0;
+}
+</code></pre>
+
+</p><hr><small>
+Last modified: July 25, 1997
+<address>Michael O. Thompson <a href="mailto:mot1@cornell.edu">(mot1@cornell.edu)</a> </address></small>
+</body>
+</html>

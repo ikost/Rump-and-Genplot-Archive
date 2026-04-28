@@ -1,0 +1,12 @@
+Sim Reset
+Layer 1
+ Thick 151 ITO
+ Composition In 2 O 3 Sn 0.1 /
+Next
+ Thick 10 um
+ Composition O 4 C 14 H 10 /
+Next
+ Thick 50 um
+ Composition O 4 C 14 H 10 /
+Maxpth 200
+Foil disable

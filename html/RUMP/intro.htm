@@ -1,0 +1,245 @@
+<html>
+<head>
+<title> Section P. RUMP - Intro </title>
+</head>
+
+<body>
+<A NAME="top"></A>
+<h2><center>RUMP: Welcome and Introduction </center></h2>
+<hr>
+
+<pre></tt><A HREF="#intro">Introduction</A>
+<A HREF="#relation">Relationship between RUMP and GENPLOT</A>
+<A HREF="#source_code">Source Code and Modifications</A>
+<A HREF="#references">Algorithm and Data References</A>
+<A HREF="#dist_notes">Distribution Notes</A>
+<A HREF="#starting">Starting RUMP</A>
+<A HREF="#initialization">Initialization</A>
+<A HREF="#data_files">RUMP Data Files</A>
+</pre>
+
+<hr>
+<A NAME="intro"></A>
+<p> RUMP version 2.0, an ANSI C based program ported from an earlier FORTRAN
+version, is specifically designed for the analysis and simulation of
+Rutherford Backscattering Spectrometry (RBS) data.  The original FORTRAN code
+was developed at Cornell university in Dr. J.W. Mayer's research group by then
+graduate students L.R. Doolittle and M.O. Thompson with assistance from R.C.
+Cochran.  The development of efficient simulation algorithms and
+semi-automatic search algorithms formed a major part of L.R. Doolittle's
+thesis.  Numerous graduate students and researchers at Cornell and other sites
+have since contributed.  We wish to especially acknowledge Dr. E.J. Kramer's
+group at Cornell for introducing equations to SIM as well as being the impetus
+for the forward scattering support.  Dr. P. Revesz is also acknowledged for
+numerous improvements in both the code and user interface including most
+recently the smoothing algorithms.  Finally, we most gratefully acknowledge
+all of the past and current graduate students at Cornell and users elsewhere
+who have used the program for real analysis and data reduction.  We firmly
+believe that the value of RUMP stems directly from the fact that it is used by
+the same people who are responsible for its development.
+
+<p> The specific meaning of the acronym <acronym>RUMP</acronym> (other than
+the obvious) is a question often raised.  Let us set the record straight; the
+name was invented solely to avoid trademark infringement - the earliest name
+of this package was based on the specific MCA in use at Cornell.  However, for
+those who demand full accounting and explanations, we offer the following
+relatively accurate expansions for term RUMP:
+
+<ul>
+  <li> Rutherford Universal Manipulation Program
+  <li> RBS Universal Master Package
+  <li> RBS for the Upwardly Mobile Professional
+  <li> Rapid Unearthing of Multiple Parameters
+  <li> Random Utility for Making Pictures
+  <li> Rather Unusual Masochistic Package
+  <li> Really Ugly and Mangled Procrastination tool
+  <li> Reasonably United Management Principles
+  <li> Release Unconventional Masters from Prison
+</ul>
+
+<hr>
+<A NAME="relation"></A>
+<h3> Relationship between RUMP and GENPLOT </h3>
+
+<p> RUMP is always distributed with a related package, GENPLOT.  Although
+similar, RUMP is designed specifically for the analysis and simulation of
+Rutherford Backscattering Spectrometry (RBS) data.  GENPLOT is a much more
+general scientific data analysis and plotting package.  Both packages were
+initially written around the same graphics and token processing libraries to
+provide a consistent (but not identical) user interface.  Although they
+diverged in the FORTRAN versions because of memory limitations, they have
+again merged and are closely linked in these versions.
+
+<p> On one level, RUMP and GENPLOT are designed as equivalent software levels
+- both are the upper shell of a kernal data analysis and graphics package.
+Strictly speaking, RUMP is neither a subset of GENPLOT nor is GENPLOT a subset
+of RUMP.  They are equivalent programs utilizing a common set of graphics and
+system support libraries.  Indeed, spectra may be transferred transparently
+from RUMP to GENPLOT (for analysis that is beyond the capabilities or
+imagination of RUMP).  Commands available in either packages can be divided
+into two classes; upper level commands implemented within the main program
+itself and lower level commands implemented in the underlying library.
+<tt>PLOT</tt> is an upper level command and hence operates in a slightly
+different manner in each package.  However, <tt>SCRIPT</tt> and
+<tt>ANNOTE</tt> are support library commands and are identical in both RUMP
+and GENPLOT.  The number of distint commands is relatively small, but it is
+important to bear in mind the differences if working with both packages.
+
+<hr>
+<A NAME="source_code"></A>
+<h3> Source Code and Modifications </h3>
+
+<p> The algorithms and subroutines comprising RUMP version 1.0 (FORTRAN) are
+in the public domain.  However, the specific C code implemented in version 2.0
+remain copyrighted although it is freely available to the scientific
+community.  The code, if not included in your distribution, may be requested
+through CGS.  Modification is permitted as needed, and may be distributed to
+others for use with RUMP as long as the copyright notices are retained.
+Commercial exploitation without the explicit permission of the copyright
+holder, however, is not permitted.  CGS will act as a general repository for
+code corrections and enhancements and will attempt to disseminate
+modifications in an orderly manner.
+
+<hr>
+<A NAME="references"></A>
+<h3> Algorithm and Data References </h3>
+<ol>
+  <li> <i>Algorithms for the Rapid Simulation of Rutherford Backscattering
+       Spectra</i>, L.R. Doolittle, Nucl. Inst. Meth. <b>B9</b>, 344 (1985).
+  <li> <i>A Semiautomatic Algorithm for Rutherford Backscattering Analysis</i>,
+       L.R. Doolittle, Nucl. Inst. Meth. <b>B15</b>, 227 (1986).
+  <li> <i>Empirical Stopping Powers for Ions in Solids</i>, J.F. Ziegler, J.P. 
+       Biersack, and U. Littmark, IBM Research Report RC9250 (1982).
+  <li> <i>Numerical Recipes</i>, Press, Flannery, Teukolsky and Vetterling,
+       (Cambridge University Press, 1986).
+  <li> <i>Backscattering Spectrometry</i>, W.K. Chu, J.W. Mayer and M.-A.
+       Nicolet, (Academic Press, NY, 1978).
+  <li> <i>Ion Beam Handbook for Material Analysis</i>, J.W. Mayer and E. 
+       Rimini, (Academic Press, NY, 1977).
+  <li> L.R. Doolittle, Ph.D Thesis, (Cornell University, Ithaca, NY 1987).
+</ol>
+
+<hr>
+<A NAME="dist_notes"></A>
+<h3> Distribution Notes </h3>
+<ul>
+<li> RUMP stopping power tables are prebuilt for hydrogen, deuterium and helium for energies up to 3.0 MeV.  Outside these energy ranges or for other particles, stopping powers are generated as needed using the Ziegler Universal Stopping Model.  This is known to have problems for high Z particles and corrections are almost certainly necessary.
+<li> Resonances are not handled internally by RUMP since they depend very strongly on the scattering geometry. To include non-Rutherford cross sections, you must
+create a <code>.ADT</code> file as described in the appendix.
+<li> Forward scattering simulations still permits manual entry of cross
+sections.  See commands <tt>XSECT</tt> and <tt>E2COEF</tt>.
+<li> The native format for <code>.RBS</code> files has changed only slightly from the DOS version.  The new format is necessary only for multiple spectra stored in a single data file and is written only when necessary.  This should eliminate the need for any new translation programs.  The file format is described in an appendix.
+</ul>
+
+<hr>
+<A NAME="starting"></A>
+<h3> Starting RUMP </h3>
+
+\syntax{RUMP [ini_file]}{Start RUMP with optional initialization file}
+\syntax{PERT [ini_file]}{Start RUMP and PERT with optional initialization file}
+
+<p>
+RUMP and PERT may be started directly from the <code>.EXE</code> files distributed in
+the <code>RUMP</code> directory.  RUMP and PERT differ only in that RUMP has all
+routines associated with the PERT commands nulled out to save space.  Hence, 
+RUMP is a complete subset of PERT.  Both RUMP and PERT require a full 640 kB
+configuration and will not run if a substantial number of terminate and stay
+resident routines have been loaded (TSR's).  
+
+<p>
+Because of the large memory requirements of RUMP and PERT, they are normally
+executed from the batch files <code>RUMP.BAT</code> or <code>PERT.BAT</code>.  These batch
+files define an environment variable <code>HDATA.CHR</code> which causes only 4
+character sets to be loaded into the graphic plotting routines.  The batch
+files point RUMP initialization to <code>RUMP.INI</code> and PERT initialization to
+<code>PERT.INI</code> or as specified on the calling command line.
+
+
+<hr>
+<A NAME="initialization"></A>
+<h3> Initialization </h3>
+
+<p>
+The default directory for RUMP internal data files and the initialization file
+is <tt>c:\rump</tt>.  RUMP will search for atomic stopping power data files,
+resonance cross section tables and the initialization files in this
+directory if not found elsewhere.  The search order is (1) check for an
+environment variable with the same name as the requested file and use the
+value of the environment variable as the actual filename, (2) check for file
+in the current directory and (3) check for file in the default directory.
+
+<p>
+RUMP automatically loads the <tt>ATOM3.DAT</tt> file during initialization.  This
+file must contain the atomic stoppping power data.  Next, RUMP searches for 
+the default initialization file <tt>RUMP.INI</tt> or the initialization file
+specified on the command line.  If an initialization file is found, it will be
+executed as a macro file after other initialization.  The file is always
+executed with <tt>ECHO OFF</tt>.  Initialization files should configure RUMP with
+the appropriate facility dependent parameters.
+
+<hr>
+<A NAME="data_files"></A>
+<h3> RUMP Data Files </h3>
+
+RUMP requires only a single data file, the atomic stopping power and isotope
+information file.  The stopping power tables are initially loaded from
+<tt>atom3.dat</tt> in the default directory.  These tables, as distributed, are
+configured for alpha particle energies between 0.35 and 3.5 MeV.  See the
+<tt>LOAD</tt> command and the <tt>QSTOPP</tt> and <tt>STOPP</tt> programs for
+generating alternate stopping power tables.  Resonance cross section files are
+also, by default, located in the <tt>c:\rump</tt>} directory and loaded as
+requested by the <tt>LOAD</tt> command.
+
+<p>
+Many other data files are part of the underlying subsystem and are loaded from
+the <tt>c:\genplot</tt> directory.  RUMP only files which are located in 
+<tt>c:\genplot</tt> are include <tt>RUMP_RDR.OVL</tt> and <tt>RUMP_DYN.OVL</tt>.
+These files contain additional executable code for <tt>RUMP.EXE</tt> and <tt>PERT.EXE</tt>. 
+
+<!--
+<h3> VAX Specifics </h3>
+%
+%@@{VAX--RUMP}
+%
+%A filename on the VAX is the title of a clump of information.  In particular,
+%your spectrum with parameters is stored as a file. The name of a file must be
+%<tt>TITLE.EXT</tt>, where <tt>TITLE</tt> is 1--9 characters, letters or numbers.
+%<tt>EXT</tt> is 0--3 characters, letters or numbers. No distinction is made here
+%between upper and lower case letters.  Example: <tt>ALCU1G.RBS</tt> would be a
+%glancing angle RBS spectrum.  RUMP will supply the <tt>.RBS</tt>, but VMS
+%commands do not.
+%
+%The version number of a file is shown by a <tt>;N</tt> at the end of the file
+%name.  You can usually ignore this -- all commands refer to the latest
+%version.  For <tt>DELETE</tt>, however, you must specify which version (use <tt>%;*</tt> for all of them).
+%
+%The wildcard characters for use with <tt>GET</tt> are `*' and `?'.  `*' will
+%match any string of characters, and `?' will match any single character.
+%
+%\hl3{Spawn}
+%
+%Spawn a subprocess to execute VMS commands.
+%
+%<tt>SPAWN</tt> can be particularly useful in editing macro files.  Simply say
+%<tt>spawn~edit~filename</tt>, and when you exit the editor you can <tt>%xeq~filename</tt> to try it out.  This is convenient when you are working on a
+%macro to do some complex plotting.
+%
+%\hl3{Initialization File}
+%
+%RUMP will search for the file <tt>SYS\$LOGIN:RUMP.INI</tt> when it is started up.
+%If found, this file will be run as a macro in <tt>QUIET</tt> mode.
+%%\bye
+%you are working on a
+%macro to do some complex plotting.
+%
+%\hl3{Initialization File}
+%
+%RUMP searches for the file <tt>SYS\$LOGIN:RUMP.INI</tt> when it is started up.
+%If found, this file will be run as a macro in <tt>QUIET</tt> mode.
+-->
+
+</p><hr><small>
+Last modified: November 21, 1996
+<address>Michael O. Thompson <a href="mailto:mot1@cornell.edu">(mot1@cornell.edu)</a> </address></small>
+</body>
+</html>

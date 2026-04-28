@@ -1,0 +1,2275 @@
+<HTML>
+<HEAD>
+<TITLE>RUMP->SIM: Command descriptions</TITLE>
+</HEAD>
+
+<BODY><A NAME="top"></A>
+<H2><CENTER>SIM: Simulation level commands</CENTER></H2>
+<HR>
+
+<!-- Syntax -->
+<center><table columns=3 width=95% border=0><tr>
+    <td VALIGN=TOP><em>Brief:</em></td>
+    <td COLSPAN=2>Enter SIM sub-process</td>
+</tr>
+<tr><td VALIGN=TOP><em>Syntax:</em></td>
+    <td VALIGN=TOP><tt><b>SIM</b></tt></td>
+</tr></table></center>
+
+<!-- @@{Simulations--RUMP}   @@{SIM--RUMP}  @@{RBS Simulations--RUMP} -->
+
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 COLUMNS=2 WIDTH=100%>
+
+<HR>
+<A NAME="discussions"></A>
+<TR>
+  <TD COLSPAN=2 ALIGN=CENTER><STRONG>Discussion Sections</STRONG></TD>
+</TR>
+<TR>
+  <TD align=CENTER><A HREF="#intro"><CODE>Intro</CODE></A></TD>
+  <TD>Introduction to SIM</TD>
+</TR>
+<TR>
+  <TD align=CENTER><A HREF="#editing"><CODE>Editing</CODE></A></TD>
+  <TD>Editing the Sample</TD>
+</TR>
+<TR>
+  <TD align=CENTER><A HREF="#precision"><CODE>Precision</CODE></A></TD>
+  <TD>Trading off Accuracy and Time</TD>
+</TR>
+<TR>
+  <TD align=CENTER><A HREF="#recoil"><CODE>Recoil</CODE></A></TD>
+  <TD>Hydrogen Recoil Spectrum</TD>
+</TR>
+<TR>
+  <TD align=CENTER><A HREF="#changes"><CODE>Changes</CODE></A></TD>
+  <TD>Changes from early versions of SIM</TD>
+</TR>
+
+<!-- ----------------------- -->
+<TR><TD COLSPAN=2><HR></TD></TR>
+<!-- ----------------------- -->
+
+<A NAME="commands"></A>
+<TR>
+  <TD COLSPAN=2 ALIGN=CENTER><STRONG>Basic Simulation Commands</STRONG></TD>
+</TR>
+<TR>
+  <TD align=CENTER><A HREF="#abort"><CODE>ABORT</CODE></A></TD>
+  <TD>Abort back to RUMP (hint: use RETURN instead)</TD>
+</TR>
+<TR>
+  <TD align=CENTER><A HREF="#composition"><CODE>Composition</CODE></A></TD>
+  <TD>Modifies composition of a layer</TD>
+</TR>
+<TR>
+  <TD align=CENTER><A HREF="#equation"><CODE>EQuation</CODE></A></TD>
+  <TD>Specify a impurity distribution equation for layer</TD>
+</TR>
+<TR>
+  <TD align=CENTER><A HREF="#fuzz"><CODE>FUZZ</CODE></A></TD>
+  <TD>Fuzz an interface by summing several similar structures</TD>
+</TR>
+<TR>
+  <TD align=CENTER><A HREF="#get"><CODE>GEt</CODE></A></TD>
+  <TD>Retrieve a sample description from a disk file</TD>
+</TR>
+<TR>
+  <TD align=CENTER><A HREF="#help"><CODE>HElp</CODE></A></TD>
+  <TD>Display the SIM commands</TD>
+</TR>
+<TR>
+  <TD align=CENTER><A HREF="#layer"><CODE>LAyer</CODE></A></TD>
+  <TD>Moves to a specific layer in sample description</TD>
+</TR>
+<TR>
+  <TD align=CENTER><A HREF="#maxpth"><CODE>MAXpth</CODE></A></TD>
+  <TD>Set maximum thickness of internal structure</TD>
+</TR>
+<TR>
+  <TD align=CENTER><A HREF="#next"><CODE>NExt</CODE></A></TD>
+  <TD>Moves to next layer </TD>
+</TR>
+<TR>
+  <TD align=CENTER><A HREF="#open"><CODE>OPen</CODE></A></TD>
+  <TD>Open a new (empty) layer above current layer </TD>
+</TR>
+<TR>
+  <TD align=CENTER><A HREF="#recalculate"><CODE>RECALCulate</CODE></A></TD>
+  <TD>Mark sample structure as modified to force recalculation</TD>
+</TR>
+<TR>
+  <TD align=CENTER><A HREF="#reset"><CODE>RESET</CODE></A></TD>
+  <TD>Reset sample configuration to empty space</TD>
+</TR>
+<TR>
+  <TD align=CENTER><A HREF="#return"><CODE>RETurn</CODE></A></TD>
+  <TD>Returns to RUMP command level</TD>
+</TR>
+<TR>
+  <TD align=CENTER><A HREF="#save"><CODE>SAve</CODE></A></TD>
+  <TD>Put the sample description into a file</TD>
+</TR>
+<TR>
+  <TD align=CENTER><A HREF="#show"><CODE>SHow</CODE></A></TD>
+  <TD>Display state of current sample</TD>
+</TR>
+<TR>
+  <TD align=CENTER><A HREF="#species"><CODE>Species</CODE></A></TD>
+  <TD>Specifies the impurity species for EQUATIONS </TD>
+</TR>
+<TR>
+  <TD align=CENTER><A HREF="#splot"><CODE>SPlot</CODE></A></TD>
+  <TD>Overlay a partial simulation on graph</TD>
+</TR>
+<TR>
+  <TD align=CENTER><A HREF="#sthickness"><CODE>STHickness</CODE></A></TD>
+  <TD>Sets thickness of each sublayer in internal structure</TD>
+</TR>
+<TR>
+  <TD align=CENTER><A HREF="#straggle"><CODE>STRaggle</CODE></A></TD>
+  <TD>Include Bohr straggling in simulations</TD>
+</TR>
+<TR>
+  <TD align=CENTER><A HREF="#sublayer"><CODE>SUblayer</CODE></A></TD>
+  <TD>Specify number of sublayers in internal structure</TD>
+</TR>
+<TR>
+  <TD align=CENTER><A HREF="#thickness"><CODE>THickness</CODE></A></TD>
+  <TD>Sets thickness of current layer</TD>
+</TR>
+
+<A NAME="recoil_commands"></A>
+<!-- ----------------------- -->
+<TR><TD COLSPAN=2><HR></TD></TR>
+<!-- ----------------------- -->
+
+<TR>
+  <TD COLSPAN=2 ALIGN=CENTER><STRONG>Forward scattering specific commands</STRONG></TD>
+</TR>
+<TR>
+  <TD align=CENTER><A HREF="#absorber"><CODE>ABSorber</CODE></A></TD>
+  <TD>Set density and composition of the stopper foil </TD>
+</TR>
+<TR>
+  <TD align=CENTER><A HREF="#e2cof"><CODE>E2Cof</CODE></A></TD>
+  <TD>Set quadratic E<SUP>2</SUP> term in the scattering cross section</TD>
+</TR>
+<TR>
+  <TD align=CENTER><A HREF="#xsect"><CODE>XSEct</CODE></A></TD>
+  <TD>Set the hydrogen recoil cross section</TD>
+</TR>
+
+<A NAME="plotting_commands"></A>
+<!-- ----------------------- -->
+<TR><TD COLSPAN=2><HR></TD></TR>
+<!-- ----------------------- -->
+
+<TR>
+  <TD COLSPAN=2 ALIGN=CENTER><STRONG>RUMP Plotting commands within SIM</STRONG></TD>
+</TR>
+<TR>
+  <TD align=CENTER><A HREF="#compare"><CODE>COMPAre </CODE></A></TD>
+  <TD>Identical to RUMP level command</TD>
+</TR>
+<TR>
+  <TD align=CENTER><A HREF="#overlay"><CODE>OVerlay</CODE></A></TD>
+  <TD>Identical to RUMP level command</TD>
+</TR>
+
+<A NAME="table_commands"></A>
+<!-- ----------------------- -->
+<TR><TD COLSPAN=2><HR></TD></TR>
+<!-- ----------------------- -->
+
+<TR>
+  <TD COLSPAN=2 ALIGN=CENTER><STRONG>Control and modification of internal data tables</STRONG></TD>
+</TR>
+<TR>
+  <TD align=CENTER><A HREF="#density"><CODE>DEnsity</CODE></A></TD>
+  <TD>Displays known thickness units (compounds) and densities</TD>
+</TR>
+<TR>
+  <TD align=CENTER><A HREF="#load"><CODE>LOad</CODE></A></TD>
+  <TD>Read a new stopping power table or resonance table</TD>
+</TR>
+<TR>
+  <TD align=CENTER><A HREF="#scale"><CODE>SCale</CODE></A></TD>
+  <TD>Perform a scaling operation on stopping power tables</TD>
+</TR>
+<TR>
+  <TD align=CENTER><A HREF="#setdensity"><CODE>SEtdensity</CODE></A></TD>
+  <TD>Add a new unit or modify the density table</TD>
+</TR>
+<TR>
+  <TD align=CENTER><A HREF="#pileup"><CODE>PILEup</CODE></A></TD>
+  <TD>Sets algorithm used to simulate pulse pileup</TD>
+</TR>
+<TR>
+  <TD align=CENTER><A HREF="#status"><CODE>STatus</CODE></A></TD>
+  <TD>Status of SIM parameters</TD>
+</TR>
+
+</TABLE>
+
+<!-- Discussion section start -->
+<A NAME="intro"></A>
+<P><HR><FONT SIZE=+2 COLOR="339999"><B>Introduction to SIM</B></FONT>
+
+<!-- @@{SIM--RUMP} -->
+
+<P> 
+Spectral simulation is an extremely powerful tool for understanding
+complex RBS spectra involving overlap of numerous elements or
+compounds.  After defining a theoretical sample structure consisting of
+numerous layers of varying thicknesses, the simulation routines will
+construct the theoretical spectrum corresponding to that sample.  The
+simulations are then generally used in an interative manner to arrive
+at a best set of parameters in the sample structure to fit a given
+sample spectrum.  The related package, <tt><b>PERT</b></tt>, is a
+semi-automated algorithm for performing this optimization.  Used
+properly, <tt><b>SIM</b></tt> can provide reliable estimates for layer
+thickness and compositions on extremely complex samples.  Used
+improperly, it will provide any answer you wish to hear
+(<tt><b>PERT</b></tt> is even better at this).
+
+<P>
+The simulator in <tt><b>RUMP</b></tt> is both accurate and relatively
+fast, allowing complex simulations to be calculated in a few seconds on
+even old PC-AT class microcomputers.  Actual simulation algorithms are
+discussed in the papers listed at the beginning of this section.  The
+accuracy of a simulation is limited primarily by uncertainties in the
+stopping cross sections, non-Rutherford scattering cross sections at
+low and high energies, and failure of Bragg's Law for compounds.  The
+<tt><b>RUMP</b></tt> simulator can compute the spectrum for any laterally uniform
+sample consisting of an arbitrary number of layers containing up to some
+maximum total number of elements (currently 20 - but can be reconfigured
+if anyone shows need for more).  Non-uniform interfaces can be roughly
+simulated by summing several simulations together, each with slightly
+varying layer thicknesses (called <tt><b>FUZZ</b></tt>ing).  Impurities
+and diffusion profiles are simulated by generating relatively fine layers
+with a slowly varying composition in each layer.  There is currently no
+good way to handle grossly non-uniform samples except by simulating each
+component and <tt><b>ADD</b></tt>ing the resulting spectra manually.
+
+<P>
+The <tt><b>SIM</b></tt> command enters a sub-process that is not the
+spectrum simulator, but rather primarily an editor of the theoretical
+sample description table.  Once <tt><b>SIM</b></tt> establishes a
+theoretical sample, computational routines within <tt><b>RUMP</b></tt>
+update the theoretical spectrum as required by, for example,
+<tt><b>PLOT</b></tt> or <tt><b>COPY</b></tt>.  The scattering geometry,
+incident particle, and channel calibration parameters for the
+theoretical spectrum are always taken from the active buffer.  Any
+change of parameters in the active buffer, or a change in the active
+buffer itself, will require a re-computation of the theoretical
+spectrum (done automatically).  The simulation spectrum will also
+attempt to simulate pulse-pileup given a proper detector electronics
+parameters (see <A HREF="#pileup">Pulse-Pileup</A></TD> section).
+
+<P>
+The <tt><b>SIM</b></tt> processor then is used then to define and edit the sample
+description.   SIM is entered with the RUMP command <tt><b>SIM</b></tt>.  The prompt is
+always <tt><b>SIM Command:</b></tt> to distinguish the subprocessor from RUMP (no
+user abuse here).  Once in SIM, commands are read and interpreted as long as
+possible;  RUMP will be returned to automatically on any unknown command (such
+as <tt><b>MEV</b></tt> or <tt><b>REPLOT</b></tt> or mistyping).  SIM includes all of the system
+commands as part of its vocabulary to avoid unnecessary return to RUMP and
+some of the more useful plotting commands.   The <tt><b>RETURN</b></tt> command will
+also exit SIM directly.  Once back in RUMP, it is necessary to execute <tt><b>
+SIM</b></tt> again to re-enter the SIM processor. 
+
+<P>
+The general steps involved in generating a theoretical spectra are (1)
+defining a sample structure using the SIM commands, (2) either loading an
+experimental spectra or setting experimental parameters in the ACTIVE buffer,
+and (3) plotting or overlaying the THEORY buffer.
+
+<P>
+Forward recoil simulations are also handled by the simulation routines, though
+not as transparently as might be desired.  Special commands for dealing with
+the stopper foil and the cross-section for forward recoil are described in
+this section also.
+
+<P>
+Finally, the SIM processor includes, for historical reasons, what might be
+called maintanence commands.  These commands provide for modifying and loading
+internal tables in RUMP, especially tables used in calculating simulation
+spectra.  These commands are treated after complete discussion of the sample
+description commands.
+
+<P>
+Return to <A HREF="#discussions">section level</A> or <A HREF="#top">top level</A> index.
+
+<!-- Discussion section start -->
+<A NAME="editing"></A>
+<P><HR><FONT SIZE=+2 COLOR="339999"><B>Editing the Sample</B></FONT>
+
+<P>
+The commands <tt><b>RESET</b></tt>, <tt><b>RECALC</b></tt>, <tt><b>COMPOSITION</b></tt>, <tt><b>THICKNESS</b></tt>,
+<tt><b>LAYER</b></tt>, <tt><b>NEXT</b></tt>, <tt><b>OPEN</b></tt>, and <tt><b>SHOW</b></tt> are used to describe the
+theoretical matrix sample as a series of layers.  The <tt><b>SPECIES</b></tt> and <tt><b>
+EQUATION</b></tt> commands allow impurity profiles, or varying layer compositions, to
+be included, although in a limited fashion.  <tt><b>FUZZ</b></tt> and <tt><b>STRAGGLE</b></tt>
+provide further realistic degredation of a theoretical spectrum by interface
+roughness and energy loss straggling.  The commands <tt><b>SAVE</b></tt> and <tt><b>GET</b></tt>
+provide for saving and reloading a theoretical sample structure from disk.
+
+<P>
+Understanding the commands <tt><b>MAXPTH</b></tt>, <tt><b>STHICKNESS</b></tt> and <tt><b>SUBLAYER</b></tt>
+require a clear understanding of the sample description tables.  There are
+actually two sample description tables in SIM which must be distinguished.
+The first is the <em>user sample description</em> consisting of a series of
+layers, compositions, thicknesses, equations and species.  This is the table
+that SIM directly edits and it forms the basis of the second table.  The
+second table is an <em>internal sample description</em> and also consists of
+layers with various compositions and thicknesses (but no equations).  Each
+layer in the user description table becomes one or more layers in the internal
+description table.  Varying impurity profiles as defined by the <tt><b>equation</b></tt>
+and <tt><b>species</b></tt> specifications in the user table are translated into a
+series of internal layers, each with a fixed composition and thickness.  The
+collection of these sublayers approximates the desired profile.
+A single layer in the user table may also be translated into several
+sublayers in the internal table if it is too thick to be accurately
+simulated as a single block.  These commands, <tt><b>MAXPTH</b></tt>, <tt><b>STHICKNESS</b></tt>
+and <tt><b>SUBLAYER</b></tt>  control the number and manner in which each single user
+layer is translated into multiple internal layers.  For beginning users, the
+default modes can be used and the distinction between user and internal tables
+can be safely ignored except for <tt><b>EQUATION</b></tt> and <tt><b>SPLOT</b></tt> commands.
+
+<P>
+SIM maintains the description of only a single sample in memory at any time, 
+defined by the layers of uniform composition and thickness.  SIM is currently
+configured to accept up to 100 layers with 20 active elements.  If you exceed
+these limits, consider finding a new analytical technique.
+
+<P>
+Return to <A HREF="#discussions">section level</A> or <A HREF="#top">top level</A> index.
+
+<!-- Discussion section start -->
+<A NAME="precision"></A>
+<P><HR><FONT SIZE=+2 COLOR="339999"><B>Trading off Accuracy and Time</B></FONT>
+
+<P>
+The three commands, <tt><b>MAXPTH</b></tt>, <tt><b>STHICK</b></tt>, and <tt><b>SUBLAYERS</b></tt>
+control the manner in which the user sample description table is translated
+into the internal sample description.  Each of these specifies a different
+criteria for determining the number of sublayers in the internal table.
+Each layer in the user description can have a <tt><b>STHICK</b></tt> or a <tt><b>
+SUBLAYERS</b></tt> value.  If defined, these values will be used with <tt><b>SUBLAYERS</b></tt>
+taking precedence if both are defined.  <tt><b>MAXPTH</b></tt> is the default mode and
+its value is set once for the entire sample structure.
+
+<P>
+More sublayers will give a more accurate simulation at the expense of longer
+calculation time.  The default value for <tt><b>MAXPTH</b></tt> will (in most cases)
+give answers indistinguishable from a <em>perfect</em> simulation.  Since the
+time taken for a simulation has a strong component proportional to the number
+of sublayers squared, overly conservative setting is not recommended (unless,
+of course, you happen to be patient).  <tt><b>SIM</b></tt> is usually configured to
+handle up to 99 sublayers.
+
+<P>
+Numerous sublayers are often required, however, to accurately simulate a
+spectrum.  This is especially true for layers where an <tt><b>EQUATION</b></tt> has
+been defined.  If too few sublayers are used to simulate the varying
+composition layer, important features may be completely missed.  For example,
+to get a proper integral from the <tt><b>GAUSSIAN</b></tt>, there must be at least 10
+layers over across the peak.   Either <tt><b>SUBLAYERS</b></tt> or <tt><b>STHICK</b></tt> should
+be set in the case of equations to ensure at least 5-10 sublayers over the
+region of interest.
+
+<P>
+Return to <A HREF="#discussions">section level</A> or <A HREF="#top">top level</A> index.
+
+<!-- Discussion section start -->
+<A NAME="recoil"></A>
+<P><HR><FONT SIZE=+2 COLOR="339999"><B>Hydrogen Recoil Spectrum</B></FONT>
+
+<P>
+Simulations always check for the possible of a forward recoil particle.  The
+forward recoil can only occur if the detector angles are such that the forward
+scattered particles will be observed.  Unfortunately, there are as yet not
+standard accepted values for the <SUP>1</SUP>H(<FONT FACE="Symbol">a</FONT>,p)<SUP>4</SUP>He and
+<SUP>2</SUP>H(<FONT FACE="Symbol">a</FONT>,d)<SUP>4</SUP>He scattering cross sections.  The three commands <tt><b>
+XSECT</b></tt>, <tt><b>E2COF</b></tt> and <tt><b>ABSORB</b></tt> allow reasonable simulations of forward
+recoil spectroscopy of hydrogen and deuterium.  <tt><b>XSECT</b></tt> and <tt><b>E2COF</b></tt>
+set the cross sections for p and d scattering. <tt><b>ABSORB</b></tt> allows the first
+few layers in the sample structure to be treated as stopper foil on the way
+out only.  The stopper foil is necessary to filter out forward scattered
+<FONT FACE="Symbol">a</FONT> particles before the detector.
+
+
+
+<P>
+Return to <A HREF="#discussions">section level</A> or <A HREF="#top">top level</A> index.
+
+<!-- Discussion section start -->
+<A NAME="changes"></A>
+<P><HR><FONT SIZE=+2 COLOR="339999"><B>Changes from early versions of SIM</B></FONT>
+
+<P>
+SIM at version 3 of RUMP has several new capabilities which are hopefully
+fully documented below.  These capabilities include the ability to describe
+impurity profiles within the sample description through the <tt><b>EQUATION</b></tt> and
+<tt><b>SPECIES</b></tt> commands.  There are new methods of controlling the subdivision
+of the user sample description into an internal description including
+<tt><b>STHICKENSS</b></tt>, <tt><b>MAXPATH</b></tt> and <tt><b>SUBLAYERS</b></tt>.  Using <tt><b>ABSORB</b></tt>,
+<tt><b>XSECT</b></tt>, and <tt><b>E2COF</b></tt> commands, the program can simulate forward recoil
+scattering spectra as well as Rutherford Backscattering. 
+
+<ul>
+<li> Pileup simulation is now significantly enhanced.  Requires setting
+detector electronics time-constant.
+<li> Limitations have been removed in general.
+</ul>
+
+<P><HR>
+
+
+<!-- =======================  Command section start  ====================== -->
+
+<A NAME="reset"></A>
+<P><HR><FONT SIZE=+2 COLOR="339999"><B>Reset</B></FONT>
+
+<!-- Syntax -->
+<center><table columns=3 width=95% border=0><tr>
+    <td VALIGN=TOP><em>Brief:</em></td>
+    <td COLSPAN=2>Blank out simulation sample</td>
+</tr>
+<tr><td VALIGN=TOP><em>Syntax:</em></td>
+    <td VALIGN=TOP><tt><b>RESET</b></tt></td>
+    <td VALIGN=TOP><tt><b>[-RESONANCE]</b></tt></td>
+</tr></table></center>
+
+<!-- @@{RESET--SIM--RUMP} -->
+
+<P>
+The <tt><b>RESET</b></tt> command erases the current sample description table back to
+vacuum.  All equations and fuzz parameters are reset to default values.  This
+command should be executed before starting a new sample description to
+eliminate holdovers from the previous sample.  (Automatic loading <tt><b>.LCM</b></tt>
+files execute this command before loading the description table with new
+values.)  
+
+<P>
+The <tt><b>RESET -RES</b></tt> command serves a second purpose as well.  Executed with
+an option token as here, it also resets the resonance data structures and
+disables any active resonance data sets.  See <tt><b>LOAD</b></tt> for a further
+discussion of resonance tables.
+
+<P>
+Return to <A HREF="#discussions">section level</A> or <A HREF="#top">top level</A> index.
+
+
+
+<!-- =======================  Command section start  ====================== -->
+
+<A NAME="recalculate"></A>
+<P><HR><FONT SIZE=+2 COLOR="339999"><B>Recalculate</B></FONT>
+
+<!-- Syntax -->
+<center><table columns=3 width=95% border=0><tr>
+    <td VALIGN=TOP><em>Brief:</em></td>
+    <td COLSPAN=2>Mark sample structure as modified so recalculated</td>
+</tr>
+<tr><td VALIGN=TOP><em>Syntax:</em></td>
+    <td VALIGN=TOP><tt><b>RECALulate</b></tt></td>
+</tr></table></center>
+
+<!-- @@{RECALCULATE--SIM--RUMP} -->
+
+<P>
+Normally, RUMP keeps track of modifications to the sample structure and notes
+when the theory buffer is out of date because of the sample description or
+parameter changes.  However, it does not track either modifications to the
+buffer itself or sample parameters which are linked to the function evaluator
+(such as <tt><b>BACKGROUND</b></tt> subtract on buffer 0 or the <tt><b>EQUATION USER</b></tt>
+within the sample structure).  The <tt><b>RECALC</b></tt> command simply marks the
+buffer as being out of date so that the next reference to theory buffer will 
+have the simulation recalculated.
+
+<P>
+Return to <A HREF="#commands">section level</A> or <A HREF="#top">top level</A> index.
+
+
+<!-- =======================  Command section start  ====================== -->
+
+<A NAME="show"></A>
+<P><HR><FONT SIZE=+2 COLOR="339999"><B>Show</B></FONT>
+
+<!-- Syntax -->
+<center><table columns=3 width=95% border=0><tr>
+    <td VALIGN=TOP><em>Brief:</em></td>
+    <td COLSPAN=2>Display the current user sample description</td>
+</tr>
+<tr><td VALIGN=TOP><em>Syntax:</em></td>
+    <td VALIGN=TOP><tt><b>SHow</b></tt></td>
+</tr></table></center>
+
+<!-- @@{SHOW--SIM--RUMP} -->
+
+<P>
+<tt><b>SHOW</b></tt> outputs the current user sample description table to the screen. 
+This command should be executed often, especially when first using SIM, to
+make sure the correct layer is being modified and that the desired
+modifications are actually occuring.  In the output, the layer currently being
+modified is specified on the last line.
+
+<P>
+The numbering of layers is not static property.  Layers may be defined with
+zero thickness or the thickness of a layer may be set to zero in SIM, but the
+layer remains in the description table.   However, if the active pointer moves
+away from a layer with zero thickness, you return to RUMP, or if a simulation
+is performed, the zero thickness layer will be deleted.  The numbering of the
+layers will consequently change. As we say in the trade, you have been warned.
+
+<P>
+The following sample <tt><b>SHOW</b></tt> output describes a sample with surface Ni on
+NiSi on a Si substrate.  Layers are number from the surface inward.  The layer
+number, thickness and composition columns are self-explanatory.  The sublayers
+column indicates how the layer will be subdivided into multiple layers in the
+internal sample description.  This first layer will be subdivided into layers
+of 50 \AA each so the gaussian profile is accurately reproduced.  Layers 2
+and 3 are automatically subdivided as the simulation software deems necessary
+for accuracy.  Layer 1 has also been configured with an impurity (diffusiant)
+of Au using the <tt><b>EQUATION</b></tt> and <tt><b>SPECIES</b></tt> commands.  The next line
+describes the type of equation <tt><b>Gaussian</b></tt> and the parameters defined for
+the Gaussian.
+ 
+<P><CENTER><TABLE BORDER=1 CELLPADDING=1 CELLSPACING=2 COLUMNS=1 ROWS=1 WIDTH=90%>
+<TR><TD><PRE><CODE>
+SIM Command: <B>show</B>
+  #    Thickness        Sublayers     Composition  . . .
+  1     550.00 A        50.00 A        Ni   1.000
+                    with diffusant:    Au   1.000
+         GAUSSIAN   0.5000E+02  0.2000E+03  0.1000E+03
+
+  2    3820.00 /cm2        auto        Ni   1.800     Si   1.000
+  3   30000.00 A           auto        Si   1.000
+ You are now working on layer # 2
+SIM Command: 
+</CODE></PRE></TD></TR></TABLE></CENTER>
+
+<P>
+Return to <A HREF="#commands">section level</A> or <A HREF="#top">top level</A> index.
+
+
+<!-- =======================  Command section start  ====================== -->
+
+<A NAME="layer"></A>
+<P><HR><FONT SIZE=+2 COLOR="339999"><B>Layer</B></FONT>
+
+<!-- Syntax -->
+<center><table columns=3 width=95% border=0><tr>
+    <td VALIGN=TOP><em>Brief:</em></td>
+    <td COLSPAN=2>Switch to working on a specific layer</td>
+</tr>
+<tr><td VALIGN=TOP><em>Syntax:</em></td>
+    <td VALIGN=TOP><tt><b>LAyer</b></tt></td>
+    <td VALIGN=TOP><tt><b>&lt;number&gt;</b></tt></td>
+</tr></table></center>
+
+<!-- @@{LAYER--SIM--RUMP} -->
+
+<P>
+The <tt><b>LAYER</b></tt> command switches the internal layer pointer to the specified
+layer.  All subsequent commands act on the active layer.  <tt><b>LAYER</b></tt> will not
+allow selection of a layer that is not currently defined.  There is always one
+blank layer, however, at the bottom of the structure which can be selected.
+The command <tt><b>SHOW</b></tt> is used to determine which layer is currently active.
+
+<P>
+Return to <A HREF="#commands">section level</A> or <A HREF="#top">top level</A> index.
+
+
+<!-- =======================  Command section start  ====================== -->
+
+<A NAME="next"></A>
+<P><HR><FONT SIZE=+2 COLOR="339999"><B>Next</B></FONT>
+
+<!-- Syntax -->
+<center><table columns=3 width=95% border=0><tr>
+    <td VALIGN=TOP><em>Brief:</em></td>
+    <td COLSPAN=2>Moves current layer pointer to next valid layer</td>
+</tr>
+<tr><td VALIGN=TOP><em>Syntax:</em></td>
+    <td VALIGN=TOP><tt><b>NExt</b></tt></td>
+</tr></table></center>
+
+<!-- @@{NEXT--SIM--RUMP} -->
+
+<P>
+The <tt><b>NEXT</b></tt> command increments the internal layer pointer to the next valid
+layer.  If already at the bottom of the sample structure, the active pointer
+does not move.  See also <tt><b>LAYER</b></tt> and <tt><b>SHOW</b></tt>.
+
+<P>
+Return to <A HREF="#commands">section level</A> or <A HREF="#top">top level</A> index.
+
+
+<!-- =======================  Command section start  ====================== -->
+
+<A NAME="open"></A>
+<P><HR><FONT SIZE=+2 COLOR="339999"><B>Open</B></FONT>
+
+<!-- Syntax -->
+<center><table columns=3 width=95% border=0><tr>
+    <td VALIGN=TOP><em>Brief:</em></td>
+    <td COLSPAN=2>Opens up a new (null) layer above current pointer</td>
+</tr>
+<tr><td VALIGN=TOP><em>Syntax:</em></td>
+    <td VALIGN=TOP><tt><b>OPen</b></tt></td>
+</tr></table></center>
+
+<!-- @@{OPEN--SIM--RUMP} -->
+
+<P>
+The <tt><b>OPEN</b></tt> command inserts a null (zero thickness) layer immediately
+above the current layer pointer.  All layers below the opened one are scrolled
+down.  The active layer is left pointing at the new null layer.  Remember, if
+the thickness of the layer is not reset from the default zero value, the layer
+will disappear automatically if the active layer changes, or if a return or
+spectrum simulate occurs.  See also <tt><b>SHOW command</b></tt>.
+
+<P><CENTER><TABLE BORDER=1 CELLPADDING=1 CELLSPACING=2 COLUMNS=1 ROWS=1 WIDTH=90%>
+<TR><TD><PRE><CODE>
+SIM Command: <B>layer 2 open show</B>
+New layer opened up
+ You are now working on a fresh layer # 2
+  #    Thickness        Sublayers     Composition  . . .
+  1     550.00 A       500.00 A        Ni   1.000
+  2       0.00 A           auto
+  3    2650.00 A           auto        Ni   1.800     Si   1.000
+  4   30000.00 A           auto        Si   1.000
+ You are now working on layer # 2
+SIM Command: <B>copy 0 2</B>
+ Layer  2 has been deleted
+Automatic simulation performed
+Beam me up Scottie! <B>/* Automatic return to RUMP for COPY command</B>
+At your service! 
+</CODE></PRE></TD></TR></TABLE></CENTER>
+
+<P>
+Return to <A HREF="#commands">section level</A> or <A HREF="#top">top level</A> index.
+
+
+<!-- =======================  Command section start  ====================== -->
+
+<A NAME="composition"></A>
+<P><HR><FONT SIZE=+2 COLOR="339999"><B>Composition</B></FONT>
+
+<!-- Syntax -->
+<center><table columns=3 width=95% border=0><tr>
+    <td VALIGN=TOP><em>Brief:</em></td>
+    <td COLSPAN=2>Modifies composition of active layer</td>
+</tr>
+<tr><td VALIGN=TOP><em>Syntax:</em></td>
+    <td VALIGN=TOP><tt><b>Composition</b></tt></td>
+    <td VALIGN=TOP><tt><b>&lt;element&gt; &lt;frac&gt; [...] &lt;/&gt;</b></tt></td>
+</tr></table></center>
+
+<!-- @@{COMPOSIT--SIM--RUMP} -->
+
+<P>
+The <tt><b>COMPOSIT</b></tt> command modifies the composition of the current layer.  The
+elements are specified by name (including possibly specific isotopes) and a
+relative fraction.  Elements continue to be added to the composition of the
+layer until a / element is entered (default value).  This signals the end of
+the <tt><b>COMPOSIT</b></tt> command.  If an element given does not currently exist
+in the layer, it is added with the specified fraction.  If it does exist, the
+fraction is replaced with the new value.  Any element with a fraction of zero
+is deleted from the layer.
+
+<P>
+The fraction of an element is relative only to the fraction of the other
+elements in the layer and the total may sum to any value.  A layer with
+<tt><b>Si 1 O 2</b></tt> is identical in composition to a layer with <tt><b>Si .333 O
+.667</b></tt>.  The specified fractions are converted to atomic fractions in the
+calculations since most thickness units are in terms of atomic density.  See
+<tt><b>THICKNESS m/cm2</b></tt> for the exception. 
+
+<P><CENTER><TABLE BORDER=1 CELLPADDING=1 CELLSPACING=2 COLUMNS=1 ROWS=1 WIDTH=90%>
+<TR><TD><PRE><CODE>
+SIM Command: <B>reset layer 1 composition</B>
+Element name (/ to end)? <B>Ni</B>
+Relative amount of element (1)? <B>1</B>
+Element name (/ to end)? <B> </B>
+SIM Command: <B>show</B>
+  #    Thickness        Sublayers     Composition  . . .
+  1       0.00 A           auto        Ni   1.000
+ You are now working on layer # 1
+SIM Command: <B>comp ni 1.8 si 1 / show</B>
+  #    Thickness        Sublayers     Composition  . . .
+  1       0.00 A           auto        Ni   1.800     Si   1.000
+ You are now working on layer # 1
+SIM Command: 
+</CODE></PRE></TD></TR></TABLE></CENTER>
+
+
+<P>
+Return to <A HREF="#commands">section level</A> or <A HREF="#top">top level</A> index.
+
+
+<!-- =======================  Command section start  ====================== -->
+
+<A NAME="thickness"></A>
+<P><HR><FONT SIZE=+2 COLOR="339999"><B>Thickness</B></FONT>
+
+<!-- Syntax -->
+<center><table columns=3 width=95% border=0><tr>
+    <td VALIGN=TOP><em>Brief:</em></td>
+    <td COLSPAN=2>Sets thickness of current layer</td>
+</tr>
+<tr><td VALIGN=TOP><em>Syntax:</em></td>
+    <td VALIGN=TOP><tt><b>THickness</b></tt></td>
+    <td VALIGN=TOP><tt><b>&lt;value&gt; &lt;unit&gt;</b></tt></td>
+</tr></table></center>
+
+<!-- @@{THICKNESS--SIM--RUMP} -->
+
+<P>
+The <tt><b>THICKNESS</b></tt> command specifies the thickness, and the
+units of thickness, for the active layer. The current thickness and units
+are replaced by the new values. A layer can be deleted by specifying a
+zero thickness in any unit and then moving away from the layer by, for
+example, the <tt><b>NEXT</b></tt> command.
+
+<P>
+The magnitude of the thickness is relatively straightforward but the
+units of thickness are littered with pitfalls. The only natural unit for
+RBS is the areal density atoms/cm<SUP>2</SUP>. Distance units, such as
+angstroms or nm, require a conversion to the areal density via an atomic
+density. Unfortunately, no one is eager to work in atoms/cm<SUP>2</SUP>
+so SIM allows the unnatural units of Angstroms (<tt><b>a</b></tt>), nm
+(<tt><b>nm</b></tt>) and <FONT FACE="Symbol">m</FONT>m (<tt><b>um</b></tt>).
+It also permits special compound units such as <tt><b>SIO2</b></tt> and
+<tt><b>GAAS</b></tt>. The conversion factors from thickness to actual areal
+density for these materials is stored in an internal table. The commands
+<tt><b>DENSITY</b></tt> and <tt><b>SETDENS</b></tt> allow access to the
+table to define new units (or correct old ones) as necessary. For example,
+<tt><b>SIO2</b></tt> as a unit is properly calibrated to convert an Ansgrom
+of SiO<SUB>2</SUB> to atoms/cm<SUP>2</SUP>. A thickness of <tt><b>100 SIO2</b></tt>
+for a composition of <tt><b>Si 1 O 2</b></tt> models precisely 100 physical
+angstroms of SiO<SUB>2</SUB>.
+
+<P>
+The natural unit <tt><b>/cm2</b></tt> is always available, though the
+unit is actually 10<SUP>15</SUP> at/cm<SUP>2</SUP>.&nbsp; Since the density
+of Si is 5x10<SUP>22</SUP> at/cm<SUP>2</SUP>, <tt><b>1000 /cm2</b></tt>
+of Si is approximately 200 nm. By popular demand, a second natural unit
+<tt><b>m/cm2</b></tt> now also exists. This is the areal density in molecules/cm<SUP>2</SUP>
+instead of atoms. The <tt><b>m/cm2</b></tt> unit treats the atomic fractions
+defined by the <tt><b>COMPOSITION</b></tt> command as a <I>molecule definition</I>
+and creates the specified number of <I>molecules</I> in the layer. As with
+<tt><b>/cm2</b></tt>, the absolute units are actually 10<SUP>15</SUP> m/cm<SUP>2</SUP>.
+If a layer has a composition of <tt><b>Si 1 O 2</b></tt>, then the thickness
+specifications of <tt><b>1000 m/cm2</b></tt> is equivalent to <tt><b>3000
+/cm2</b></tt>. Given a composition of <tt><b>Si .333 O .667</b></tt>, the
+thickness <tt><b>1000 m/cm2</b></tt> is equivalent to <tt><b>1000 /cm2</b></tt>.
+
+<P>
+The units angstrom, nanometers, and microns are also available.&nbsp;
+These units are converted to areal densities using the weighted average
+of the elemental atomic densities. The following table is a full list of
+units predefined by RUMP (one might get the feeling we work with semiconductors).
+<BR>&nbsp;
+
+<CENTER><TABLE BORDER=3 CELLPADDING=5 COLUMNS=3 WIDTH=95%>
+<TR><TH ALIGN=CENTER>Unit Name</TH>
+    <TH ALIGN=CENTER>Atomic density</TH>
+    <TH ALIGN=CENTER>Description</TH>
+</TR>
+<TR><TD><tt><b>/cm2</b></tt></TD>
+    <TD>10<SUP>15</SUP> at/cm<SUP>2</SUP></TD>
+    <TD>Absolute unit</TD>
+</TR>
+<TR><TD><tt><b>m/cm2</b></tt></TD>
+    <TD>10<SUP>15</SUP> molecules/cm<SUP>2</SUP></TD>
+    <TD>Absolute unit</TD>
+</TR>
+<TR><TD><tt><b>A</b></tt></TD>
+    <TD>composition dependent</TD>
+    <TD>Angstroms</TD>
+</TR>
+<TR><TD><tt><b>nm</b></tt></TD>
+    <TD>composition dependent</TD>
+    <TD>Angstroms</TD>
+</TR>
+<TR><TD><tt><b>ALP</b></tt></TD>
+    <TD>0.5926x10<SUP>23</SUP> at/cm<SUP>2</SUP></TD>
+    <TD>Aluminum Phosphide</TD>
+</TR>
+<TR><TD><tt><b>ALAS</b></tt></TD>
+    <TD>0.4506</TD>
+    <TD>Aluminum Arsenide</TD>
+</TR>
+<TR><TD><tt><b>ALSB</b></tt></TD>
+    <TD>0.3418</TD>
+    <TD>Aluminum Antimonide</TD>
+</TR>
+<TR><TD><tt><b>GAP</b></tt></TD>
+    <TD>0.2942</TD>
+    <TD>Gallium Phosphide</TD>
+</TR>
+<TR><TD><tt><b>GAAS</b></tt></TD>
+    <TD>0.4428</TD>
+    <TD>Gallium Arsenide</TD>
+</TR>
+<TR><TD><tt><b>GASB</b></tt></TD>
+    <TD>0.3536</TD>
+    <TD>Gallium Antimonide</TD>
+</TR>
+<TR><TD><tt><b>INP</b></tt></TD>
+    <TD>0.3956</TD>
+    <TD>Indium Phosphide</TD>
+</TR>
+<TR><TD><tt><b>INAS</b></tt></TD>
+    <TD>0.3594</TD>
+    <TD>Indium Arsenide</TD>
+</TR>
+<TR><TD><tt><b>INSB</b></tt></TD>
+    <TD>0.2942</TD>
+    <TD>Indium Antimonide</TD>
+</TR>
+<TR><TD><tt><b>SIO2</b></tt></TD>
+    <TD>0.660</TD>
+    <TD>Silicon Dioxide</TD>
+</TR>
+<TR><TD><tt><b>SINX</b></tt></TD>
+    <TD>1.036</TD>
+    <TD>Silicon Nitride (generic)</TD>
+</TR>
+</TABLE></CENTER>
+
+<P>
+The following fragment defines a complete sample.  The last layer (substrate)
+is made sufficiently thick that no particles are scattered from the back edge.
+
+<P><CENTER><TABLE BORDER=1 CELLPADDING=1 CELLSPACING=2 COLUMNS=1 ROWS=1 WIDTH=90%>
+<TR><TD><PRE><CODE>
+SIM Command: <B>reset layer 1 comp Ni 1 /</B>
+SIM Command: <B>thick</B>
+Thickness of layer (unchanged)? <B>550</B>
+Unit of thickness (angstroms)? <B>a</B>
+SIM Command: <B>layer 2 comp ni 1.8 si 1 / thick 2650 /cm2</B>
+SIM Command: <B>layer 3 comp si 1 / thick 30000 nm</B>
+SIM Command: <B>show</B>
+  #    Thickness        Sublayers     Composition  . . .
+  1     550.00 A           auto        Ni   1.000
+  2    2650.00 /cm2        auto        Ni   1.800     Si   1.000
+  3   30000.00 nm          auto        Si   1.000
+ You are now working on layer # 3
+SIM Command: <B>plot theory</B>
+</CODE></PRE></TD></TR></TABLE></CENTER>
+
+<P>
+Return to <A HREF="#commands">section level</A> or <A HREF="#top">top level</A> index.
+
+
+<!-- =======================  Command section start  ====================== -->
+
+<A NAME="save"></A>
+<P><HR><FONT SIZE=+2 COLOR="339999"><B>Save</B></FONT>
+
+<!-- Syntax -->
+<center><table columns=3 width=95% border=0><tr>
+    <td VALIGN=TOP><em>Brief:</em></td>
+    <td COLSPAN=2>Saves the current sample description in a disk file</td>
+</tr>
+<tr><td VALIGN=TOP><em>Syntax:</em></td>
+    <td VALIGN=TOP><tt><b>SAve</b></tt></td>
+    <td VALIGN=TOP><tt><b>&lt;filename&gt;</b></tt></td>
+</tr></table></center>
+
+<!-- @@{SAVE--SIM--RUMP} -->
+
+<P>
+The <tt><b>SAVE</b></tt> command will write the entire current user sample description
+in the specified file as a set of macro commands.  A default extension of <tt><b>
+.LCM</b></tt> is used if none is specified.  The file is a pure ASCII collection of
+SIM commands which regenerate the current description.  It can be easily
+edited to modify compositions or thicknesses - or a similar file may be
+automatically generated by other software.  The file may be reloaded from SIM
+using the <tt><b>GET</b></tt> command or from RUMP by <tt><b>XEQ</b></tt>ing the file.
+
+<P>
+Return to <A HREF="#commands">section level</A> or <A HREF="#top">top level</A> index.
+
+
+<!-- =======================  Command section start  ====================== -->
+
+<A NAME="get"></A>
+<P><HR><FONT SIZE=+2 COLOR="339999"><B>Get</B></FONT>
+
+<!-- Syntax -->
+<center><table columns=3 width=95% border=0><tr>
+    <td VALIGN=TOP><em>Brief:</em></td>
+    <td COLSPAN=2>Retrieve a saved sample description</td>
+</tr>
+<tr><td VALIGN=TOP><em>Syntax:</em></td>
+    <td VALIGN=TOP><tt><b>GEt</b></tt></td>
+    <td VALIGN=TOP><tt><b>&lt;file&gt;</b></tt></td>
+</tr></table></center>
+
+<!-- @@{GET--SIM--RUMP} -->
+
+<P>
+A file storing a simulation spectra description, such as generated by the <tt><b>
+SIM SAVE</b></tt> command, can be reloaded using the <tt><b>GET</b></tt> command.  A default
+extension of <tt><b>.LCM</b></tt> is assumed if none is given.  If the file does not
+exist, the current sample description will be retained.  If the file begins
+loading, the current sample description will probably be erased since
+<tt><b>.LCM</b></tt> files normally start with a <tt><b>RESET</b></tt> command.  A <tt><b>SHOW</b></tt>
+command should immediately follow the <tt><b>GET</b></tt> to verify the new structure.
+
+<P>
+Return to <A HREF="#commands">section level</A> or <A HREF="#top">top level</A> index.
+
+
+<!-- =======================  Command section start  ====================== -->
+
+<A NAME="species"></A>
+<P><HR><FONT SIZE=+2 COLOR="339999"><B>Species</B></FONT>
+
+<!-- Syntax -->
+<center><table columns=3 width=95% border=0><tr>
+    <td VALIGN=TOP><em>Brief:</em></td>
+    <td COLSPAN=2>Set composition of impurity</td>
+</tr>
+<tr><td VALIGN=TOP><em>Syntax:</em></td>
+    <td VALIGN=TOP><tt><b>Species</b></tt></td>
+    <td VALIGN=TOP><tt><b>&lt;element&gt; &lt;fraction&gt; [...] &lt;/&gt;</b></tt></td>
+</tr></table></center>
+
+<!-- @@{SPECIES--SIM--RUMP} -->
+
+<P>
+The <tt><b>SPECIES</b></tt> command works in conjunction with the <tt><b>EQUATION</b></tt> command
+to define an impurity distribution or a varying composition within a given
+layer.  The impurities and the equation describing their distribution have
+validity only in the given layer;  they will not extend into adjoining layers
+even if the equation indicates otherwise.  Specification of the impurity
+composition using the <tt><b>SPECIES</b></tt> command is otherwise identical to the
+<tt><b>COMPOSITION</b></tt> command.
+
+<P>
+The concentrations of each element in the species should be considered as part
+of the main layer definition.  In subdividing the user table into the internal
+table, the species composition is multiplied at any depth by a ``mole fraction
+impurity'' obtained from the equation value.  The resulting ``composition''
+is added to the ``mole fraction matrix'' composition of the main layer to
+obtain the sublayer composition.  Hence, coefficients defined in the
+<tt><b>EQUATION</b></tt> command will interact with the compositions given in the
+<tt><b>SPECIES</b></tt> command.  We recommend, for consistency, that the main layer
+fractions and the species layer fractions should individually sum to either
+unity or 100%.  Use the coefficients of the <tt><b>EQUATION</b></tt> to set the
+relative ratio of impurity to host.
+
+<P>
+The composition of the <tt><b>SPECIES</b></tt> layer is listed in the <tt><b>SHOW</b></tt> report.
+
+<P>
+Return to <A HREF="#commands">section level</A> or <A HREF="#top">top level</A> index.
+
+
+
+<!-- =======================  Command section start  ====================== -->
+
+
+<A NAME="equation"></A>
+<P><HR><FONT SIZE=+2 COLOR="339999"><B>Equation</B></FONT>
+
+<!-- Syntax -->
+<center><table columns=3 width=95% border=0><tr>
+    <td VALIGN=TOP><em>Brief:</em></td>
+    <td COLSPAN=2>Specify an equation to describe the impurity in a layer</td>
+</tr>
+<tr><td VALIGN=TOP><em>Syntax:</em></td>
+    <td VALIGN=TOP><tt><b>EQuation</b></tt></td>
+    <td VALIGN=TOP><tt><b>-? | -help</b></tt></td>
+</tr>
+<tr><td></td>
+    <td VALIGN=TOP><tt><b>EQuation</b></tt></td>
+    <td VALIGN=TOP><tt><b>&lt;equation type&gt; &lt;parms&gt;</b></tt></td>
+</tr></table></center>
+
+<!-- @@{EQUATION--SIM--RUMP} -->
+
+<P>
+The <tt><b>EQUATION</b></tt> command works in conjunction with the
+<tt><b>SPECIES</b></tt> declaration to define impurities or varying
+concentrations within a single given layer (does not operate over multiple
+layers even if the equation would continue to be valid).  The
+<tt><b>EQUATION</b></tt> operation defines an atomic fraction relationship
+between the composition of the matrix (layer) and the impurities (species).
+Functionally, the given layer is subdivided into multiple sub-layers with the
+composition varying as per the specified equation.
+
+<P>
+<b>Warning:</b> The equation command has undergone significant changes
+between the DOS version of RUMP and the current version.  Most of these have
+been to rationalize the haphazard coding that resulted from adding commands
+on an <i>immediate need</i> basis (usually a day or two before the conference
+presentation).  The current implementation -- at least for the set of
+equations present when rationalization occured -- is logically consistent.
+Also, equations may now be specified for each layer independently.
+
+<P>
+The first prompt from the <tt><b>EQUATION</b></tt> command requests an
+equation type, which must be one of the following (reflecting the large
+amount of diffusion work done at Cornell):
+
+<br>&nbsp;
+<CENTER><TABLE BORDER=1 COLUMNS=3 WIDTH=95%>
+<TR><TH>Equation Name</TH>
+    <TH>Description</TH>
+    <TH># of Parms</TH>
+</TR>
+<TR><TD><tt><b>NONE</b></tt></TD>
+    <TD>Disable the equation mode for this layer</TD>
+    <TD ALIGN=CENTER>0</TD>
+</TR>
+<TR><TD><tt><b>CONSTANT</b></tt></TD>
+    <TD>Constant fraction impurity in the layer</TD>
+    <TD ALIGN=CENTER>1</TD>
+</TR>
+<TR><TD><tt><b>LINEAR</b></tt></TD>
+    <TD>Linearly varying fraction of species</TD>
+    <TD ALIGN=CENTER>2</TD>
+</TR>
+<TR><TD><tt><b>GAUSSIAN</b></tt></TD>
+    <TD>Gaussian profile from specified peak and FWHM</TD>
+    <TD ALIGN=CENTER>3</TD>
+</TR>
+<TR><TD><tt><b>IMPLANT</b></tt></TD>
+    <TD>Gaussian implant profile from peak and FWHM</TD>
+    <TD ALIGN=CENTER>3</TD>
+</TR>
+<TR><TD><tt><b>EDGEWORTH</b></tt></TD>
+    <TD>Edgeworth implant profile w/ skewness and kurtosis</TD>
+    <TD ALIGN=CENTER>5</TD>
+</TR>
+<TR><TD><tt><b>ERFC</b></tt></TD>
+    <TD>Error function diffusion from a constant surface concentration</TD>
+    <TD ALIGN=CENTER>3</TD>
+</TR>
+<TR><TD><tt><b>ERROR</b></tt></TD>
+    <TD>Error function diffusion from a constant surface concentration</TD>
+    <TD ALIGN=CENTER>3</TD>
+</TR>
+<TR><TD><tt><b>EXPONENTIAL</b></tt></TD>
+    <TD>Diffusion in front of a moving interface (D/v form)</TD>
+    <TD ALIGN=CENTER>3</TD>
+</TR>
+<TR><TD><tt><b>SEMI-INFINITE</b></tt></TD>
+    <TD>Diffusion from a semi-infinite bulk layer</TD>
+    <TD ALIGN=CENTER>4</TD>
+</TR>
+<TR><TD><tt><b>THINFILM</b></tt></TD>
+    <TD>Diffusion from a thin surface layer</TD>
+    <TD ALIGN=CENTER>3</TD>
+</TR>
+<TR><TD><tt><b>BURIEDTHINFILM</b></tt></TD>
+    <TD>Diffusion from a thin buried layer</TD>
+    <TD ALIGN=CENTER>4</TD>
+</TR>
+<TR><TD><tt><b>THICKFILM</b></tt></TD>
+    <TD>Diffusion from a thick surface layer</TD>
+    <TD ALIGN=CENTER>5</TD>
+</TR>
+<TR><TD><tt><b>THICFILM</b></tt></TD>
+    <TD>Same as ThickFilm - maintained for compatibility</TD>
+    <TD ALIGN=CENTER>5</TD>
+</TR>
+<TR><TD><tt><b>TIMEDEPENDENT</b></tt></TD>
+    <TD>Time dependent diffusion for polymers</TD>
+    <TD ALIGN=CENTER>4</TD>
+</TR>
+<TR><TD><tt><b>USEREQN</b></tt></TD>
+    <TD>Arbitrary user equation for profile</TD>
+    <TD ALIGN=CENTER>5</TD>
+</TR>
+</TABLE></CENTER>
+
+<P>
+Equations may be disabled in a layer by specifying <tt><b>EQUATION NONE</b></tt>.
+
+<p>
+<b>Specifying Parameters:</b> 
+
+<p>
+Several parameters, the number dependent on the selected equation, must then
+be specified to fully describe the equation.  For example, the
+<tt><b>GAUSSIAN</b></tt> requests the total integrated area under the peak,
+the centroid position of the peak, and the FWHM of the peak.  The parameters
+required for each equation are specified below, along with the precise
+defining equations.  In general, the following rationalization for parameters
+has been used:
+<ul>
+<li>All parameters can be specified in their natural units - if one exists
+<li> In the absence of some natural unit, a consistent set of units should be
+     use from distances, time, surface coverage, etc.
+<li> Diffusion equations specify the <i>atomic fraction</i> of the diffusing
+     species throughout the layer
+<li> Simulation results should not depend on the number of sublayers used
+     for the segment.  This requires integral forms of the equations to be
+     used when possible.
+<li> Where possible, allow overrides to the default units.
+</ul>
+The default set of units for various common parameters are:
+<ul>
+<li> diffusivity - cm<sup>2</sup>/s
+<li> velocity - cm/s
+<li> time - seconds
+<li> distances - Angstroms (don't like, but not using SI anywhere else so why
+start here)
+<li> dose/thickness - Units can be specified.  Default depends on the
+equation but is either angstroms or 10<sup>15</sup> atoms/cm<sup>2</sup>.
+</ul>
+Internal work in RUMP is always based on thicknesses in atoms/cm<sup>2</sup>,
+with atomic densities used to convert physical distances as needed.  For
+implants and gaussian profiles, the natural unit for total dose atoms/cm^2
+anyway, and only in the thin-film case is there ever an ambiguity.  Since
+most users do not think in atoms/cm^2, while serious workers always do, it
+is necessary to have two different possibility values for the thin film
+thickness.  Since it is required for this one equation, all requests for
+dose or for a thickness that can be interpreted as a dose will accept
+units as well. (See thinfilm for an example.)
+
+<P>
+<b>Coupling of matrix and species:</b> 
+
+<p>
+It is critical at this point to be absolutely clear on how the composition of
+each internal sublayer is determined by the equation, the specie composition,
+and the matrix composition. The composition of the matrix and the species are
+first normlized to 1, and then they are added together using the value from
+the equation command as the atomic fraction of the species composition.  The
+equation is used to determine the atomic fraction used to mix the matrix and
+the species.  The composition of the internal sublayer at the depth x is then
+set to
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<tt><b>composition
+= f(x)*[normalized species] + [1-f(x)]*[normalized matrix]</b></tt>.<br>
+
+<p>
+An example is probably better than more words.  Consider the following:
+<br>&nbsp;
+<CENTER><TABLE BORDER=1 COLUMNS=4 WIDTH=95%>
+<TR><TH>Matrix</TH>
+    <TH>Species</TH>
+    <TH>Constant Eqn</TH>
+    <TH>Calculation</TH>
+    <TH>Equivalent specification</TH>
+</TR>
+<TR><TD ALIGN=CENTER><tt><b>Si 1 O 2</b></tt></TD>
+    <TD ALIGN=CENTER><tt><b>Al 2 O 3</b></tt></TD>
+    <TD ALIGN=CENTER><tt><b>0.3</b></tt></TD>
+    <TD><tt><b>0.7 Si(.33)O(.67) + 0.3 Al(0.4)O(0.6)</b></tt></TD>
+    <TD><tt><b>Si 0.233 Al 0.120 O 0.647</b></tt></TD>
+</TR>
+<TR><TD ALIGN=CENTER><tt><b>Si 75 Ge 25</b></tt></TD>
+    <TD ALIGN=CENTER><tt><b>As 1</b></tt></TD>
+    <TD ALIGN=CENTER><tt><b>0.01</b></tt></TD>
+    <TD><tt><b>0.99 Si(.75)O(.25) + 0.01 As(1.0)</b></tt></TD>
+    <TD><tt><b>Si 0.723 Ge 0.267 As 0.01</b></tt></TD>
+</TR>
+<TR><TD ALIGN=CENTER><tt><b>Si 3 Ge 1</b></tt></TD>
+    <TD ALIGN=CENTER><tt><b>As 100</b></tt></TD>
+    <TD ALIGN=CENTER><tt><b>0.01</b></tt></TD>
+    <TD><tt><b>0.99 Si(.75)O(.25) + 0.01 As(1.0)</b></tt></TD>
+    <TD><tt><b>Si 0.742 Ge 0.248 As 0.01</b></tt></TD>
+</TR>
+</TABLE></CENTER>
+	
+<br>
+The latter two illustrate the reason for shifting to atomic fraction
+summation -- they are really the same problem but would give vastly different
+results if added without normalizing the composition of both the matrix and
+the species.
+
+<p>
+<b>Warning:</b> If you do not understand this discussion, do not proceed
+further. Return to Go and do not collect $200.  Usage of the
+<tt><b>equation</b></tt> command will simply frustrate both of us.
+
+<p><B>Equation Descriptions</B>
+
+<P>
+The descriptions below provide a very brief introduction to the equations,
+specifying their functional form for f(x) and the associated parameters.  If
+you understand their use, it is relatively easy to construct linearly graded
+or diffusional composition gradients.
+
+<p>
+Equations dealing with diffusion profiles are fully discussed in almost any
+elementary diffusion text.  For diffusion, the internal distance from the
+layer surface in user units is multiplied by 10$^{-8}$ to provide the value of
+$x$ in $f(x)$.  Diffusion equations consequently work out correctly if the
+layer thicknesses are specified in \AA and all diffusion parameters refer to
+cm unit.  For other equations, distance is measured in the same units as the
+thickness specified for the layer.  Because of the normalization, units of
+<tt><b>m/cm2</b></tt> are not recommended unless both the species composition and the
+matrix composition sum to the same number of atoms.  Also, if an equation
+layer has a thickness specified in \AA or <tt><b>nm</b></tt>, the areal thickness in
+atoms/cm<SUP>2</SUP> is determined from the composition of the matrix alone.
+
+<P>
+<strong>WARNING:</strong> Distances x in the equations for f(x) below are
+always measured from front edge of the corresponding layer - <em>not</em> the
+true surface. 
+
+<p><tt><b>NONE</b></tt>
+
+<p>Duh ... guess.
+
+<p><tt><b>CONSTANT</b></tt>
+
+<p><tt><b>LINEAR</b></tt>
+
+<p><tt><b>GAUSSIAN</b></tt>
+
+<p><tt><b>IMPLANT</b></tt>
+
+<p><tt><b>EDGEWORTH</b></tt>
+
+<p><tt><b>ERFC</b></tt>
+
+<p><tt><b>ERROR</b></tt>
+
+<p><tt><b>EXPONENTIAL</b></tt>
+
+<p><tt><b>SEMI-INFINITE</b></tt>
+
+<p><tt><b>THINFILM</b></tt>
+
+<p><tt><b>BURIEDTHINFILM</b></tt>
+
+<p><tt><b>THICKFILM</b></tt>
+
+<p><tt><b>THICFILM</b></tt>
+
+<p><tt><b>TIMEDEPENDENT</b></tt>
+
+<p><tt><b>USEREQN</b></tt>
+
+
+<p>
+{\parindent=1in \parskip=0pt
+\item{Description:} Constant impurity concentration.
+         Layer is weighted sum of matrix and specie compositions.
+\item{Equation:} f(x) = p(1)  
+\item{Prompts:} p(1) = Constant concentration:
+}
+
+\def\erfc{{\rm erfc}}
+\hl3{LINEAR}
+
+{\parindent=1in \parskip=0pt
+\item{Description:} Linear distribution from front edge to back edge.  This allows
+              formation of linearly graded layers from a starting to ending
+              concentration.  Full translation from the specie at the surface
+              of the layer to the matrix at the back edge occurs for $p(1)=1$
+              and $p(2)=0$.
+\item{Equation:} $f(x) = p(1) + [p(2)-p(1)] * x/t_{layer}$
+\item{} x measured in same units as $t_{layer}$
+\item{Prompts:} p(1) = Front edge concentration:
+\item{}         p(2) = Back edge concentration:
+}
+
+\hl3{ERFC}
+
+{\parindent=1in \parskip=0pt
+\item{Description:} Error function diffusion profiles.  This equation describes the
+              diffusion of a specie into a thick layer from a source which
+              holds the surface at a fixed concentration.  
+\item{Equation:} $Dt   = p(2)*p(3)$
+\item{} $f(x) = p(1)*\erfc(x/\sqrt{4Dt})$
+\item{} Units for distance x are 10$^{-8}$ times the internal 
+        thickness unit.  See note above.
+\item{Prompts:} p(1) = Initial concentration: 
+\item{}         p(2) = Diffusion constant (cm2/sec)
+\item{}         p(3) = Time (sec)
+}
+
+\hl3{EXPONENT}
+
+{\parindent=1in \parskip=0pt
+\item{Description:} The exponential equation describes the steady state impurity
+              concentration in front of a moving interface with the
+              concentration at the front edge fixed.  This implementation
+              simply provides an exponentially decreasing (or increasing)
+              mole fraction impurity with depth.
+\item{Equation:} $D/v = p(2)/p(3)$
+\item{}          $f(x) = p(1)*\exp[-x/(D/v)]$
+\item{}          Units for distance x are $10^{-8}$ times the internal 
+ thickness unit.  See note above.
+\item{Prompts:} p(1) = Initial concentration
+\item{}         p(2) = Diffusion constant (cm2/sec)
+\item{}         p(3) = Velocity (cm/sec)
+}
+
+\hl3{SEMI-INF}
+
+{\parindent=1in \parskip=0pt
+
+\item{Description:} The semi-infinite equation describes bulk couple diffusion in
+              the limit where the edges of the couples are well beyond
+              $\sqrt{4Dt}$.  The ``center'' of the diffusion couple must be
+              specified.  The front edge of the layer is the matrix side of
+              the diffusion couple and the back edge is the specie side.
+
+\item{Equation:} $Dt = p(2)*p(3)$
+\item{} $\delta x = x-p(4)$
+\item{} $f(x) = p(1) * [1 + \erfc(\delta x / \sqrt{4Dt}) ] / 2$
+\item{} Units for distance x are $10^{-8}$ times the internal 
+                     thickness unit.  See note above.
+
+\item{Prompts:} p(1) = Concentration
+\item{} p(2) = Diffusion constant (cm2/sec)
+\item{} p(3) = Time (sec)
+\item{} p(4) = Location of interface (cm)
+}
+
+\hl3{THINFILM}
+
+{\parindent=1in \parskip=0pt
+
+\item{Description:} Diffusion of a one sided thin layer as a half-gaussian
+              profile.  Given a thin impurity peak on the surface with area
+              p(1), the profile will resemble a one-sided Gaussian in time.
+              Integrated concentration is in units of the film thickness.
+\item{Equation:} $Dt = p(2)*p(3)$
+\item{} $f(x) = p(1) / (2\sqrt{\pi Dt}) * \exp(-x^2/4Dt)$
+\item{} Units for distance x are $10^{-8}$ times the internal 
+                     thickness unit.  See note above.
+\item{Prompts:} p(1) = Surface quantity of solute
+\item{} p(2) = Diffusion constant (cm2/sec)
+\item{} p(3) = Time (sec)
+}
+
+\hl3{THICFILM}
+
+{\parindent=1in \parskip=0pt
+
+\item{Description:} Thick film diffusion equation.  Semi-infinite with reflections.
+              Actually, this equation makes no sense to me right now but this
+              is how it is currently implemented and is included in the
+              documentation for completeness.  Someone should justify/verify
+              it someday.
+
+\item{Equation:} $Dt  = p(3)*p(4)$
+\item{} $k   = \sqrt{4Dt}$
+\item{} $l   = p(5)$
+\item{} $f(x) = p(1) + [p(2)-p(1)]*(\erfc[(l+x)/k]+\erfc[(l-x)/k]) / 2$
+\item{} Units for distance x are $10^{-8}$ times the internal 
+                     thickness unit.  See note above.
+
+\item{Prompts:} p(1) = Surface concentration
+\item{} p(2) = Concentration in substrate
+\item{} p(3) = Diffusion constant (cm2/sec)
+\item{} p(4) = Time (sec)
+\item{} p(5) = Thickness of film (cm)
+}
+
+\hl3{TIMEDEPE}
+
+{\parindent=1in \parskip=0pt
+
+\item{Description:} Kramer special diffusion equations for case II diffusion.  Don't ask.
+
+\item{Equation:} $D   = p(2)$
+\item{} $v   = p(4)$
+\item{} $t   = p(3)$
+\item{} $T   = v^2 t / D$
+\item{} $X   = x / (D/v)$
+\item{} $f(x) = p(1) * (\exp(-X)*\erfc[(X-T)/2T]+\erfc[(X+T)/2T]) / 2$
+\item{} Units for distance x are $10^{-8}$ times the internal 
+                     thickness unit.  See note above.
+
+\item{Prompts:} p(1) = Initial concentration
+\item{} p(2) = Diffusion constant (cm2/sec)
+\item{} p(3) = Time (sec)
+\item{} p(4) = Front velocity (cm/sec)
+}
+
+\hl3{GAUSSIAN}
+
+{\parindent=1in \parskip=0pt
+
+\item{Description:} Gaussian peak impurity distribution.  Recommend /cm2 for layer
+              thickness so can easily set the integrated dose.  Creates a
+              gaussian impurity distribution - must have sufficient
+              sublayers to actually get the total integral correct.
+
+\item{Equation:} $C_0 = 2*\sqrt{\ln(2)/\pi}*p(1)/p(3)$
+\item{} $f(x) = C_0 * \exp(-4*\ln(2)*[x-p(2)]^2/p(3)^2)$
+\item{} x measured in user units from front of this layer
+
+\item{Prompts:} p(1) = Integral of Gaussian (user units)
+\item{} p(2) = Depth of layer (user units)
+\item{} p(3) = FWHM of Gaussian (user units)
+}
+
+\hl3{USER}
+
+{\parindent=1in \parskip=0pt
+
+\item{Description:} User defined function so can be anything.  The current
+              definition of $F(X)$ in the function evaluator will be used.
+              If $F(X)$ is undefined, expect lots of errors and no
+              concentration profile.  <tt><b>EQUATION</b></tt> links the array 
+              corresponding to (p(1) through p(5) as $P$.  If these parameters
+              are used in the definition of $f(x)$, PERT will be able to
+              search for the best fit to parameters in your equation as well.
+              RUMP unfortunately cannot know when you change the parameters or
+              the equation, so the <tt><b>RECALC</b></tt> command must be manually
+              executed to force recalculation of simulations with <tt><b>USER</b></tt>
+              equations.
+
+\item{Equation:} $f(x) = f(x)$
+\item{} x measured in user units from front of this layer
+
+\item{Prompts:} p(1-5) = User set and defined
+
+\item{Example:} <tt><b>sim eq user define f(x)=p(1)+p(2)*x</b></tt>
+\item{} <tt><b>let p(1),p(2)=0.1,0.01</b></tt>
+\item{} <tt><b>recalc plot theory</b></tt>
+\item{} <tt><b>let p(2) = -0.01 recalc ov theory</b></tt>
+}
+
+<P>
+Return to <A HREF="#commands">section level</A> or <A HREF="#top">top level</A> index.
+
+
+<!-- =======================  Command section start  ====================== -->
+
+<A NAME="fuzz"></A>
+<P><HR><FONT SIZE=+2 COLOR="339999"><B>Fuzz</B></FONT>
+
+<!-- Syntax -->
+<center><table columns=3 width=95% border=0><tr>
+    <td VALIGN=TOP><em>Brief:</em></td>
+    <td COLSPAN=2>Roughen the interface between two layers}</td>
+</tr>
+<tr><td VALIGN=TOP><em>Syntax:</em></td>
+    <td VALIGN=TOP><tt><b>FUZZ</b></tt></td>
+    <td VALIGN=TOP><tt><b>&lt;layer&gt; &lt;amount&gt; &lt;iterations&gt; ... &lt;/&gt;</b></tt></td>
+</tr></table></center>
+
+
+<!-- @@{FUZZ--SIM--RUMP} -->
+
+<P>
+Interfaces between layers in the ideal simulation structure are absolutely
+sharp and planar.  In reality, interfaces are slightly fuzzy giving rise
+to the <tt><b>FUZZ</b></tt> command.  <tt><b>FUZZ</b></tt> simulates this lateral non-uniformity
+by simulating and averaging several sample structures, each with a slightly
+different layer thickness.  The computation time for <tt><b>FUZZ</b></tt> obviously
+scales as the number of simulations (iterations).  For each layer to be
+fuzzed, it is necessary to specify the layer number, the average thickness
+deviation of the layer (fuzz amount), and the number of iterations to be
+used.  <tt><b>FUZZ</b></tt> recycles requesting another layer to fuzz until the default
+is given or the maximum number of fuzzed layers is reached.
+
+<P>
+<tt><b>FUZZ</b></tt> erases all previous knowledge of fuzzed layers before it
+requests the layer number.  Thus, fuzzing can be disabled by <tt><b>FUZZ /</b></tt>.
+The current setting of <tt><b>FUZZ</b></tt> can be determined with the <tt><b>STATUS</b></tt>
+command.
+
+<P><CENTER><TABLE BORDER=1 CELLPADDING=1 CELLSPACING=2 COLUMNS=1 ROWS=1 WIDTH=90%>
+<TR><TD><PRE><CODE>
+SIM Command: <B>fuzz</B>
+Layer # to fuzz? (end)  <B>1</B>
+Amount to fuzz this layer? <B>300</B>
+Number of iterations? (3) <B>5</B>
+Layer # to fuzz? (end) <B> </B>
+SIM Command: <B>status</B>
+ Layer # 1 Fuzzed by   300.00 A    in  5 steps
+ Auto-division of layers gives 3000.0 /CM2 maximum sublayer pathlength
+SIM Command: 
+</CODE></PRE></TD></TR></TABLE></CENTER>
+
+
+<P>
+Return to <A HREF="#commands">section level</A> or <A HREF="#top">top level</A> index.
+
+
+<!-- =======================  Command section start  ====================== -->
+
+<A NAME="straggle"></A>
+<P><HR><FONT SIZE=+2 COLOR="339999"><B>Straggle</B></FONT>
+
+<!-- Syntax -->
+<center><table columns=3 width=95% border=0><tr>
+    <td VALIGN=TOP><em>Brief:</em></td>
+    <td COLSPAN=2>Include energy straggling in simulations</td>
+</tr>
+<tr><td VALIGN=TOP><em>Syntax:</em></td>
+    <td VALIGN=TOP><tt><b>STRaggle</b></tt></td>
+    <td VALIGN=TOP><tt><b>&lt;scaling value&gt;</b></tt></td>
+</tr></table></center>
+
+<!-- @@{STRAGGLE--SIM--RUMP} -->
+
+<P>
+Straggling is the gradual increase in the energy spread of a beam as it loses
+energy by electronic and low angle collisions.  It is a statistical broadening
+which occurs because of the discrete nature of the energy loss events.  The
+broadening due to straggling hence scales as the square root of the total path
+length.  Simulation of beam straggling is an optional feature of the
+simulations which adds enormously to the computation time and complexity.  Its
+use is only indicated if you need to accurately fit the back edge of thick
+layers.  
+
+<P>
+Straggling is not understood at the same level as Rutherford cross
+sections or even stopping powers.  RUMP uses the simple Bohr straggling model
+but allows this straggling to be scaled by a user chosen factor.  The <tt><b>
+STRAGGLE</b></tt> command sets this straggling constant.  The default value, zero,
+disables straggling completely.   A value of unity gives the Bohr straggling.
+In general, the straggling computed can be any chosen multiple of the Bohr
+theory values.  The current setting of <tt><b>STRAGG</b></tt> is shown in the 
+<tt><b>STATUS</b></tt> listing.
+
+<P>
+Any non-zero <tt><b>straggle</b></tt> value will issue a warning message abouts its
+molasses like computational nature.
+
+<P><CENTER><TABLE BORDER=1 CELLPADDING=1 CELLSPACING=2 COLUMNS=1 ROWS=1 WIDTH=90%>
+<TR><TD><PRE><CODE>
+SIM Command: <B>straggle</B>
+Straggling constant? (0) <B>2</B>
+WARNING: Straggling is a molasses-like option
+SIM Command: <B>status</B>
+ Straggling computed as  2.00 times the Bohr theory
+ Layer # 1 Fuzzed by   300.00 A    in  5 steps
+ Auto-division of layers gives 3000.0 /CM2 maximum sublayer pathlength
+SIM Command: 
+</CODE></PRE></TD></TR></TABLE></CENTER>
+
+<P>
+Return to <A HREF="#commands">section level</A> or <A HREF="#top">top level</A> index.
+
+
+<!-- =======================  Command section start  ====================== -->
+
+<A NAME="sublayer"></A>
+<P><HR><FONT SIZE=+2 COLOR="339999"><B>Sublayer</B></FONT>
+
+<!-- Syntax -->
+<center><table columns=3 width=95% border=0><tr>
+    <td VALIGN=TOP><em>Brief:</em></td>
+    <td COLSPAN=2>Specify number of sublayers used to simulate the active layer</td>
+</tr>
+<tr><td VALIGN=TOP><em>Syntax:</em></td>
+    <td VALIGN=TOP><tt><b>SUblayer</b></tt></td>
+    <td VALIGN=TOP><tt><b>&lt;nlayers&gt;</b></tt></td>
+</tr></table></center>
+
+<!-- @@{SUBLAYER--SIM--RUMP} -->
+
+<P>
+The highest precedence for determining the number of sublayers to divide a
+single user layer into is the <tt><b>SUBLAYER</b></tt> command.  This setting just
+force specifies the exact number of sublayers to create from the layer.
+If the <tt><b>SUBLAYER</b></tt> value is zero (the default), the setting of either <tt><b>
+STHICK</b></tt> or <tt><b>MAXPTH</b></tt> will be used to determine the number of sublayers.
+If non-zero, the setting of <tt><b>SUBLAYER</b></tt> will be reported in the <tt><b>SHOW</b></tt>
+report for the layer.  See example after <tt><b>MAXPTH</b></tt>.
+
+<P>
+Return to <A HREF="#commands">section level</A> or <A HREF="#top">top level</A> index.
+
+
+<!-- =======================  Command section start  ====================== -->
+
+<A NAME="sthickness"></A>
+<P><HR><FONT SIZE=+2 COLOR="339999"><B>Sthickness</B></FONT>
+
+<!-- Syntax -->
+<center><table columns=3 width=95% border=0><tr>
+    <td VALIGN=TOP><em>Brief:</em></td>
+    <td COLSPAN=2>Specify maximum thickness of a sublayer formed from the active layer</td>
+</tr>
+<tr><td VALIGN=TOP><em>Syntax:</em></td>
+    <td VALIGN=TOP><tt><b>STHickness</b></tt></td>
+    <td VALIGN=TOP><tt><b>&lt;max_thickness&gt; &lt;units&gt;</b></tt></td>
+</tr></table></center>
+
+<!-- @@{STHICKNE--SIM--RUMP} -->
+
+<P>
+If the setting of the <tt><b>SUBLAYER</b></tt> parameter is zero for a layer, the <tt><b>
+STHICK</b></tt> setting is checked next.  If non-zero, the layer is divided into a
+number of sublayers such that no sublayer exceeds the specified thickness.
+This mode is automatically selected for any <tt><b>EQUATION</b></tt> but the value SIM
+chooses may need to be modified.  The units of <tt><b>STHICK</b></tt> do not have to
+be the same as the as the units specified for the layer thickness.  If both
+<tt><b>SUBLAYER</b></tt> and <tt><b>STHICK</b></tt> are zero, the default mode using <tt><b>MAXPTH</b></tt>
+is used to subdivide the layer.
+
+<P>
+Return to <A HREF="#commands">section level</A> or <A HREF="#top">top level</A> index.
+
+
+<!-- =======================  Command section start  ====================== -->
+
+<A NAME="maxpth"></A>
+<P><HR><FONT SIZE=+2 COLOR="339999"><B>Maxpth</B></FONT>
+
+<!-- Syntax -->
+<center><table columns=3 width=95% border=0><tr>
+    <td VALIGN=TOP><em>Brief:</em></td>
+    <td COLSPAN=2>Set maximum size of internal subdivisions</td>
+</tr>
+<tr><td VALIGN=TOP><em>Syntax:</em></td>
+    <td VALIGN=TOP><tt><b>MAXpth</b></tt></td>
+</tr></table></center>
+
+<!-- @@{MAXPTH--SIM--RUMP} -->
+
+<P>
+<tt><b>MAXPTH</b></tt> is the lowest priority method for subdividing a user layer and is
+also the default on simple structures.  The command <tt><b>MAXPTH</b></tt> sets a
+maximum path parameter in units of at/cm<SUP>2</SUP>.  If both <tt><b>SUBLAYERS</b></tt> and
+<tt><b>STHICK</b></tt> are zero, the automatic subdivision mode is enabled.  In
+automatic mode, the layer is broken up such that the beam pathlength through a
+sublayer is less than or equal to <tt><b>MAXPTH</b></tt>.  The default value for <tt><b>
+MAXPTH</b></tt> is 3000 at/cm<SUP>2</SUP> (about 600 nm).  For normal stopping powers and
+cross sections, the value of 3000 at/cm<SUP>2</SUP> produces spectra that are
+essentially indistinguishable from spectra generated with smaller values of
+<tt><b>MAXPTH</b></tt>.  The setting of <tt><b>MAXPTH</b></tt> is listed with the <tt><b>STATUS</b></tt>
+command.
+
+<P>
+The following example illustrates the three sublayer dividing commands.  The
+user description has only three layers.  In the internal description, the
+first 5 sublayers correspond to layer 1, the next 20 to layer 2 and the final
+5 or 6 to layer 3.
+
+<P><CENTER><TABLE BORDER=1 CELLPADDING=1 CELLSPACING=2 COLUMNS=1 ROWS=1 WIDTH=90%>
+<TR><TD><PRE><CODE>
+SIM Command: <B>layer 1 comp si 1 o 2 / thick 5000 a</B>
+SIM Command: <B>layer 2 comp si 1 / thick 2000 /cm2</B>
+SIM Command: <B>layer 3 comp al 2 o 3 / thick 100000 a show</B>
+  #    Thickness        Sublayers     Composition  . . .
+  1    5000.00 A           auto        Si   1.000     O    2.000
+  2    2000.00 /CM2        auto        Si   1.000
+  3  100000.00 A           auto        O    3.000     Al   2.000
+ You are now working on layer # 3
+SIM Command: <B>layer 1 sublayers 5</B>
+SIM Command: <B>layer 2 sthick 100 /cm2</B>
+SIM Command: <B>show</B>
+  #    Thickness        Sublayers     Composition  . . .
+  1    5000.00 A             5         Si   1.000     O    2.000
+  2    2000.00 /CM2    100.00 /CM2     Si   1.000
+  3  100000.00 A           auto        O    3.000     Al   2.000
+ You are now working on layer # 2
+SIM Command: <B>maxpth</B>
+Maximum sublayer path length, in /CM2 ? (2000) <B>1000</B>
+SIM Command: <B>status</B>
+Straggling is not computed
+ Auto-division of layers gives 1000.0 /CM2 maximum sublayer pathlength
+SIM Command: 
+</CODE></PRE></TD></TR></TABLE></CENTER>
+
+<P>
+Return to <A HREF="#commands">section level</A> or <A HREF="#top">top level</A> index.
+
+
+<!-- =======================  Command section start  ====================== -->
+
+<A NAME="density"></A>
+<P><HR><FONT SIZE=+2 COLOR="339999"><B>Density</B></FONT>
+
+<!-- Syntax -->
+<center><table columns=3 width=95% border=0><tr>
+    <td VALIGN=TOP><em>Brief:</em></td>
+    <td COLSPAN=2>Displays specific thickness units or list all available and units and densities</td>
+</tr>
+<tr><td VALIGN=TOP><em>Syntax:</em></td>
+    <td VALIGN=TOP><tt><b>DEnsity</b></tt></td>
+    <td VALIGN=TOP><tt><b>[ <name> | ALL]</b></tt></td>
+</tr></table></center>
+
+<!-- @@{DENSITY--SIM--RUMP} -->
+
+<P>
+The <tt><b>DENSITY</b></tt> queries the internal table used to convert thicknesses
+specified for a layer into the areal density of at/cm<SUP>2</SUP>.  Either a specific
+unit can be listed or the entire list can be listed to the screen.
+<tt><b>DENSITY ALL</b></tt> lists all compounds and densities.  See <tt><b>SETDENS</b></tt> to
+modify the values in this table or to add new entries.
+
+<P><CENTER><TABLE BORDER=1 CELLPADDING=1 CELLSPACING=2 COLUMNS=1 ROWS=1 WIDTH=90%>
+<TR><TD><PRE><CODE>
+SIM Command: <B>density</B>
+Compound name (ALL)? <B>sio2</B>
+ Density of compound: SIO2 is 0.6600 E23 atoms/cm3
+SIM Command: <B>density all</B>
+ Density of compound: ALP  is 0.5926 E23 atoms/cm3
+ .........
+ Density of compound: SIO2 is 0.6600 E23 atoms/cm3
+ Density of compound: SINX is 1.0360 E23 atoms/cm3
+ Density of compound: MOT1 is 0.6600 E23 atoms/cm3
+SIM Command: <B>setdens</B>
+Name of new unit? (4 letters - <CR> aborts) <B>mot1</B>
+Density of compound in units of 1E23 atoms/cm3 (ABORT): <B>0.48</B>
+ Density of compound: MOT1 is 0.4800 E23 atoms/cm3
+SIM Command: <B>setdens sio2 0.66</B>
+WARNING: Unit already in table - will override
+ Density of compound: SIO2 is 0.6600 E23 atoms/cm3
+</CODE></PRE></TD></TR></TABLE></CENTER>
+
+<P>
+Return to <A HREF="#table_commands">section level</A> or <A HREF="#top">top level</A> index.
+
+
+<!-- =======================  Command section start  ====================== -->
+
+<A NAME="setdensity"></A>
+<P><HR><FONT SIZE=+2 COLOR="339999"><B>Setdensity</B></FONT>
+
+<!-- Syntax -->
+<center><table columns=3 width=95% border=0><tr>
+    <td VALIGN=TOP><em>Brief:</em></td>
+    <td COLSPAN=2>Add to or modify the density table</td>
+</tr>
+<tr><td VALIGN=TOP><em>Syntax:</em></td>
+    <td VALIGN=TOP><tt><b>SEtdens</b></tt></td>
+    <td VALIGN=TOP><tt><b>&lt;unit_name&gt; &lt;atomic_density&gt;</b></tt></td>
+</tr></table></center>
+
+<!-- @@{SETDENS--SIM--RUMP} -->
+
+<P>
+The command <tt><b>SETDENS</b></tt> command modifies existing entries in the <tt><b>
+DENSITY</b></tt> table or adds new entries to the table.  If the name specified
+already exists in the table, the atomic density will be overridden by the
+current value.  If it does not exist, the unit will be added to the table.
+Units for atomic density are specified in units of 1x10$^{23}$ at/cm$^3$.
+See <tt><b>THICK</b></tt> for additional discussion of thickness units and see
+<tt><b>DENSITY</b></tt> above for an example use of this command.
+
+<P>
+Return to <A HREF="#table_commands">section level</A> or <A HREF="#top">top level</A> index.
+
+
+<!-- =======================  Command section start  ====================== -->
+
+<A NAME="pileup"></A>
+<P><HR><FONT SIZE=+2 COLOR="339999"><B>Pileup</B></FONT>
+
+<!-- Syntax -->
+<center><table columns=3 width=95% border=0><tr>
+    <td VALIGN=TOP><em>Brief:</em></td>
+    <td COLSPAN=2>Sets method for simulating pulse pileup in the spectrum</td>
+</tr>
+<tr><td VALIGN=TOP><em>Syntax:</em></td>
+    <td VALIGN=TOP><tt><b>PILEUP</b></tt></td>
+    <td VALIGN=TOP><tt><b>[full | DOS | none]</b></tt></td>
+</tr></table></center>
+
+<!-- @@{PILEUP--SIM--RUMP} -->
+
+<P> 
+Pulse pileup exhibits itself as a tail on peaks occuring at energies above
+valid scattering events (more information below).  Is is primarily a problem
+for high current data acquisition with high Z samples (yielding high absolute
+count rates).  The current version of <tt><b>SIM</b></tt> includes a module
+to simulate the pileup occuring in the absence of pileup rejection
+electronics, following the algorithm detailed by Jon Custer in his thesis -
+Cornell Ph.D 1990.  In DOS RUMP, pileup was simulated using a very gross
+algorithm that gave only poor qualitative agreement - but was fast.  
+
+<P>
+For compatibiliy, <tt><b>SIM</b></tt> allows the user to select the module
+used to simulate pulse pileup.  Three options are provided.
+<ul>
+<li> <tt><b>full</b></tt> - full convolution simulation following the
+Custer algorithm.  This is the default mode.  The magnitude of the pileup 
+is proportional to the beam <tt><b>current</b></tt> (in nanoamps) and the
+detector shaping time constant <tt><b>tau</b></tt>.
+<li> <tt><b>DOS</b></tt> - DOS version.  Fast but not terribly accurate.
+Recommended only where compatibility with the DOS simulator is required.
+<li> <tt><b>none</b></tt> - disable pileup simulation completely.
+Recommended for systems with perfect pileup rejection electronics.
+</ul>
+
+<P>
+Pulse pileup arises from the fundamental nature of energy determination in 
+solid-state detectors and the statistical nature of the RBS scattering process.
+A PIN solid-state detector is most commonly used to detect the energy of
+scattered alpha particles in RBS and FRES.  Detector shaping electronics
+convert the current pulse from the detector into a voltage spike which decays
+with a selectable time-constant (usually 1-5 <FONT FACE="Symbol">m</FONT>s).
+The height of this pulse is measured by the MCA and an appropriate histogram
+bin is incremented.
+
+<P>
+Counting rates for RBS are typically sufficiently low that baseline
+correctors are unnecessary.  However, pulse pileup does occur if a
+second alpha particle is arrives at the detector before the shaped voltage
+spike from the first has fully decayed.  In this case, the second pulse adds
+above the baseline of the first and is detected as a higher energy event.
+Some labs incorporate pulse-pileup rejection electronics to catch and
+eliminate most of these events - increasing the data collection time
+appropriately to compensate for the dead period (deadtime correction).
+
+<P>
+In the pileup simulation module, the statistical nature of the scattering
+events - determined by the sample structure and the beam current - is coupled
+to a simple decay of the shaping electronics - specified by the electronics
+time-constant <tt><b>tau</b></tt>.  The convolution would have been
+unacceptable in the days of 286 machines, but is sufficiently fast on
+modern computers to be of little consequence.
+
+<P>
+<b>Pileup Rejection:</b> I have not carefully studied simulations of high Z
+samples on RBS data acquired using state of the art pileup rejections
+systems.  The best recommendation at this time is to disable the pileup
+calculations by setting a shaping time-constant that is negative, or
+disabling directly using the <tt><b>PILEUP NONE</b></tt> command.
+
+<P>
+Return to <A HREF="#table_commands">section level</A> or <A HREF="#top">top level</A> index.
+
+
+
+<!-- =======================  Command section start  ====================== -->
+
+<A NAME="splot"></A>
+<P><HR><FONT SIZE=+2 COLOR="339999"><B>Splot</B></FONT>
+
+<!-- Syntax -->
+<center><table columns=3 width=95% border=0><tr>
+    <td VALIGN=TOP><em>Brief:</em></td>
+    <td COLSPAN=2>Overlay a partial simulation on graph</td>
+</tr>
+<tr><td VALIGN=TOP><em>Syntax:</em></td>
+    <td VALIGN=TOP><tt><b>SPlot</b></tt></td>
+    <td VALIGN=TOP><tt><b>[&lt;element&gt; | &lt;sub_layer&gt;]</b></tt></td>
+</tr></table></center>
+
+<!-- @@{SPLOT--SIM--RUMP} -->
+
+<P>
+The command <tt><b>SPLOT</b></tt> (short for selective plot) will overlay a partial
+simulation on your graph.  The partial simulation is either the component of
+the spectrum which results from scattering by a given element in all of the
+layers, or the spectrum resulting from a single sublayer of the sample
+description.  <tt><b>SPLOT <element></b></tt> is the most useful format and allows you
+to view the components of a spectrum arising from a given element.  This is
+especially useful to gain an intuitive feeling for complex overlapping
+spectra.  
+
+<P>
+It is not possible to get a <tt><b>SPLOT</b></tt> spectrum from a single layer in the
+user description table unless it happens to corrspond to a single layer in the
+internal description table.  Note also that the numbering of the sublayers is
+related to, but does not correspond to, the numbering of the user layers.  See
+the example under <tt><b>MAXPTH</b></tt>.
+
+<P>
+The partial spectrum created by <tt><b>SPLOT</b></tt> is stored in the temporary buffer.
+It is possible to move this temporary spectrum to a real buffer using the move
+command <tt><b>MOVE -1 2</b></tt>.
+
+<P>
+Return to <A HREF="#commands">section level</A> or <A HREF="#top">top level</A> index.
+
+
+<!-- =======================  Command section start  ====================== -->
+
+<A NAME="xsect"></A>
+<P><HR><FONT SIZE=+2 COLOR="339999"><B>Xsect</B></FONT>
+
+<!-- Syntax -->
+<center><table columns=3 width=95% border=0><tr>
+    <td VALIGN=TOP><em>Brief:</em></td>
+    <td COLSPAN=2>Set scattering cross sections for P and D forward recoils</td>
+</tr>
+<tr><td VALIGN=TOP><em>Syntax:</em></td>
+    <td VALIGN=TOP><tt><b>XSECt</b></tt></td>
+    <td VALIGN=TOP><tt><b>&lt;P cross_section&gt; &lt;D cross_section&gt;</b></tt></td>
+</tr></table></center>
+
+<!-- @@{XSECT--SIM--RUMP} -->
+
+<P>
+The <tt><b>XSECT</b></tt> command sets the forward recoil scattering cross sections at
+the geometry energy of interest.  The values specified in <tt><b>XSECT</b></tt> are
+constants independent of energy and angle.  See <tt><b>E2COEFF</b></tt> to add a
+quadratic term to the cross sections.  The cross section must be specified in
+the rather peculiar internal units of RUMP,
+counts/$\mu$C/msr/10$^{15}$at/cm<SUP>2</SUP>.  Fortunately, we have figured out the
+conversion and a <tt><b>XSECT</b></tt> value of 1.0 is equal to 0.1602 barns.  The
+initial values for both cross sections are undefined at startup and must be
+reset before any forward recoil particles can be observed.
+
+<P>
+Return to <A HREF="#recoil_commands">section level</A> or <A HREF="#top">top level</A> index.
+
+
+<!-- =======================  Command section start  ====================== -->
+
+<A NAME="e2cof"></A>
+<P><HR><FONT SIZE=+2 COLOR="339999"><B>E2Cof</B></FONT>
+
+<!-- Syntax -->
+<center><table columns=3 width=95% border=0><tr>
+    <td VALIGN=TOP><em>Brief:</em></td>
+    <td COLSPAN=2>Set E<SUP>2</SUP> term in cross sections for P and D forward recoils</td>
+</tr>
+<tr><td VALIGN=TOP><em>Syntax:</em></td>
+    <td VALIGN=TOP><tt><b>E2Cof</b></tt></td>
+    <td VALIGN=TOP><tt><b>&lt;P cross_section&gt; &lt;D cross_section&gt;</b></tt></td>
+</tr></table></center>
+
+<!-- @@{E2COF--SIM--RUMP} -->
+
+<P>
+The <tt><b>E2COF</b></tt> command works in conjunction with the <tt><b>XSECT</b></tt> command to 
+set the cross sections for forward recoil scattering.  The coefficients set by
+<tt><b>E2COF</b></tt> give the E$^{-2}$ energy dependence of the cross section.  The
+units are the same as for <tt><b>XSECT</b></tt> with the energy measured in MeV.
+The <tt><b>E2COF</b></tt> coefficients are initially undefined.  The total cross section
+is determined by 
+
+$$ {{d\sigma} \over {d\Omega}} = <tt><b>XSECT</b></tt> +{ <tt><b>E2COF</b></tt> \over {E^2}} $$
+
+<P>
+Return to <A HREF="#recoil_commands">section level</A> or <A HREF="#top">top level</A> index.
+
+
+<!-- =======================  Command section start  ====================== -->
+
+<A NAME="absorber"></A>
+<P><HR><FONT SIZE=+2 COLOR="339999"><B>Absorber</B></FONT>
+
+<!-- Syntax -->
+<center><table columns=3 width=95% border=0><tr>
+    <td VALIGN=TOP><em>Brief:</em></td>
+    <td COLSPAN=2>Set number of layers comprising the stopping foil for forward scattering</td>
+</tr>
+<tr><td VALIGN=TOP><em>Syntax:</em></td>
+    <td VALIGN=TOP><tt><b>ABSorber</b></tt></td>
+    <td VALIGN=TOP><tt><b>&lt;# of layers&gt;</b></tt></td>
+</tr></table></center>
+
+<!-- @@{ABSORBER--SIM--RUMP} -->
+
+<P>
+The stopper foil used to filter out <FONT FACE="Symbol">a</FONT> particles from the forward
+scattered beam and hence detect only protons has a substantial effect on the
+energy of the protons and deuterons.  The absorber is treated by allocating
+the upper few layers of the sample as descriptors of the absorber foil.  The
+<tt><b>ABSORBER</b></tt> command specifies the number of layers comprising this stopper
+foil.  During simulation, particles see these layers only on their exit
+paths but not the entrance path.  The number of <tt><b>ABSORBER</b></tt> layers is
+listed with the <tt><b>STATUS</b></tt> command.
+
+<P><CENTER><TABLE BORDER=1 CELLPADDING=1 CELLSPACING=2 COLUMNS=1 ROWS=1 WIDTH=90%>
+<TR><TD><PRE><CODE>
+SIM Command: <B>xsect</B>
+Old values are:    1H=   0.000000E+00   2H=   0.000000E+00
+New 1H value? (unchanged) <B>4.22</B>
+New 2H value? (unchanged) <B>2.84</B>
+SIM Command: <B>e2cof</B>
+Coeff 1/E^2 are:   1H=   0.000000E+00   2H=   0.000000E+00
+New 1H coeff value? (unchanged) <B>.72 .63</B>
+SIM Command: <B>absorb</B>
+# of layers in absorber foil? (0) <B>1</B>
+SIM Command: <B>layer 1 comp c 1 h 2 o .5 / thick 10000 /cm2</B>
+SIM Command: <B>show</B>
+  #    Thickness     Sublayers   Composition  . . .
+  1   10000.00 /CM2     auto      C  1.00   H  2.00   O  0.50
+ You are now working on layer # 1
+SIM Command: <B>status</B>
+Straggling is not computed
+ Auto-division of layers gives 3000.0 /CM2 maximum sublayer pathlength
+ First  1 layers comprise absorber foil
+SIM Command: 
+</CODE></PRE></TD></TR></TABLE></CENTER>
+
+<P>
+Return to <A HREF="#recoil_commands">section level</A> or <A HREF="#top">top level</A> index.
+
+
+<!-- =======================  Command section start  ====================== -->
+
+<A NAME="load"></A>
+<P><HR><FONT SIZE=+2 COLOR="339999"><B>Load</B></FONT>
+
+<!-- Syntax -->
+<center><table columns=3 width=95% border=0><tr>
+    <td VALIGN=TOP><em>Brief:</em></td>
+    <td COLSPAN=2>Read a stopping power or resonance data table</td>
+</tr>
+<tr><td VALIGN=TOP><em>Syntax:</em></td>
+    <td VALIGN=TOP><tt><b>LOad</b></tt></td>
+    <td VALIGN=TOP><tt><b>&lt;filename&gt;</b></tt></td>
+</tr></table></center>
+
+<!-- @@{LOAD--SIM--RUMP} -->
+
+<P>
+The default data tables shipped with RUMP are configured for incident energies
+below 3.5 MeV.  The stopping powers are a fit to Ziegler et al.  curves in the
+range of 0.35 to 3.5 MeV and fail miserably above this range.  The <tt><b>LOAD</b></tt>
+command allows alternate data tables to be loaded to provide higher energy
+stopping powers.  The alternate tables may be generated with the programs <tt><b>
+QSTOPP</b></tt> or <tt><b>STOPP</b></tt>.  
+
+<P>
+When RUMP initiates, the stopping powers and atomic data tables are read from
+the file <tt><b>ATOM3.DAT</b></tt> by calling <tt><b>LOAD</b></tt>.   The default directory for
+data tables is <tt><b>c:\rump</b></tt>.   <tt><b>ATOM3.DAT</b></tt> contains the data tables for
+incident energies up to 3.0 MeV.  The distribution file <tt><b>HIGH_E.DAT</b></tt> file
+contains stopping powers up to 5.5 MeV.  To automatically load this file,
+either add the command <tt><b>SIM LOAD HIGH_E.DAT</b></tt> to your <tt><b>RUMP.INI</b></tt> file
+or rename <tt><b>HIGH_E.DAT</b></tt> to <tt><b>ATOM3.DAT</b></tt>.
+
+<P>
+The <tt><b>LOAD</b></tt> command will override and replace all tables with the new
+values.  If any element stopping power have been scaled through <tt><b>SCALE</b></tt>,
+that scaling factor will be lost.
+
+<P>
+The <tt><b>LOAD</b></tt> command is also used to load in resonance scattering cross
+sections.  Once a resonance data file has been loaded, RUMP will check for the
+occurrence of a resonance at each scattering energy and deal correctly with
+the cross section. <strong>Note:</strong> Only the simulation spectra will utilize the
+non-Rutherford scattering cross sections; analytic routines will continue to
+use only the Rutherford values.  The convention is to give resonance data
+files an <tt><b>.ADT</b></tt> extension (close to DAT but not quite).
+
+<P>
+The status of the resonance buffer is listed by the <tt><b>STATUS</b></tt> command.
+Resonances are described by a piecewise linear function.  The non-smoothness
+of this description is completely swamped by convolution with any detector
+resolution.  The program <tt><b>RES5</b></tt> allows computation of resonance data files
+based on nuclear models, or by fitting to experimentally obtained data.  Two
+default tables are provided, <tt><b>OXY.ADT</b></tt> and <tt><b>CAR.ADT</b></tt> covering the low
+MeV resonances of oxygen and carbon respectively.
+
+<P>
+Return to <A HREF="#table_commands">section level</A> or <A HREF="#top">top level</A> index.
+
+
+<!-- =======================  Command section start  ====================== -->
+
+<A NAME="scale"></A>
+<P><HR><FONT SIZE=+2 COLOR="339999"><B>Scale</B></FONT>
+
+<!-- Syntax -->
+<center><table columns=3 width=95% border=0><tr>
+    <td VALIGN=TOP><em>Brief:</em></td>
+    <td COLSPAN=2>Perform a scaling operation on an elements stopping power</td>
+</tr>
+<tr><td VALIGN=TOP><em>Syntax:</em></td>
+    <td VALIGN=TOP><tt><b>SCale</b></tt></td>
+    <td VALIGN=TOP><tt><b>&lt;element&gt; &lt;new scaling&gt;</b></tt></td>
+</tr></table></center>
+
+<!-- @@{SCALE--SIM--RUMP} -->
+
+<P>
+Stopping power cross sections are only known to within 10% at best.  There
+are several elements where the cross sections are clearly in error since the
+spectrum height of the pure element cannot be simulated properly.  Rather than
+try to modify the tables, the command <tt><b>SCALE</b></tt> is provided to allow for
+user modification of the stopping power tables on a per element and per
+session basis.  This command scales the stopping power of any element by a
+constant factor over the entire energy range.  The effects of the command are
+only temporary and are lost when RUMP is quit, or if a new data table is
+loaded using <tt><b>LOAD</b></tt>.  It is not possible, with <tt><b>SCALE</b></tt> to modify the
+energy dependence of the stopping power.  The program <tt><b>STOPP</b></tt> is provided
+to build up a new set of stopping power tables if such accuracy is warranted
+or desired.
+
+<P>
+<tt><b>SCALE</b></tt>ing of an element affects both the simulation spectra and the
+analytic routines such as <tt><b>WIDTH_TH</b></tt> and <tt><b>MATRIX</b></tt>.  The settings of
+any scaled element can be determined with the <tt><b>STATUS</b></tt> command.
+
+<P>
+<strong>WARNING:</strong> All scaling factors are lost on any <tt><b>LOAD</b></tt> command,
+including <tt><b>LOADS</b></tt> of additional resonance files.  Be sure all resonances
+are loaded before scaling the stopping powers in a <tt><b>RUMP.INI</b></tt> file.
+
+<P>
+Return to <A HREF="#table_commands">section level</A> or <A HREF="#top">top level</A> index.
+
+
+<!-- =======================  Command section start  ====================== -->
+
+<A NAME="status"></A>
+<P><HR><FONT SIZE=+2 COLOR="339999"><B>Status</B></FONT>
+
+<!-- Syntax -->
+<center><table columns=3 width=95% border=0><tr>
+    <td VALIGN=TOP><em>Brief:</em></td>
+    <td COLSPAN=2>Status of <tt><b>SIM</b></tt> parameters</td>
+</tr>
+<tr><td VALIGN=TOP><em>Syntax:</em></td>
+    <td VALIGN=TOP><tt><b>STatus</b></tt></td>
+</tr></table></center>
+
+<!-- @@{STATUS--SIM--RUMP} -->
+
+<P>
+The <tt><b>STATUS</b></tt> command lists a collection of parameters from throughout
+the SIM package.  Included in the list are
+
+<ul>
+  <li> Straggling status (either not computed or current factor)
+  <li> List of elements with a scaled stopping power
+  <li> List of layers which are fuzzed and the fuzz parameters
+  <li> Maxpath variable setting
+  <li> Number of absorber layers in the sample structure
+  <li> Status of the resonance processor
+</ul>
+
+<P><CENTER><TABLE BORDER=1 CELLPADDING=1 CELLSPACING=2 COLUMNS=1 ROWS=1 WIDTH=90%>
+<TR><TD><PRE><CODE>
+SIM Command: <B>load high_e.dat</B>
+SIM Command: <B>load oxy.adt</B>
+Original Cameron (1953) oxygen-16 data, 2-4 MeV
+Resonance data:  z1=2  m1=4.00  z2=8  m2=16.00  phi=10.0
+SIM Command: <B>matrix si</B>
+ Si expected at  1.696 MeV ( 342.3) and height    9.052
+Feed me! <B>sim scale</B>
+Scale stopping power of which element? (abort) <B>si</B>
+ Stopping power of SI is currently scaled by 1.000
+New scale factor? (unchanged) <B>1.3</B>
+SIM Command: <B>matrix si</B>
+ Si expected at  1.696 MeV ( 342.3) and height    6.963
+Up periscope! <B>sim status</B>
+Straggling is not computed
+ Stopping power of SI is scaled by 1.300
+ Auto-division of layers gives 3000.0 /CM2 maximum sublayer pathlength
+            ---  Resonance Data Tables  ---
+  Z1   M1        Z2   M2        phi      Emin    Emax   # points
+   2   4.0        8  16.0      10.0      2.00    4.00     72
+  926 points free
+SIM Command: 
+</CODE></PRE></TD></TR></TABLE></CENTER>
+
+<P>
+Return to <A HREF="#table_commands">section level</A> or <A HREF="#top">top level</A> index.
+
+
+<!-- =======================  Command section start  ====================== -->
+
+<A NAME="help"></A>
+<P><HR><FONT SIZE=+2 COLOR="339999"><B>Help</B></FONT>
+
+<!-- Syntax -->
+<center><table columns=3 width=95% border=0><tr>
+    <td VALIGN=TOP><em>Brief:</em></td>
+    <td COLSPAN=2>Outputs the command list to screen</td>
+</tr>
+<tr><td VALIGN=TOP><em>Syntax:</em></td>
+    <td VALIGN=TOP><tt><b>HELP or ?</b></tt></td>
+</tr></table></center>
+
+<P>
+The <tt><b>HELP</b></tt> command lists to the screen all commands recognized by the
+SIM subprocessor.  The list will include commands implemented by the libraries
+as well as commands implemented by SIM.  The characters shown in uppercase are
+the minimum abbreviation recognized for that command.
+
+<P>
+Return to <A HREF="#commands">section level</A> or <A HREF="#top">top level</A> index.
+
+
+<!-- =======================  Command section start  ====================== -->
+
+<A NAME="overlay"></A>
+<P><HR><FONT SIZE=+2 COLOR="339999"><B>Overlay</B></FONT>
+
+<!-- Syntax -->
+<center><table columns=3 width=95% border=0><tr>
+    <td VALIGN=TOP><em>Brief:</em></td>
+    <td COLSPAN=2>Overlay specified spectrum on graph</td>
+</tr>
+<tr><td VALIGN=TOP><em>Syntax:</em></td>
+    <td VALIGN=TOP><tt><b>OVerlay</b></tt></td>
+</tr></table></center>
+
+<!-- @@{OVERLAY--SIM--RUMP} -->
+
+<P>
+The <tt><b>RUMP OVERLAY</b></tt> command is so often used in SIM to compare the theory
+spectrum with the current plot that it has a synonym within SIM.  The
+commmands are identical in both.
+
+<P>
+Return to <A HREF="#plotting_commands">section level</A> or <A HREF="#top">top level</A> index.
+
+
+<!-- =======================  Command section start  ====================== -->
+
+<A NAME="compare"></A>
+<P><HR><FONT SIZE=+2 COLOR="339999"><B>Compare</B></FONT>
+
+<!-- Syntax -->
+<center><table columns=3 width=95% border=0><tr>
+    <td VALIGN=TOP><em>Brief:</em></td>
+    <td COLSPAN=2>Plot active spectrum and overlay simulation</td>
+</tr>
+<tr><td VALIGN=TOP><em>Syntax:</em></td>
+    <td VALIGN=TOP><tt><b>COMPAre</b></tt></td>
+</tr></table></center>
+
+<!-- @@{COMPARE--SIM--RUMP} -->
+
+<P>
+The <tt><b>RUMP COMPARE</b></tt> command is so often used in SIM to compare the theory
+spectrum with the active buffer that it has a synonym within SIM.  The
+commmands are identical in both.
+
+<P>
+Return to <A HREF="#plotting_commands">section level</A> or <A HREF="#top">top level</A> index.
+
+
+<!-- =======================  Command section start  ====================== -->
+
+<A NAME="return"></A>
+<A NAME="abort"></A>
+<P><HR><FONT SIZE=+2 COLOR="339999"><B>Return and/or Abort</B></FONT>
+
+<!-- Syntax -->
+<center><table columns=3 width=95% border=0><tr>
+    <td VALIGN=TOP><em>Brief:</em></td>
+    <td COLSPAN=2>Return from SIM to RUMP, or abort from SIM immediately</td>
+</tr>
+<tr><td VALIGN=TOP ROWSPAN=2><em>Syntax:</em></td>
+    <td VALIGN=TOP><tt><b>ABORT</b></tt></td>
+</tr>
+<tr><td VALIGN=TOP><tt><b>RETURN</b></tt></td>
+</tr></table></center>
+
+<!-- @@{ABORT--SIM--RUMP} -->
+<!-- @@{RETURN--SIM--RUMP} -->
+
+<P>
+Both <tt><b>RETURN</b></tt> and <tt><b>ABORT</b></tt> leave the SIM processor and return to RUMP.
+Before exiting, <tt><b>RETURN</b></tt> checks the status of the current layer to
+determine its validity and deletes the layer if it has zero thickness.  It
+then fills in the {IDENT} of the simulation buffer with a <i>quasi</i>-name
+based on the sample configuration and returns to RUMP.  The command
+<tt><b>ABORT</b></tt> bypasses these two steps and returns immediately to RUMP.
+
+<P>
+Return to <A HREF="#commands">section level</A> or <A HREF="#top">top level</A> index.
+
+
+</p><hr><small>
+Last modified: December 5, 1998
+<address>Michael O. Thompson <a href="mailto:mot1@cornell.edu">(mot1@cornell.edu)</a> </address></small>
+</body>
+</html>

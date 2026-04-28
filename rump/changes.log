@@ -1,0 +1,1087 @@
+RUMP Enhancements Log File
+
+<News>
+<item> Use of the Ziegler2005 stopping powers has been simplified.
+<item> Limits on the number of layers is removed.
+</News>
+
+This file is to contain changes, enhancements, and now fixes to the RUMP
+code from the earlier FORTRAN version.  Specifically, it should document
+all known differences between results.  As of 1/1/94, the basic functions
+of the DOS version were completely transferred.  Changes now are
+enhancements over the DOS version.
+
+MOT - 7/2010
+    Modified resonance code to read default R33 format files from the ibandl
+    web site.  www-nds.iaea.org/ibandl is now recommended as the default
+    source for all resonance files.  SIM STATUS also now lists the reaction
+    in conventional format - 16O(a,a)16O
+
+MOT - Wow - haven't documented anything for 3 years!
+
+MOT - 5/21/2007 Minor fix
+    Still another small problem in the pulse pileup code.  Error shows
+    up only in such environments as Au on C.  Pileup not extended far
+    enough.
+
+MOT - 5/15/2007 Minor enhancement
+    The search for user DLL's now scans the RBS config path rather than
+    the GENPLOT config path.
+    
+MOT - 4/2/2007  *ERROR - SIGNIFICANT FIX*
+    The pulse pileup calculation has incorrectly "reduced" the overall
+    spectrum incorrectly since its first implementation in 1994.  (Only
+    the difference between sum and sum2 in the code).  This was found
+    as part of the IAEA intercomparison with NDF and SIMNRA - which
+    were correct.  As a practical matter, it should not have
+    significantly impacted any but extremely high currents with high Z
+    elements and long integration times.  In rump, for current*tau
+    greater than 2000, the effect is less than 1% and would be almost
+    completely disappear with a change in the correction factor.
+
+    RUMP disagrees with NDF/SIMNRA on the absolute level of the pileup
+    by a factor of approximately 3.  Rump uses a triangular shape to
+    approximate the typical bipolar shaping electronics -- going
+    through 0 at tau.  From there, it is an exact convolution of the
+    pileup mechanism.  NDF and SIMNRA use different approximations to
+    the pulse shape.  Someday will get enough data to clean up.
+
+MOT - 3/19/2007
+    Added simulation direct ability to include a background in the
+simulation.  The "background <buffer>" command in sim will cause the
+counts in the specified buffer to be added to all simulations -- just
+before the optional addition of noise to the spectrum.  This improves
+the ability to do fits with multiple/plural scattering addressed as a
+set of background counts.  Direct result of the IAEA intercomparison
+work.
+
+MOT - 2/9/2007
+    Documented change.  Slight change in charge of an electron and
+    dielectric permittivity of free space (sub 0.1% change).  Just to be
+    consistent with latest values.  Modified sigma.c, sim2.c.  Now using
+    the values from NIST 2002 CODATA.
+        (e^2/4) goes from 1299.242 to 1295.9358 keV^2-barn
+        (1/q)   conversion from barn/sr to internal unit goes from 6.242 to 6.2415
+
+MOT - Numerous undocumented changes - sorry.
+
+MOT - 10/5/05
+    Modified UserStop format.  See new code examples.
+
+MOT - 10/5/05
+    Added variable "RUTHERFORD_FORWARD" check.  If set to any value,
+    forward scattering is pure Rutherford.
+
+MOT - 3/31/05
+      Increased the maximum size of a spectrum from 2048 to 16384.
+
+MOT - 8/26/02
+      Revised error message handling on data file reads.  Now will point out
+      the source of the error when reading RBS files.  Helps to discern the
+      problems in some cases.  No impact on 99.99% of the users.
+
+MOT - 3/16/02
+      Added a new data output/input format - Excel.  Actually tab-delimited
+      format for reading by Excel.  SAVEAS *.xls will now write the file in
+      a tab-delimited format.  The first part of the file are headers
+      containing a full specification of the RUMP headers.  Following that
+      is a four column data output.  
+          Column 1 - channel number (0 through n)
+          Column 2 - actual counts (from the RUMP file)
+          Column 3 - converted energy (MeV)
+          Column 4 - Normalized yield (counts/msr/uC/keV)
+      If the file is not modified, it may also be read back into RUMP.  In
+      the data section, only the second column is interpreted.
+	/* Excel format [1.0] from RUMP */
+	Original File	f:\cgs\rump\tests\mb\ast.xls
+	Spectrum	RBS
+	Identifier	Simulation of Si-O/Si
+	Date	
+	Charge	10.000000
+	MeV	3.100000
+	Conversion	4.950000	1.600000
+	Theta	7.000000
+	Phi	9.000000
+	Omega	3.400000
+	Corr	1.004129
+	Choff	1.000000
+	FWHM	35.000000
+	Current	8.000000
+	Tau	5.000000
+	Geometry	Cornell
+	Beam	4He++
+	
+	Channel	Counts	Energy (MeV)	Normalized Yield
+	0	0	0.0016	0
+	1	1	0.00655	0.0130647
+	2	1	0.0115	0.0130647
+	249	744	1.23415	8.88451
+	250	744	1.2391	8.8814
+	1022	0	5.0605	0
+
+MOT - 3/1/02
+      Changed slightly the way writes are handled in RUMP.  First scan is made 
+      on the specified extension.  If this is found in the list of write routines,
+      then write is made by that format (.rbs => BINARY, .txt => EXCEL, .dat => ASCII)
+      This makes it easier to specify the output format.
+
+MOT - 10/24/01
+      Fixed problem with GENPLOT command.  The energy conversion failed
+      on transferring a spectrum to GENPLOT.  Problem with macros versus
+      function calls - I should know better.  A freshman programming errror.
+
+PR/MOT - 2/23/01
+      Change to extrapolation of H and D forward scattering crosssections.
+      In previous code, if the incident energy were above the limits for
+      either the Ziegler or Quillet H/D scattering formulas, the code switched
+      to Rutherford throughout the energy bounds.  Now, it will instead just
+      change to using the 1/E^2 energy dependence of Rutherford above the
+      valid energy range of both routines.  The cross section will be 
+      continuous in energy, just going to simple 1/E^2 above the 4.0 MeV
+      (Ziegler) or 2.7 MeV (Quillet).
+
+PR/MOT - 2/23/01
+      Error in Quillot calculations for ERD cross sections.  +1.278E-1 is
+      now corrected to -1.278E-1 in two places of sigma.c.
+
+MOT - 6/26/00
+      Changed "menu" read/save as routines so that they use the current
+      working directory when first opened.
+
+MOT - 5/15/00
+      Fix problem with reading via the drop down menu.
+
+MOT - 4/27/00
+      Clarified and added non-important option to read and write ASCII
+      module.
+         READ   <file> -ASCII [-onecolumn | -1column | -twocolumn | -2column]
+         SAVEAS <file> -ASCII [-onecolumn | -1column | -twocolumn | -2column]
+         SWALLOW              [-onecolumn | -1column | -twocolumn | -2column]
+      Default is single column mode, each line contains exactly one channel of
+      data.  In two column mode, the first column is taken to be the channel
+      number and the second is the count data.  Swallow expects the data to
+      follow on the command lines (or macro file), ending with a blank line.
+
+MOT - 4/13/99
+      Removed "Rutherford Integral" from spectral calculations.  It was 
+      creating too many problems with complex resonances and new handling
+      of cross sections.  Fixed some minor problems with resonances, including
+      forcing code to just switch to Rutherford on either side of a table
+      range.
+  
+MOT - 12/29/99
+      Added screening correction to Rutherford cross section at low E.
+           J. L'Ecuyer et al, Nucl. Instr. and Methods 160, 337 (1979)
+           sigma *= (1 - 0.049*Z1*pow(Z2,4/3)/E)
+      where E is in keV.  This should sligtly reduce the deviation at
+      low energies for the RUMP simulation tail, but is generally not
+      visible even at low energies.  Will make a few percent difference 
+      in gold and similar heavy metal simulations.
+
+      For Si at 3 MeV, the maximum deviation in data at low E is ~0.1%.
+      For Au at 1 MeV, the deviation is about 3%.
+
+      Because of the potential problem this change may create, it can
+      be turned off by setting a variable NO_SIGMA_SCREEN to any value.
+
+MOT - Modified ASCII read routine so that the first line not recognized
+      as data columns will be copied into the "ID" buffer.  If not line
+      is found, then the ID will simply be "! <filename>" as before.
+
+MOT - Added new stopping power formulations, especially the data of
+      Kalbitzer's group (Konac particularly for Si).  The data is in a
+      new file "newstop.kal" in the RUMP data directory.
+
+MOT - Default stopping power representation is now a SQRT form rather
+      than linear.  This provides significant improvement over the linear
+      form, and it seems now to be sufficiently stable to make the 
+      default.
+
+MOT - Aded Kalbitzer format stopping power tables.  The extension for a
+      file of this format is .kal.  They can be force loaded (changed)
+      using the command
+            CONFIG STOP_LOAD <file>.kal
+            CONFIG STOP_LOAD -unload
+      will release the tables so you can revert to RUMP values.
+
+MOT - Changed BACKGROUND command to include a -inplace options so no more 
+      buffers get created.  Internally documented using the -? option.
+      [Also fixed so channels can be entered manually.  This hasn't worked
+      for a LONG time - no one ever complained :-) ]
+
+MOT - Added option to GENPLOT <buffer> command to allow transfer in
+      channel rather than energy mode.  
+          GENPLOT <buffer> [-channel | -energy]
+      Default, as previous, is -energy.
+
+MOT - Added option to ASCII write to do as two column mode.
+         SAVEAS <file> -ASCII -TWOCOLUMN
+      will save it in channel / counts format (plus the headers).
+      Read will have some problems!  This also modifies the
+      Swallow command so that it can read two-column data.
+         SWALLOW [-2column]
+         SAVEAS <filename> [-ASCII [-TWOCOLumn] ]
+         READ   <filename> [-ASCII [-TWOCOLumn] ]
+
+MOT - As per recommendation (and my agreement), PERT will now set the
+      correction factor that it computes in a run.  The message is
+      slightly modified to read: 
+          Estimated correction factor set for buffer: 1.0042
+      as opposed to 
+          Estimated correction factor for buffer: 1.0042
+      This is now the default behavior.
+
+
+MOT - CAVEAT: The following work is "in progress".  The format may be
+      modified based on feedback from either Vickridge or Vizkelethy.
+
+      Loading resonance files:
+           SIM RESREAD <filename>
+      This ultimately will be moved out of SIM (where it doesn't
+      belong) and into CONFIG.  But the backward compatibility will
+      be maintained.
+
+      Work on resonance files continues.  Resonance files may now 
+      specified in roughly the same format as proposed for IBA reaction
+      cross sections (I.C. Vickridge 1993).  The format has some minor
+      differences to help RUMP identify files and to permit use of
+      relative cross-sections.
+
+      See the Idaho State University site
+         http://ibaserver.physics.isu.edu/sigmabase/documents/ian_prop.html
+      for a copy of the DSIR Physical Sciences Report 33 original text.  All
+      of the tags presented in that document are allowed.  
+
+      In addition, 4 new tags are defined.
+         VERSION: DSIR 33a       -- Must be first line in file.  Identifies
+                                    the file as a resonance file conforming
+                                    to the DSIR report 33 format (modified).
+         UNITS: mb/sr            -- Specifies the type of data for sigma.
+                rtr                 Default is mb/sr.  "rtr" means relative
+                                    to Rutherford -- ratio of actual cross
+                                    section to Rutherford.  Useful only
+                                    for resonance reactions, eg. 16O(a,a)16O.
+         DATA:                   -- Indicates start of an indeterminate # of
+                                    data points.  Original standard requires
+                                    NVALUES: <n> to specify precise number.
+         NVALUES: <n>            -- The NVALUES: tag may be used instead of the
+                                    DATA: tag as per original standard.  If
+                                    a positive number of points is given, then
+                                    a maximum of that many data values will be
+                                    used.  The remainder of the file will be
+                                    ignored once this limit is reached.  Setting
+                                    <n> to 0 or a negative value is equivalent to
+                                    the DATA: tag.
+         END_DATA:               -- Optional tag to mark end of data.  RUMP
+                                    returns to reading header tags after this
+                                    tag and thus resonance files may be 
+                                    "stacked" together (ie. several angles)
+
+      In addition, all tag lines may be preceeded by /* or C so that the files
+      can be read simply by GENPLOT for plotting.  Within the data block, blank
+      lines or lines beginning with the comment character(s) will be ignored.
+
+      RUMP interprets only the COMMENT, UNITS, REACTION, DISTRIBUTION, QVALUE, 
+      THETA, ENFACTORS, SIGFACTORS, DATA, and END_DATA tags.  Other tags
+      are simply read and ignored (including the MASSES tag).  No specific
+      order for the tags is required, and tags may be repeated (only last 
+      kept though).  Defaults exist for all important tags, corresponding to
+      oxygen resonance at 168 degree laboratory angle in mb/sr.
+
+      Reactions must be fully specified, ie. 16O(4He,4He)16O or 16O(a,a)16O.
+      If the reaction is not a simple scattering event (Q non-zero or masses
+      change), it will invoke an error and abort reading the file.
+
+      Finally, RUMP requires resonance data to be strictly sorted in ascending
+      energy.  Any point violating this condition (energy less than or equal
+      to previous point) will simply be discarded.  Several of the databases
+      from the Sandia site have this problem.
+
+      WARNING: The COMMENT: tag must be terminated with a blank line.  This 
+               is the most common error I made in converting files to this
+               format.
+
+      Example:
+          VERSION: DSIR 33a
+          COMMENT: Alphas on O16; 2000-9000 keV; LAB angle = 170;
+                   Cheng et al., 1993 A; RPC; 
+                   Ratio to Rutherford vs. alpha lab KE in keV.
+
+          NAME: Cheng et al.
+          ADDRESS1: 
+          ADDRESS2: 
+          ADDRESS3: 
+          ADDRESS4: 
+          ADDRESS5: 
+          ADDRESS6: 
+          SERIAL NUMBER: 
+          REACTION: 16O(a,a)16O
+          DISTRIBUTION: Energy
+          MASSES: 16 4 4 16
+          QVALUE: 0
+          THETA:  170
+          SIGFACTORS: 1.0               (SIGMA FACTORS: also permitted tag)
+          ENFACTORS: 1.0 0.0            (ENERGY FACTORS: also permitted tag)
+          UNITS: relative
+          DATA:
+          2000    1.00
+          2050    0.98
+          2100    1.00
+              .......
+          8940    3.27
+          8960    2.29
+          8980    2.29
+          9000    9.53
+          END_DATA:
+
+          THETA: 160
+          DATA:
+            ......
+          END_DATA:
+
+MOT - Distribution for NT now includes resonance files for (boron, carbon
+      fluorine, nitrogen, oxygen, and silicon) from the Sandia site.
+      [See Sandia for updated versions of these files or for the original
+      reference data].  The actual data has been "edited" to remove duplicate
+      points and correct obvious errors (transcription).  Files are annoted
+      with changes.
+
+MOT - Added CURRENT as variable for PERT.
+
+MOT - Despite the potential for data faking, SIM now has a command to
+      add statistical noise to the simulation.  Use
+              SIM NOISE [ON | OFF]
+      The default is off.  When on, statistical noise is added and the
+      raw data is truncated to integral counts.  Useful for comparing
+      validity of low count peaks.
+          LOOP 10 RECALC OV 0
+      The recalc is required to force a new simulation with different
+      random numbers for the statistical result.
+
+MOT - Getting annoyed hitting COMPRE instead of COMPARE and getting the
+      COMPRESS command.  It is so seldom used that it now requires ALL
+      8 letters.  Should consider making COMPRE and alias for COMPARE.
+
+MOT - It is no longer necessary to specify a normalization window in PERT.
+      If never given, it defaults to assuming the value given is exactly
+      correct.  Also, as long as NORM is not being used, you can now
+      vary the CORRECTION parameter over the full extent.  This can be
+      very useful matching full spectra.
+
+MOT - Major changes happening in SIM again. 
+
+      FUZZ is now enabled on every layer rather than limited -- this also
+      means that FUZZ now longer gets lost when layers are inserted or
+      removed.  New command:
+         FUZZY <amount> <iterations>
+             If amount is <=0 or iterations is zero, same as UNFUZZ.
+             Units for amount of fuzzing are the same as the layer itself.
+         UNFUZZy
+             Cancels fuzzing for this layer
+         FUZZ [ <ilayer> <amount> <iterations> ... repeat ... / ]
+      SIM SAVE uses the FUZZY command to re-enable.
+      PERT changes only slightly.
+         PERT VARY FUZZ <layer #> <min value> <max value>
+      whereas it used to take an index instead of layer #.  New PERT 
+      HAS NOT BEEN extensively TESTED but I don't expect problems.
+
+MOT - Major changes happening in SIM again. 
+
+      Computers are fast enough that MAX_PATH has been by default 
+      reduced to 200 /cm2 rather than 5000 /cm2.  The default value 
+      can be changed using the new command:
+         DFLT_MAXPATH <default_maxpath>
+      This value will be inserted as the MAXPATH for all new sims
+      (reset command).
+
+MOT - Major changes happening in SIM again. 
+
+      Global impurity profiles.  This is a new feature allowing very
+      complex impurity profiles to be introduced atop a basic sample
+      structure.  It can be used to implement an element or compound
+      profiling within the sample.
+         G_COMPosition  -  specifies the composition of the global
+                           impurity profile (multiple elements)
+         G_CURVE        -  name of a GENPLOT curve that contains the
+                           atomic fraction as a function of depth.
+                           The depth MUST be in units of 10^15 at/cm2.
+         G_START        -  Profile starts (x coordinate measured) at 
+                           this  layer #.  Default is 0 which means 
+                           the physical surface of the sample.  All
+                           absorber layers are ignored.  If specified
+                           as non-zero, then X coordinate for profile
+                           is taken to start at that layer # -- or
+                           physical surface -- whichever comes last.
+         G_MODE         -  knot fitting mode.
+                              0 is normal cubic interpolation
+                              1 is a linear interpolation (bore-ing)
+                           
+      The actual impurity profile is taken as a spline of the given
+      curve (knots).  A very few points will represent a smooth 
+      profile in default mode.  Setting mode can change to piecewise
+      linear instead of cubic if desired.
+
+      This global impurity profile is added into the spectrum AFTER
+      the diffusing species and matrix and extends across layer
+      boundaries.  It is not affected by FUZZ except for layers
+      before the G_START.
+
+MOT - Major changes happening in SIM again. 
+
+      New equation mode - SPLINE.  The five coefficients for this
+      equation are the knots of a spline profile with X coordinates
+      at (0,1/4,2/4,3/4,1.0) fraction through the layer.  See GLOBAL
+      diffusant equation for more knots on a spline profile.
+
+MOT - Pulse pileup modeling is sufficiently safe now to disable the old
+      backup mode.  Prior to 12/5/98 build, if tau were 0, the routine
+      would automatically switch to DOS mode compatibility.  This no 
+      longer happens and instead no pileup is performed.  You must
+      specifically request DOS mode pileup modeling using the
+      SIM PILEUP DOS if so desired.
+
+MOT - Major changes in the internal handling of read/write.  Should be
+      generally better -- and certainly more supportable.  Let me know
+      of any problems.  Only functional change is:
+           WRASCII test.asc
+           WRITE test.asc -ASCII
+      are no longer exactly identical.  Later produces a better file
+      for reading via either "READ test.asc" or "XEQ test.asc".  WRASCII
+      retains compatability.  The latter, however, is subject to
+      ongoing change to support general ASCII data storage of RBS data.
+
+MOT - Reading multiple data formats (distinguished by extension) is now
+      cleanly implemented on NT/95 via DLL's loaded with RUMP.  Sites can
+      write their own DLLs to handle reading of individual data formats. 
+      SUNY Albany, Bell Labs, and a WEB-RBS format have been implemented
+      as examples.  See WEB site (www.genplot.com) for download details.
+
+      Modified command:  
+           read -CONFIG
+	   read -RELEASE
+           read <path> -FORMAT <ID>
+
+      The -CONFIG option will list out all the currently loaded modules.
+      These modules are read from the entire RumpConfigPath when the first
+      file read is requested.  Any file in the path an extension of ".rdr"
+      is assumed to be a RUMP reader DLL.
+       
+      The -FORMAT <ID> option overrides the extension determination of
+      data file format.  The ID may be determined from the -CONFIG list.
+           read test.rbs -format SUNY
+      will read the file test.rbs assuming the SUNY format despite the
+      .rbs extension (which normally means RUMP format).
+
+      Existing files formats are: SUNY, LUCENT, MCA.
+           suny.rdr       SUNY Albany binary data format     .dat
+           lucent.rdr     Lucent Bell Labs ASCII format      .mca
+           mca_read.rdr   Livetime read of Cornell MCA       .wrbs
+
+      If you have mca_read.rdr, try plot 1.wrbs.  This will download the
+      current data in sector 1 of the Cornell 1 MeV accelerator MCA.
+
+
+MOT - The "description" written with a .lcm file failed due to lack of CRLF.
+      Code now properly writes a new line as well as the text.
+
+MOT - Documented the STOP_USER <routine_name> package for loading alternate
+      stopping power calculation routines.  See the MyStop directory for
+      details.
+    
+             CONFIG STOP_USER [<routine> | -]
+
+      Loads the specified dll to calculate stopping powers before resorting
+      to the Ziegler default.  The "-" form deletes the current loaded
+      dll (if any), and in addition releases any and all stopping power
+      tables currently defined.  This causes all stopping powers to be
+      recalculated.
+
+
+MOT - Modified the stopping calculation routine to include a kludge for
+      element 93 as Mylar.  This is a holdover from the DOS code where
+      Mylar was explicitely added to the tables for FRES users.  Forcing
+      users to use the stopping exception load method is considered
+      poor compatibility -- just hope no one really wants to start working
+      with the transuranic elements.
+
+MOT - Added command "VERsion" to print the current revision information.
+      Serial number verification now implemented.
+
+MOT - Working with the calibration of spectra is a major pain in the butt.
+      This will change very quickly.
+
+MOT - MAJOR BUG FIX:
+      Straggling with forward recoil was in real trouble -- a constant was
+      not being properly set under inconsistent conditions.  I think this
+      has been fixed.
+
+MOT - Added command to SIM:
+        FRES_ABSORBER <num_layers>
+      which is synonymous with the ABSORBER command except that in this
+      form, the absorber foil is ONLY used if the spectrum type is FRES;
+      if not, the absorber layer is totally ignored.  This allows the same
+      simulation description to be used for the RBS glancing angle and 
+      FRES spectrum without defining/destroying the absorber definition.
+
+MOT - Added command:
+         SPECtrum [RBS | FRES | PIXE | NUCLEAR] 
+      to set the type of spectrum in a file.  This is currently used only
+      with the stopper foil modified command (see above).
+
+MOT - Modified the read/write to keep the RBS/FRES/PIXE spectrum type
+      indicator.  This will be incorporated with the ABSORBER feature in
+      SIM so that the absorber need not be added/removed when working with
+      joint RBS/FRES simulations.
+
+MOT - Fixed problem with STRAGGLE 1 (and possibly other STRAGGLE values)
+      with "pointer error" or crash.  Overwriting via negative indices (bad!).
+
+MOT - Fixed problem with background not doing the proper graphs.  It worked,
+      but the graphing failed.
+
+MOT - Major problem with Pert has been fixed.  It looks like it is working
+      now.  Problem existed with Poisson stastics as well as coding errors.
+
+MOT - Added code so that ~C and ~A on PMDRIV screen gets to the RUMP data
+      information also.
+
+MOT - It has been suggested that PERT SINGLE is supposed to immediately start
+      a fit on a single parameter.  Since I've forgotten about DOS, let's make
+      it so.  PERT SINGLE assumes that an immediate "VARY" operation will be
+      specified with the requested change.  PERT will then immediately do a
+      fit and return.  If any existing "VARY" setups exist, they will be 
+      retained (thus you can mix multiple and single operations).
+          PERT SINGLE THICK 1 1000 3000
+      will do an immediate variation on the thickness of layer 1 between 1000
+      and 3000 units using the existing definitions for error and normalization
+      windows.
+
+MOT - Re-Fix MATCH command so properly sets the MODIFY (not DIRTY) flag on buffers.
+
+MOT - Fix MATCH command so properly sets the DIRTY flag on buffers.
+
+MOT - New command via Revesz request.  Available at the SIM level.
+
+         Usage: MATCH [options] <low chan> <high chan>
+         
+                Command sets correction of current buffer so that it matches the integral
+                of the simulation over the range.  Cursor is used if low channel is /.
+         
+                Options, which may preceed or follow channel numbers include:
+                    -?                 this message
+                    -Buffer <num>      match to a buffer other than simulation
+                    -NOSet             just report value, don't set as new CORR factor
+                    -Silent            quiet mode
+
+      Command changes the correction factor on a spectra so that the integral
+      of counts over the region matches the current simulation (or another 
+      buffer is so specified).
+
+MOT - Fixed crash in NT on simulation.  This error probably also fixed an
+      error which would show up if you used diffusing species in the top
+      layer.
+
+MOT - In honor of Roger pointing out the density error, the element
+      command now accepts a list.  "ELEMENT Si,O,Ca,Th230" works.
+
+MOT - MAJOR FIX: Any specific material units (SiO2, AlP, ...) as a 
+      thickness would fail -- defaulting to /CM2 units independent
+      of the given density.  How come no-one reported this?  Isn't
+      anyone doing quantitative work with compounds?  Aargh ...
+      (my personal excuse is that I'm only interested in Si so never
+      worry about compounds :-) )
+
+MOT - MAJOR CHANGE in how density of compounds is approximated.  Now
+      correctly averages the cm^3/atom instead of atoms/cm^3.  This will
+      change the conversion of convenience units (A, um) to true at/cm^2
+      in simulations.  For compatibility, a backward mode is available
+      with the command:
+          CONFIG DENSITY_CALC COMPATIBLE RETURN
+      which can be inserted into the rump.ini file.  The change does not
+      affect use of CM2, M/CM2, and specific compound densities -- only 
+      physical units in compounds.
+
+      Also, to see the calculated density and thickness conversions (both
+      to at/cm2 and to A, an option is available on SIM SHOW -DETAIL.
+
+
+MOT - By request, if the ID of a spectrum is empty, the filename will be
+      associated with the IDS command.
+
+MOT - Fixed plotting so in PORTRAIT mode can still do an ELEMENT command.
+
+MOT - Added ability read and write via pipes "| zcat file.gz" and
+      automatic handling of gzip'd files (will read and write).  On
+      read from a pipe, the character is changed to ! so that a rewrite
+      can be trapped and failed (as opposed to desirable pipe write).
+      However, once a file is marked as a pipe for reading or writing,
+      it can be done repetatively as desired.  These subtleties apply
+      primarily to binary read/write although ascii read by pipe is
+      possible also.  The gain though is minimal on most RBS files, 
+      1040 bytes vers 1400 bytes (so 30%).  But's there for anyone who
+      wants it.
+
+MOT - Removed listing of internal addresses from PERT listing.  Not
+      terribly relevent to most users.
+
+MOT - Fixed SPLOT so it works on layer numbers.  It's about time!
+
+MOT - Fixed the use of sthickness -- the units of this parameter now has
+      meaning again.  Although it was requested, code assumed that the units
+      were the same as the layer thickness.  Sorry.
+
+MOT - The equation problem finally has me annoyed enough to fix.  This now
+      involves some major changes in the way the equations work to make them
+      consistent as well as increase the quantification of the parameters
+      which are used.  In the current implementation, the quantitative
+      meaning of the parameters changes with the unit of thickness specified
+      for the layer.  Also, layer and species compositions were unnormalized
+      so additional factors enter even in the case of the constant form.
+
+      Basic concepts:  (1) Try to use the natural unit, if one exists, for each
+                           parameter.
+                       (2) In absence of natural unit, use consistent set for
+                           distances, time, surface coverages, etc.
+                       (3) The diffusion specifies the atomic fraction of
+                           the diffusing species throughout the layer
+                       (4) Result should not depend, if possible, on the 
+                           sublayer division.  This will involve integral
+                           forms of the diffusion equations rather than the
+                           concentration form.
+      Specifics:       (1) diffusivity  - cm^2/s
+                       (2) velocity     - cm/s
+                       (3) time         - seconds
+                       (4) distances    - Angstroms
+                       (5) dose/thickness - units can be specified.  Default
+                           depends on equation (angstroms or atoms/cm^2)
+
+      Internal work in RUMP is almost always based on thicknesses of 1E15
+      atoms/cm^2, with atomic density used occasionally to convert to the
+      equivalent thickness.  For implants and gaussians, the natural unit is
+      atoms/cm^2 anyway, and only in the thin-film case is there an ambiguity.
+      Since most users do not think in atoms/cm^2, while serious workers
+      always do, it is necessary to have two different possibility values for
+      the thin film thickness.  For this reason, requests for dose or for
+      thickness (when it can be interpreted as a dose) can be given units
+      as well.
+
+      Old verions of RUMP added species into the layer composition definition
+      without normalizing the relative values.  So a layer of 100 Si with a
+      species of 1 Sb was equivalent to a layer of 1 Si with 0.01 Sb.  This
+      problem leads now to having the layer concentrations normalized so that
+      fractions specified in the equations are in atom fraction.  A diffusant
+      fraction of 0.01 SiO2 into an Al2O3 layer is 1/3 of a molecule of SiO2
+      per 100/5 molecules of Al2O3.
+
+      * For THINFILM, GAUSSIAN, IMPLANT and EDGEWORTH, the film thickness
+          can be given units.  If none given, angstroms will be assumed
+          for thin films and /cm2 for gaussian and edgeworth.  It would be
+          nice to do the same for thickfilm, but the prompts are totally
+          wrong.  Stuck with thickness being Angstroms (or cm) only.
+
+      * For SEMI-INFINITE, THICKFILM and BURIED, the default unit for the
+          interface position has been changed to the angstrom.  However, the 
+          code will recognize if a cm unit is entered (if less than 0.01, 
+          then is assumed to be cm).
+
+      * For semi-infinite, the direction has been reversed.  All species
+          diffuse from the surface in -- so the species is at the top of
+          the layer and the matrix is at the bottom.  See below for fix.
+
+      * For ERFC, SEMI-INF and EXPONENTIAL, the profile can be moved to
+          the lower edge by specifying a negative concentration for the
+          species.
+
+      * Added a new diffusion equation, BURIED which is for a thin buried
+          layer.  It is equivalent to the GAUSSIAN but takes D and t 
+          values instead of fwhm.
+
+      * The sublayer thickness is no longer automatically set when an
+        equation is specified.  Auto mode works instead with a default 
+        subdivision set during creatr -- it is between 5 and 30 sublayers
+        depending on the type of equation.  This may become more complex
+        in the future to depend on the scale and overall thickness.
+
+      * The equation USER is now much more powerful -- a different equation
+        can be specified for each layer.  X is the distance in angstroms
+        based on the matrix density!  If the diffusant becomes sufficiently
+        concentrated to change that criteria, it will substantially modify
+        the result.
+
+      Formal definitions:
+
+        x  -> distance (in cm) from "layer surface".  Conversion to cm based
+              on given density or weighted atomic density of the matrix.
+
+        CONSTANT    -  p0 -> fraction used
+           frac = p0
+           composition = matrix*(1-frac)+species*frac
+        LINEAR      -  p0 -> Cs  atomic fraction at surface of layer
+                       p1 -> C0  atomic fraction at bottom of layer
+                             x0  thickness of layer
+           frac = C0+(Cs-C0)*(x/x0)
+        ERFC        -  p0 -> C0 -> maximum fraction
+                       p1 -> D  -> diffusivity (cm^2/s)
+                       p2 -> t  -> time (s)
+           frac = C0 * erfc[x/sqrt(4DT)]
+           composition = matrix*(1-frac)+species*frac
+        EXPONENTIAL -  p0 -> C0 -> maximum fraction
+                       p1 -> D  -> diffusivity (cm^2/s)
+                       p2 -> v  -> velocity (cm/s)
+           frac = C0 * exp[-x/(D/v)]
+           composition = matrix*(1-frac)+species*frac
+        SEMI_INF     - p0 -> C0 -> saturation fraction
+                       p1 -> D  -> diffusivity (cm^2/s)
+                       p2 -> t  -> time (s)
+		       p3 -> x0 -> interface position (cm)
+           frac = C0 * { erfc[ (x0-x)/sqrt(4Dt) ] / 2 }
+           * Concentration shifts from pure matrix near start of layer (x->0)
+             to fully added matrix+species at bottom of layer (x->maximum)
+        THIN_FILM   - p0 -> Q  -> initial thickness
+                       p1 -> D  -> diffusivity (cm^2/s)
+                       p2 -> t  -> time (s)
+           frac = 2*Q / sqrt(pi*D*t) * exp(-x^2/Dt)
+           * Solution to diffusion of Q from surface into depth.  Old 
+             versions of RUMP had a factor of 4 error in this equation.
+
+MOT - Added commands
+           XCOPY         XADD           XSUBtract
+      which act like their counterparts except (1) they are hidden and
+      (2) they do not attempt to update the simulation buffer before
+      executing.  This can be useful on occassions.
+      Users should also know that SPLOT simulations are stored in buffer -1.
+
+MOT - Modified REGION command so much more flexible (similar to GENPLOT)
+         REGION <lower channel> <upper channel>
+         REGION [channel|bottom|x] <lower channel> <upper channel>
+	 REGION [counts |left  |y] <lower counts> <upper counts>
+         REGION [energy | top ]    <lower energy> <upper energy>
+      The lower counts is still ignored, and the specification in
+      energy is converted to a channel specification based on the current
+      active buffer.  Old format is used if none of the keywords are
+      used.  (key words are searched for unique characters only.)
+
+MOT - Default RBS search path modified in the ginstall.exe program to
+      include data directory (oops!)
+          rump\os2\local;rump\os2\data;rump\os2;rump;
+
+MOT - Modified density table handling so new values can be added to a
+      file.  Specific compound densities are now loaded from a file
+      "density.tab" from the RbsConfigPath.  This can have an arbitrary
+      number of values.  Space for an extra SETDENS (currently=10) is
+      provided for run-time definitions.  Need for more will require
+      editing the file "density.tab".
+
+MOT - Fixed so rump.ini is really obtained from the RUMP config path
+      or the environment variable.  Prior, used default GENPLOT search
+      path instead of the RUMP search path on initialization.  3/20/95.
+
+MOT - Changed smoothing to use data outside the window for edge points.
+      Old code (probably also in the F77 version) used a mixed method of
+      constant extension on the left, but data extension on the right.
+
+MOT - At same time as fixing elem /, also now allow Si29 as well as 29Si and
+      Si+29 as valid isotope identifiers.
+
+MOT - Fixed problem with "elem /" or "info /".  With dynamic memory alloc,
+      previous request was forgotten so not meaningful to get last.  Made
+      pointer static.
+
+MOT - Per request of HAA group, inheritance on newly read files is based
+      on the previously active spectrum.  This applies only to spectral
+      parameters such as beam energy, MCA scaling, etc.  Defaults will be
+      applied on RESET, but a read from a file without full specification
+      will inherit parameters instead of inheriting defaults.
+
+MOT - Fixed minor problem in RbsCopySpectrum having to do with overwrite
+      on spectral data.
+
+MOT - Per request of RDR, added -ASCII option to the READ command.  This
+      reads data ONLY as ASCII float, arbitrary number per line ignoring
+      each line at first error.  Up to CMAX (currently 2048) points will
+      be read.  All other parameters in the buffer will be left as defaults.
+         Usage:    read <filename> -ASCII
+      Has not been extensively tested, but seems okay dokey.
+
+MOT - Per request of WSB, added PERT GET/SAVE command pairs.  This works
+      identical to the SIM GET/SAVE commands creating an ASCII command
+      file containing the current settings of the PERT processor.  Let me
+      know if there are any problems with this segment.  Default extension
+      for PERT command files is .PERT.
+
+MOT - Re-enabled the #pragma pack() structure in rdwr_old.c for GNU_C
+      compiler.  This seems to be allowed for at least linux(tm) and permits
+      reading of ancient file format.  Let me know if other machines using
+      GNU_C fail.
+
+MOT - Enabled the additional compression mode.  CONFIG WRITELEVEL 1 will
+      now enable advanced compression on REWRITE (about 10-40%).  This is
+      version 1.1 of the data file format.  Default initially and with
+      CONFIG WRITELVEL 0 is the DOS compatability file format [1.0].  The
+      advanced format is required for sparse 2D spectra characteristic of
+      the TOF detector.
+
+MOT - Started adding support for Time-of-Flight spectrum analyzers.  Use
+      SIM TOF ON to enable.
+
+      Ultimately, idea is that all SPECTRUM types must have a basic subset
+      of parameters, but then how a collection of energy/yield trapezoids
+      would be handled differently depending on the type of detection
+      system.  SPECTRUM type would be subclassed for each type of detector.
+      For now, it is just a simple kludge handling the output for Peter to
+      write the TOF analysis portion.
+
+MOT - Added PARTicle as alias to BEAM and ECONVert as alias to CONVersion
+
+MOT - Fixed Y axis labels - novel concept to have them read properly
+
+MOT - STOPP is now accessed form the CONFIG subprocess.
+
+MOT - old change now documented.  Behavior of element
+        ELement [-Height { / | <counts>}] <name>
+      will draw a marker for element specified at appropriate surface
+      channel and optionally at the specified height.  Any option will
+      currently work, but preferred option is -Height.
+
+MOT - Added NORMALIZE command to the SIM module
+        NORMalize [-species] <sum>
+      The sum of the composition will be set to "sum".  Any option
+      causes the diffusing species sum to be done instead of normal comp.
+
+MOT - Changed behavior of some commands which accept cursor settings.
+      These commands will now first check for a command line value
+      before going to the cursor.  Allows macros to set the values
+      without having to do an "encursor no" command.  The / option 
+      indicates desire to obtain values from the cursor (which may
+      still be escaped for direct input).
+
+      MAIN:
+         background { / | <l1> <h1> <l2> <h2> } <fit_order> [-full | -noplot | -info]
+            (1) This will behave differently if used to doing "background 2"
+            (2) / selects cursor as in old mode
+         expand { / | <low> <high> }
+            (1) Expand around the specified channels
+	 blowup { / | <low> <high> } <factor>
+            (1) May create problems with old macros
+            (2) Default expansion factor is now to abort rather than 2X
+
+      PERT:
+         normalize { / | <low_channel> <high_channel> }
+            (1) the / causes the cursor to be displayed (also default)
+            (2) Use of options -entry and -nocursor supported but unnecessary
+         window -reset
+            (1) Clears all currently defined error windows
+	    (2) error is synonymous with window
+         window [-add | -multiple] { / | <low_channel> <high_channel> }
+            (1) the / causes the cursor to be displayed (also default)
+            (2) Number of error windows currently limited to 10
+            (3) If -add or -multiple is not specified, first window is
+                modified.  The -add and -multiple add a new window to list.
+            (4) Use of options -entry and -nocursor supported but unnecessary
+
+MOT - Added configure command to create new stopping power tables with
+      specific requirements. 
+        CONFIGURE STOP_TABLE <particle> <emin> <emax> <cutoff> RETURN
+           particle   - incident particle (4He, 14N, ...)
+           emin, emax - range over which the Ziegler data is fit
+           cutoff     - lower energy of simulation cutoffs
+      You are welcome Jon.
+MOT - Fixed so write and rewrite both clear the dirty and modify flags.
+MOT - Fixed so read of old PC format files does not leave dirty and modify
+      set.
+MOT - Implemented the full smoothing functions
+        smooth [-range { / | <lower> <upper>} ] [-SV | -CONV <ntimes> | -FFT <chans>]
+      -SV is the default and is a normal 5 point smoothing algorithm
+      -FFT uses the same FFT smoothing algorithm as GENPLOT
+      -CONV attempts to smooth with a edge preserving convolution algorithm.
+            Increasing the number of iterations sharpes the edge - one
+            iteration is roughly equivalent to -FFT with FWHM/SCALE as width.
+            Between 5 and 10 iterations is a reasonable compromise.
+MOT - Numerous modifications from reports:
+        (1) symbol and linetype now work like GENPLOT.  identify after a
+            plot will work correctly.  ltype -2 always starts from linetype
+            2 after a new axis - same with negative symbol types.
+        (2) numerous message spellings errors and missing CRLF fixed.
+        (3) message warning that feature does not exist for PROFILE
+        (4) GENPLOT <buf> now defaults to passing the currently active buffer.
+
+MOT - Well, background subtraction hadn't been implemented and there had
+      been no complaints, so when someone mentioned it, I did not feel any
+      need to remain compatible.  Use of the BACKGROUND subtract has changed
+      significantly.  
+         (1) Polynomial fits to order 8 allowed - weighting used on data with
+             sqrt(counts) statistics
+         (2) Default action is to create a new buffer containing only the
+             region affected by the background subtract.  Rest of spectrum
+             is simply deleted.  This buffer has filename equal to original
+             but with extension replaced by ".cut".  This spectrum is
+             "active" after the background operation.  Multiple "cut"
+             spectra can be generated from one real spectra.
+         (3) TMPBUF again gets the original spectrum with region of the
+             background subtraction set to the fit background.
+         (4) Option "-noplot" recognized and stops the automatic plotting
+             following the background subtract.
+         (5) Option "-full" causes the created buffer to contain the full
+             spectrum with the background cut region sitting in the middle
+             of the unmodified spectrum.
+         (5) Option "-info" causes the fit parameters to be printed to the
+             screen.  This uses scaled X coordinates, so may not be usful.
+    
+MOT - Fixed creatr function so pulse pileup shows up above the highest
+      energy peak.  Stupid programming error.
+
+MOT - Added a "calibration" clipboard to the buffer editing in XRUMP.  The
+      parameters from one buffer may be copied to the clipboard, and then
+      pasted into any other buffer.  Clipboard can be configured to copy
+      a limited subset.
+
+MOT - If QUIT from within GENPLOT in STOPP, program halted with an exception
+      before.  Now gracefully exits with only a warning message (problem
+      identified by Denis Endisch - why were you doing this??)
+
+MOT - Corrected error in forward scattering cross-section. Had M2/M1 where
+      M1/M2 should have been. (thanks again to Denis Endisch)
+
+MOT - Incorporated changed from Denis Endisch fixing the COMPRESS error.
+
+MOT - Fixed problem in pert when run twice.  Dumb programming error.
+
+MOT - Error in stopping power make routine.  Never used the range specified
+      in the table description - always defaulted to the fit range in the
+      stopp subprocessor.  Need a table modified rewrite to STOPP.  For the
+      time being, the table values always override so automatic generation
+      of tables will work.
+
+MOT - On exit, user is (by default) asked to confirm exit if any buffers
+      have been modified but not saved.  There is a CONFIGURE subcommand
+      to modify this behavior.
+
+MOT - Modified "get <filename>" slightly.  First, see if fully qualified
+      path is already in the buffers.  Second, try to read if the file 
+      actually exists.  Third, check if an existing buffer has the same 
+      filename, but different directory.  If all fail, return failure.
+      Allows specification of RBS filenames while changing directories.
+
+MOT - Edgeworth distribution limited to positive values only.  Negative
+      concentrations truncated prior to error message.
+
+MOT - New configuration options:
+         PROMPT [NICE | ABUSIVE]  - nice always responds RUMP: 
+         AUTORETURN [ON | OFF]    - autoreturn from SIM/PERT/CONFIGURE
+	    
+MOT - Added new configuration command, FRES_LIMIT, which sets the maximum
+      Z that will be tracked on simulations in the forward recoil
+      geometry.  Previously limited to H/D only - now can be set to any
+      Z.  Stopping power tables should be automatically generated for any
+      necessary interactions.
+
+MOT - Rewrote/reorganized major sections, hope nothing broke.  Fully
+      implemented the PERT with both METHOD DOOLITTLE and METHOD THOMPSON.
+      There are slight differences, but not clear which is "better".
+
+MOT - Added new command processor, CONFIGURE.  Has own help listing.  It
+      will become the general interface for all global modifications of
+      RUMP, such as loading resonance tables, atomic data bases.  Currently
+      permits on-the-fly setting of the number of buffers.
+
+MOT - Increased number of buffers to 20.  No reason to retain old limits.
+
+MOT - Added PLX [ENERGY | CHANNEL] command and associated parms entry.  This
+      is done under protest, but requested by some users.  Normally RUMP plots
+      all data against the energy scale so disparous MCA calibrations can be
+      compared.  Plotting against channel number effectively eliminates the
+      energy calibrations.
+
+MOT - Fixed error with LABEL [OFF BRIEF ON] command.
+
+MOT - Fixed problem in SIM with isotopes.  Had printed out 1H as "1 H" which
+      could not be parsed correctly again on SIM GET.  Also fixed problem in
+      automatic simulation ID generation.
+
+MOT - Added command "DESCription" to the SIM commands.  This DESCription
+      command sets a description of the simulation which overrides the
+      automatic generation.  SIM RESET clears this description.  Description
+      also saved with the .LCM file.
+
+MOT - Added true "IDENTIFY" command in APLOT.C code.  In response to Brunco
+      request.
+          IDs                --> Puts buffer description on plot as legend
+          IDEn | IDENTIFIer  --> Sets description of buffer (old format)
+          IDENTify           --> Similar to the GENPLOT identify command
+
+MOT - Added "DESCription" to command list in BMANIP.C.  Replacement command
+      for old IDENTIFIER command.  Use of IDENTIFIER discouraged now.
+
+MOT - Compiler bug discovered in the ANLYZ.C code.  #ifdef CSET2 to patch
+      for moment.
+
+MOT -            ************ CHAMPAGNE DAY **************
+                 ************ Dec 17, 1993  **************
+      All SIM functions seem to reproduce their DOS counterparts with
+      uncanny precision.  Normal RBS, FRES, RESONANCE and STRAGGLE
+      simulations give results identical to parts in 10^5.  Only difference 
+      is that first channel has a value in OS/2 whereas it's always 0 in 
+      DOS. Major rewrite of large sections to simplify debugging work.  
+      Much of the last vestige of F77 structure in the code has been squashed.
+
+MOT - Routine tran_adt.c will convert the DOS .adt files into the new
+      format for OS/2 version.  The new version is simple ASCII - they
+      are neither large enough nor complex enough to warrent a binary
+      storage format.  Just easier to keep it simple stupid.
+
+MOT - Added logical names TMPBUF and SPLOT which with get or pointat will
+      point to the temporary buffer where SPLOT leaves its results. 
+      However, the temporary buffer will never be listed in BUFFERS command.
+
+MOT - DOS RUMP always did simulations with FIRST set to 1.  RUMP will
+      now do simulations with FIRST equal to the value in the comparison
+      buffer.  Results are identical in energy, but this new mode allows
+      channel by channel comparison of the original and simulated spectra
+      in other modules (like GENPLOT).
+
+MOT - Limits removed on number of knots in resonance files.  Arbitrary
+      number and length of resonance files are now supported.
+
+MOT - Limits removed on number of layers/sublayers in sample structure.
+
+MOT - Scaling of individual stopping powers is not available.  Will have
+      to be a new routine since they can by dynamically calculated, and
+      old 3 table limit is removed.
+
+MOT - (in docs) New pileup routine implemented based on Jon Custer thesis.  
+      I added enough that it should now be quantitative as long as tau is 
+      set  properly.  This is now the default mode, although the new command 
+          SIM PILEUP [fast | accurate | none]
+      can be used to select the old mode (fast).  Power-on default is
+      accurate.  Setting tau (whose default is 5 uS) to zero will also
+      select fast mode on a spectrum by spectrum basis.
+
+MOT - Added new parameter to SPECTRUM structure, tau.  This is the shaping
+      time constant prior to the MCA.  Used in quantitative determination of
+      the pulse pileup. (See above).
+
+MOT - New equation added to the SIM module.
+          EDGEWORTH <dose> <mean> <sigma> <skew> <kurtosis>.
+      Sigma is true standard deviation.  Kurtosis is specified with the
+      definition where Gaussian is zero.
+
+MOT - Modified prompts to GAUSSIAN equation to reflect that the mean
+      and FWHM are specified in Angstroms independent of the user units.
+
+
+REMOVED FEATURES:
+==============================================================================
+MOT - Reading of the real "old" format RBS files (such as the VAX ones) is
+      no longer supported.   Old Ryan McFarland binary based files will be
+      read (1.2 version successfully, 1.3 I think will work but I have no
+      examples to test).
+
+
+KNOWN LIMITATIONS:
+==============================================================================
+MOT - All filenames are considered case insensitive.  Don't try using
+      FILE1.rbs as distinct from file1.rbs.  I don't like this feature 
+      of UNIX and it won't be supported in RUMP - there!
+
+</pre>
+</body></html>
