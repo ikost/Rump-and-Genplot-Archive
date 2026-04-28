@@ -1,5 +1,7 @@
 # Rump and Genplot — Source Code Archive
 
+![GENPLOT / RUMP Logo](manual/Logo.png)
+
 Archived source code of the **GENPLOT** scientific plotting package and the **RUMP** Rutherford Backscattering Spectrometry analysis tool, retrieved from genplot.org before the site went offline. Preserved here for historical and scientific reference.
 
 ---
@@ -62,23 +64,6 @@ RUMP was originally written in FORTRAN at Cornell University in Dr. J.W. Mayer's
 | `sys/` | System portability layer |
 | `mtwist-1.1/` | Mersenne Twister random number library |
 | `make*` | Platform-specific makefiles |
-
----
-
-## Screenshots
-
-The HTML documentation is included in `html/` and can be opened in any browser. To add screenshots:
-
-1. Open `html/GENPLOT/TopLevel.htm` in a browser and take a screenshot → save as `docs/screenshot-genplot.png`
-2. Open `html/RUMP/TopLevel.htm` in a browser and take a screenshot → save as `docs/screenshot-rump.png`
-
-Then the images will render here:
-
-![GENPLOT documentation](docs/screenshot-genplot.png)
-
-![RUMP documentation](docs/screenshot-rump.png)
-
-*(Alternatively, pages from the original printed manual would give an authentic look.)*
 
 ---
 
